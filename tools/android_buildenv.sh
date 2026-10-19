@@ -79,37 +79,52 @@ case "$1" in
         fi
         ;;
 
-    setup)
-        sudo apt-get update && sudo apt-get install -y --no-install-recommends -- \
-            ccache \
-            cmake \
-            make \
-            build-essential \
-            '^libxcb.*-dev' \
-            autoconf \
-            autoconf-archive \
-            bison \
-            flex \
-            google-android-cmdline-tools-13.0-installer \
-            libasound2-dev \
-            libegl1-mesa-dev \
-            libghc-resolv-dev \
-            libglu1-mesa-dev \
-            libltdl-dev \
-            libx11-xcb-dev \
-            libxi-dev \
-            libxkbcommon-dev \
-            libxkbcommon-x11-dev \
-            libxrender-dev \
-            linux-libc-dev \
-            openjdk-17-jdk \
-            pkg-config \
-            python3-jinja2
-        (yes | sudo sdkmanager --licenses) || true
-        sudo sdkmanager "platforms;android-${ANDROID_API}" "platform-tools" "build-tools;${ANDROID_VERSION}" "ndk;${ANDROID_NDK}"
-        ANDROID_SDK=/usr/lib/android-sdk
-        ANDROID_NDK_HOME=/usr/lib/android-sdk/ndk/${ANDROID_NDK}
-        JAVA_HOME=$(find /usr/lib/jvm -maxdepth 1 -name 'java-17-openjdk*')
+    setup|env)
+        if [ "$1" = "setup" ]; then
+            sudo apt-get update && sudo apt-get install -y --no-install-recommends -- \
+                ccache \
+                cmake \
+                make \
+                build-essential \
+                '^libxcb.*-dev' \
+                autoconf \
+                autoconf-archive \
+                bison \
+                flex \
+                libasound2-dev \
+                libegl1-mesa-dev \
+                libghc-resolv-dev \
+                libglu1-mesa-dev \
+                libltdl-dev \
+                libx11-xcb-dev \
+                libxi-dev \
+                libxkbcommon-dev \
+                libxkbcommon-x11-dev \
+                libxrender-dev \
+                linux-libc-dev \
+                pkg-config \
+                python3-jinja2 \
+                unzip
+            (yes | sudo sdkmanager --licenses) || true
+            sudo sdkmanager "platforms;android-${ANDROID_API}" "platform-tools" "build-tools;${ANDROID_VERSION}" "ndk;${ANDROID_NDK}" 2>/dev/null || true
+        fi
+        if [ -z "$ANDROID_SDK" ]; then
+            if [ -d "$HOME/Android/Sdk" ]; then
+                ANDROID_SDK="$HOME/Android/Sdk"
+            elif [ -d "/usr/lib/android-sdk" ]; then
+                ANDROID_SDK="/usr/lib/android-sdk"
+            elif [ -n "$ANDROID_HOME" ]; then
+                ANDROID_SDK="$ANDROID_HOME"
+            fi
+        fi
+        if [ -z "$ANDROID_NDK_HOME" ]; then
+            if [ -d "${ANDROID_SDK}/ndk/${ANDROID_NDK}" ]; then
+                ANDROID_NDK_HOME="${ANDROID_SDK}/ndk/${ANDROID_NDK}"
+            fi
+        fi
+        if [ -z "$JAVA_HOME" ]; then
+            JAVA_HOME=$(find /usr/lib/jvm -maxdepth 1 \( -name 'java-21-openjdk*' -o -name 'java-17-openjdk*' -o -name 'default-java' \) 2>/dev/null | head -n 1)
+        fi
         export ANDROID_SDK
         export ANDROID_NDK_HOME
         export JAVA_HOME

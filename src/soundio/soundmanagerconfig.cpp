@@ -319,6 +319,14 @@ bool SoundManagerConfig::checkAPI() {
     VERIFY_OR_DEBUG_ASSERT(m_pSoundManager != nullptr) {
         return false;
     }
+#if defined(Q_OS_ANDROID)
+    if (m_api == kAPIAlsa || !m_pSoundManager->getHostAPIList().contains(m_api)) {
+        if (m_pSoundManager->getHostAPIList().contains(QStringLiteral("Android Oboe"))) {
+            m_api = QStringLiteral("Android Oboe");
+            return true;
+        }
+    }
+#endif
     if (!m_pSoundManager->getHostAPIList().contains(m_api) && m_api != kAPINone) {
         return false;
     }
@@ -524,7 +532,13 @@ void SoundManagerConfig::loadDefaults(SoundManager* soundManager, unsigned int f
     if (flags & SoundManagerConfig::API) {
         QList<QString> apiList = soundManager->getHostAPIList();
         if (!apiList.isEmpty()) {
-#ifdef __LINUX__
+#if defined(Q_OS_ANDROID)
+            if (apiList.contains(QStringLiteral("Android Oboe"))) {
+                m_api = QStringLiteral("Android Oboe");
+            } else {
+                m_api = apiList.first();
+            }
+#elif defined(__LINUX__)
             // Check if PipeWire checkbox selected
             if (m_pSoundManager->isPipewireSelected()) {
                 m_api = SoundManagerConfig::kAPIPipewire;
@@ -564,12 +578,15 @@ void SoundManagerConfig::loadDefaults(SoundManager* soundManager, unsigned int f
                 soundManager->getDeviceList(m_api, true, false);
         if (!outputDevices.isEmpty()) {
             for (const auto& pDevice : outputDevices) {
-                if (pDevice->getNumOutputChannels() < 2) {
+                if (pDevice->getNumOutputChannels() < 1) {
                     continue;
                 }
+                const auto channelCount = (pDevice->getNumOutputChannels() >= 2)
+                        ? mixxx::audio::ChannelCount::stereo()
+                        : mixxx::audio::ChannelCount::mono();
                 AudioOutput mainOut(AudioPathType::Main,
                         0,
-                        mixxx::audio::ChannelCount::stereo(),
+                        channelCount,
                         0);
                 addOutput(pDevice->getDeviceId(), mainOut);
                 defaultSampleRate = pDevice->getDefaultSampleRate();

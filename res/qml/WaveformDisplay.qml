@@ -2,6 +2,7 @@ import "." as Skin
 import Mixxx 1.0 as Mixxx
 import Mixxx.Controls 1.0 as MixxxControls
 import QtQuick 2.12
+import QtQuick.Layouts
 import "Theme"
 
 Item {
@@ -9,12 +10,54 @@ Item {
 
     required property string group
     property bool splitStemTracks: false
+    property bool isTouchMode: false
     readonly property int activeWaveformType: Mixxx.Config.waveformType === Mixxx.WaveformDisplay.Type.Simple || Mixxx.Config.waveformType === Mixxx.WaveformDisplay.Type.Filtered || Mixxx.Config.waveformType === Mixxx.WaveformDisplay.Type.HSV || Mixxx.Config.waveformType === Mixxx.WaveformDisplay.Type.RGB || Mixxx.Config.waveformType === Mixxx.WaveformDisplay.Type.Stacked ? Mixxx.Config.waveformType : Mixxx.WaveformDisplay.Type.RGB
     // Renderer factories are created once by QmlWaveformDisplay. Keep track
     // of the type that was used for the scene-graph stack so a change from
     // the legacy preferences dialog can recreate that stack explicitly.
     property int renderedWaveformType: -1
     readonly property string zoomGroup: Mixxx.Config.waveformZoomSynchronization ? "[Channel1]" : group
+    readonly property var deckPlayer: Mixxx.PlayerManager.getPlayer(group)
+    readonly property var currentTrack: deckPlayer?.currentTrack
+    readonly property bool isDeck1: group === "[Channel1]"
+    readonly property bool isDeck2: group === "[Channel2]"
+    readonly property color deckColor: isDeck1 ? "#00b0ff" : (isDeck2 ? "#ff6d00" : (group === "[Channel3]" ? "#00e676" : "#e040fb"))
+    readonly property color deckBgColor: isDeck1 ? "#0d47a1" : (isDeck2 ? "#bf360c" : "#263238")
+    readonly property string deckName: isDeck1 ? "DECK 1" : (isDeck2 ? "DECK 2" : (group === "[Channel3]" ? "DECK 3" : "DECK 4"))
+
+    onEnabledChanged: {
+        if (!enabled) {
+            scratchPositionEnableControl.value = 0;
+            scratchPositionControl.value = 0;
+            wheelControl.parameter = 0.5;
+        }
+    }
+
+    Mixxx.ControlProxy {
+        id: bpmControl
+        group: root.group
+        key: "bpm"
+    }
+    Mixxx.ControlProxy {
+        id: rateControl
+        group: root.group
+        key: "rate"
+    }
+    Mixxx.ControlProxy {
+        id: durationControl
+        group: root.group
+        key: "duration"
+    }
+    Mixxx.ControlProxy {
+        id: playPositionControl
+        group: root.group
+        key: "playposition"
+    }
+    Mixxx.ControlProxy {
+        id: keyControl
+        group: root.group
+        key: "visual_key"
+    }
 
     Connections {
         target: Mixxx.Config
@@ -351,4 +394,87 @@ Item {
             }
         }
     }
+
+    // ================= WAVEFORM HEADS-UP DISPLAY (HUD) =================
+    // Modern Floating Glass HUD Badges (non-intrusive, leaves center waveform completely unobstructed)
+    Item {
+        id: waveformHud
+        anchors.fill: parent
+        z: 30
+
+        // Clean, minimal Deck badge (only DECK 1 / DECK 2)
+        Rectangle {
+            id: deckBadge
+            anchors.left: parent.left
+            anchors.leftMargin: 8
+            anchors.top: parent.top
+            anchors.topMargin: 6
+            height: 22
+            width: 66
+            radius: 11
+            color: root.deckBgColor
+            border.color: root.deckColor
+            border.width: 1
+
+            Text {
+                anchors.centerIn: parent
+                text: root.deckName
+                color: "#ffffff"
+                font.bold: true
+                font.pixelSize: 10
+                font.letterSpacing: 1
+            }
+        }
+
+        // Musical Key pill (Pioneer RX3 style)
+        Rectangle {
+            id: keyPill
+            visible: !root.isTouchMode && !!keyControl.value && keyBadgeText.text.length > 0
+            anchors.left: deckBadge.right
+            anchors.leftMargin: 5
+            anchors.verticalCenter: deckBadge.verticalCenter
+            height: 22
+            width: keyBadgeText.implicitWidth + 12
+            radius: 4
+            color: "#d0121722"
+            border.color: root.deckColor
+            border.width: 1
+
+            Text {
+                id: keyBadgeText
+                anchors.centerIn: parent
+                text: keyControl.value ? keyControl.value.toString() : ""
+                color: "#ffffff"
+                font.bold: true
+                font.pixelSize: 10
+            }
+        }
+
+        // Track title & artist pill (visible in all views EXCEPT tactile view)
+        Rectangle {
+            id: trackInfoPill
+            visible: !root.isTouchMode && !!root.currentTrack && (root.currentTrack.title.length > 0)
+            anchors.left: keyPill.visible ? keyPill.right : deckBadge.right
+            anchors.leftMargin: 6
+            anchors.verticalCenter: deckBadge.verticalCenter
+            height: 22
+            width: Math.min(320, trackInfoText.implicitWidth + 18)
+            radius: 11
+            color: "#d0121722"
+            border.color: "#2a3547"
+            border.width: 1
+
+            Text {
+                id: trackInfoText
+                anchors.centerIn: parent
+                width: parent.width - 16
+                elide: Text.ElideRight
+                text: (root.currentTrack ? (root.currentTrack.artist ? root.currentTrack.artist + " - " : "") + root.currentTrack.title : "")
+                color: "#e0e6ed"
+                font.bold: true
+                font.pixelSize: 10
+            }
+        }
+    }
 }
+

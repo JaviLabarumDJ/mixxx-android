@@ -2846,7 +2846,7 @@ endif()
 #
 
 find_package(GTest CONFIG)
-default_option(BUILD_TESTING "Build with Unittests" "GTest_FOUND")
+default_option(BUILD_TESTING "Build with Unittests" "GTest_FOUND;NOT ANDROID")
 if(BUILD_TESTING)
   if(GTest_FOUND)
     message(STATUS "Found GTest: Unittests enabled")
@@ -2857,7 +2857,7 @@ if(BUILD_TESTING)
 endif()
 
 find_package(benchmark)
-default_option(BUILD_BENCH "Build mixxx-benchmark" "benchmark_FOUND")
+default_option(BUILD_BENCH "Build mixxx-benchmark" "benchmark_FOUND;BUILD_TESTING")
 if(BUILD_BENCH AND BUILD_TESTING)
   if(benchmark_FOUND)
     message(STATUS "Found google-benchmark: mixxx-benchmark enabled")
@@ -4151,6 +4151,7 @@ if(QML)
       src/qml/qmltrackproxy.cpp
       src/qml/qmlsoundmanagerproxy.cpp
       src/qml/qmlpreferencesproxy.cpp
+      src/qml/qmlstreamingproxy.cpp
       src/waveform/renderers/allshader/digitsrenderer.cpp
       src/waveform/renderers/allshader/waveformrenderbeat.cpp
       src/waveform/renderers/allshader/waveformrenderer.cpp

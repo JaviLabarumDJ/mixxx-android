@@ -72,3 +72,12 @@ src/mixxx.rc.include
 src/mixxx.res
 src/test/**/*.actual
 res/qrc_mixxx.cc
+
+# Android build & release artifacts
+*.keystore
+*.apk
+*.idsig
+*.png
+*.jpeg
+*.jpg
+

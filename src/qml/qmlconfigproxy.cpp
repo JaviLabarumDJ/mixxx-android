@@ -392,7 +392,7 @@ void QmlConfigProxy::set_waveformDefaultZoom(double value) {
             3,
             &QmlConfigProxy::waveformDefaultZoomChanged);
 }
-PROPERTY_IMPL_GETTER(kWaveformGroup, kFrameRateKey, int, waveformFrameRate, 60);
+PROPERTY_IMPL_GETTER(kWaveformGroup, kFrameRateKey, int, waveformFrameRate, 120);
 void QmlConfigProxy::set_waveformFrameRate(int frameRate) {
     const int sanitizedFrameRate = std::clamp(frameRate, 1, 240);
     if (WaveformWidgetFactory::isCreated()) {

@@ -32,4 +32,10 @@ public class MainActivity extends QtActivityBase {
 
         Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_DISPLAY);
     }
+
+    @Override
+    protected void onNewIntent(android.content.Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+    }
 }

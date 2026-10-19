@@ -257,11 +257,11 @@ SoundDeviceStatus SoundDevicePortAudio::open(bool isClkRefDevice, int syncBuffer
     PaOboeStreamInfo obeoStreamInfo;
     if (m_deviceTypeId == PaHostApiTypeId::paOboe) {
         PaOboe_InitializeStreamInfo(&obeoStreamInfo);
-        obeoStreamInfo.androidOutputUsage = PaOboe_Usage::Media,
-        obeoStreamInfo.androidInputPreset = PaOboe_InputPreset::Generic,
-        obeoStreamInfo.performanceMode = PaOboe_PerformanceMode::LowLatency,
-        obeoStreamInfo.sharingMode = PaOboe_SharingMode::Exclusive,
-        obeoStreamInfo.contentType = PaOboe_ContentType::Music,
+        obeoStreamInfo.androidOutputUsage = PaOboe_Usage::Media;
+        obeoStreamInfo.androidInputPreset = PaOboe_InputPreset::Generic;
+        obeoStreamInfo.performanceMode = PaOboe_PerformanceMode::LowLatency;
+        obeoStreamInfo.sharingMode = PaOboe_SharingMode::Shared;
+        obeoStreamInfo.contentType = PaOboe_ContentType::Music;
         obeoStreamInfo.packageName = ANDROID_PACKAGE_NAME;
 
         m_outputParams.hostApiSpecificStreamInfo = (void*)&obeoStreamInfo;

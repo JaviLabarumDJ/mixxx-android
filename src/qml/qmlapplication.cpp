@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QMetaEnum>
 #include <QQmlEngineExtensionPlugin>
+#include <QQmlError>
 #include <QQuickStyle>
 #include <QQuickWindow>
 #include <QTextDocument>
@@ -484,10 +485,17 @@ bool QmlApplication::loadQml(const QString& path) {
 
     registerImageProvider();
 
+    connect(m_pAppEngine.get(), &QQmlEngine::warnings, [](const QList<QQmlError>& warnings) {
+        for (const auto& w : warnings) {
+            qCritical() << "QML Error:" << w.toString();
+        }
+    });
+
+    qInfo() << "Attempting to load QML file:" << path;
     m_pAppEngine->load(path);
     const auto rootObjects = m_pAppEngine->rootObjects();
     if (rootObjects.isEmpty()) {
-        qWarning() << "Failed to load QML file" << path;
+        qCritical() << "Failed to load QML file" << path << "exists:" << QFile::exists(path);
         m_pAppEngine.reset();
         return false;
     }

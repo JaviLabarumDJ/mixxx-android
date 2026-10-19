@@ -78,7 +78,9 @@ void PortAudioEnumerator::initialize() {
         auto const supportedFriendlyName = [](int type) -> std::optional<QString> {
             switch (type) {
             case 1: // AudioDeviceInfo.TYPE_BUILTIN_EARPIECE
-                return tr("Earpiece");
+                // An earpiece is exclusively for phone calls and cannot be opened
+                // for low-latency media playback on Android. Ignore it.
+                return std::nullopt;
             case 2: // AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
                 return tr("Speaker");
             case 4: // AudioDeviceInfo.TYPE_WIRED_HEADPHONES
@@ -110,7 +112,23 @@ void PortAudioEnumerator::initialize() {
             return std::nullopt;
         };
 
-        auto const parse = [supportedFriendlyName](PaOboe_Direction direction,
+        QJniObject PROPERTY_OUTPUT_SAMPLE_RATE =
+                QJniObject::getStaticField<jstring>(
+                        "android/media/AudioManager",
+                        "PROPERTY_OUTPUT_SAMPLE_RATE");
+        auto outputSampleRateStr =
+                audioManager
+                        .callMethod<jstring>("getProperty",
+                                "(Ljava/lang/String;)Ljava/lang/String;",
+                                PROPERTY_OUTPUT_SAMPLE_RATE)
+                        .toString();
+        int defaultNativeSampleRate = outputSampleRateStr.toInt();
+        if (defaultNativeSampleRate <= 0) {
+            defaultNativeSampleRate = 48000;
+        }
+        qDebug() << "audioManager defaultNativeSampleRate:" << defaultNativeSampleRate;
+
+        auto const parse = [supportedFriendlyName, defaultNativeSampleRate](PaOboe_Direction direction,
                                    QJniArray<QJniObject>& devices) {
             for (const auto& device : devices) {
                 jint type = device->callMethod<jint>("getType");
@@ -126,26 +144,36 @@ void PortAudioEnumerator::initialize() {
                 }
                 int32_t id = device->callMethod<jint>("getId");
                 auto channelCounts = device->callMethod<QJniArray<jint>>("getChannelCounts");
-                int channelCount = *std::max_element(
-                        channelCounts.begin(), channelCounts.end());
+                int channelCount = (direction == PaOboe_Direction::Output) ? 2 : 1;
+                if (!channelCounts.isEmpty()) {
+                    auto it = std::max_element(channelCounts.begin(), channelCounts.end());
+                    if (it != channelCounts.end() && *it > 0) {
+                        channelCount = *it;
+                    }
+                }
                 auto sampleRates = device->callMethod<QJniArray<jint>>("getSampleRates");
-                qDebug() << "audioManager - Type:" << type
+                int sampleRate = defaultNativeSampleRate;
+                if (!sampleRates.isEmpty()) {
+                    auto it = sampleRates.cbegin();
+                    if (*it > 0) {
+                        sampleRate = *it;
+                    }
+                }
+                qInfo() << "audioManager - Registering Oboe device:"
+                         << "Type:" << type
                          << "- Name:" << name
                          << "- ChannelCount:" << channelCount
-                         << channelCounts.size();
-                if (!sampleRates.isEmpty()) {
-                    int sampleRate = *sampleRates.cbegin();
-                    qDebug() << "audioManager - SampleRates:" << sampleRate;
-                    auto result = PaOboe_RegisterDevice(name.toStdString().c_str(),
-                            id,
-                            direction,
-                            channelCount,
-                            sampleRate);
-                    if (result != paNoError) {
-                        qWarning()
-                                << "Error registering device to PortAudio:"
-                                << Pa_GetErrorText(result);
-                    }
+                         << "- SampleRate:" << sampleRate;
+
+                auto result = PaOboe_RegisterDevice(name.toStdString().c_str(),
+                        id,
+                        direction,
+                        channelCount,
+                        sampleRate);
+                if (result != paNoError) {
+                    qWarning()
+                            << "Error registering device to PortAudio:"
+                            << Pa_GetErrorText(result);
                 }
             }
         };
@@ -260,6 +288,11 @@ void PortAudioEnumerator::initialize() {
     for (PaHostApiIndex i = 0; i < Pa_GetHostApiCount(); i++) {
         const PaHostApiInfo* api = Pa_GetHostApiInfo(i);
         if (api && std::strcmp(api->name, "skeleton implementation")) {
+#ifdef Q_OS_ANDROID
+            if (std::strcmp(api->name, "ALSA") == 0) {
+                continue;
+            }
+#endif
             m_apis.push_back(api->name);
         }
     }

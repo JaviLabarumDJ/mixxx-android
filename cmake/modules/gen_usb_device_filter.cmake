@@ -3,7 +3,10 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-file(GLOB HID_XML_FILES "${CMAKE_SOURCE_DIR}/res/controllers/*.hid.xml")
+file(GLOB CONTROLLER_XML_FILES
+  "${CMAKE_SOURCE_DIR}/res/controllers/*.hid.xml"
+  "${CMAKE_SOURCE_DIR}/res/controllers/*.bulk.xml"
+)
 
 if(NOT (TEMPLATE_FILE))
   message(FATAL_ERROR "TEMPLATE_FILE must be set")
@@ -14,13 +17,13 @@ if(NOT (TARGET_FILE))
 endif()
 
 set(USB_DEVICE_ENTRIES)
-foreach(HID_XML_FILE ${HID_XML_FILES})
-  get_filename_component(FILENAME "${HID_XML_FILE}" NAME)
+foreach(CONTROLLER_XML_FILE ${CONTROLLER_XML_FILES})
+  get_filename_component(FILENAME "${CONTROLLER_XML_FILE}" NAME)
   if(FILENAME STREQUAL "Dummy Device Screen.hid.xml")
     continue()
   endif()
-  file(STRINGS "${HID_XML_FILE}" HID_LINES REGEX "protocol=\"hid\"")
-  foreach(LINE ${HID_LINES})
+  file(STRINGS "${CONTROLLER_XML_FILE}" CONTROLLER_LINES REGEX "vendor_id=")
+  foreach(LINE ${CONTROLLER_LINES})
     string(REGEX MATCH "vendor_id=\"([^\"]+)\"" _ "${LINE}")
     set(VID "${CMAKE_MATCH_1}")
     string(REGEX MATCH "product_id=\"([^\"]+)\"" _ "${LINE}")

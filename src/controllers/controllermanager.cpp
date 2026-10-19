@@ -1,6 +1,7 @@
 #include "controllers/controllermanager.h"
 
 #include <QSet>
+#include <QStandardPaths>
 #include <QThread>
 
 #include "controllers/controller.h"
@@ -159,9 +160,15 @@ void ControllerManager::slotInitialize() {
 
     // Initialize mapping info parsers. This object is only for use in the main
     // thread. Do not touch it from within ControllerManager.
+    QStringList userPaths;
+    userPaths.append(userMappingsPath(m_pConfig));
+#if defined(Q_OS_ANDROID)
+    userPaths.append(QStringLiteral("/storage/emulated/0/Mixxx/controllers/"));
+    userPaths.append(QStandardPaths::writableLocation(QStandardPaths::MusicLocation) + QStringLiteral("/Mixxx/controllers/"));
+    QDir().mkpath(QStringLiteral("/storage/emulated/0/Mixxx/controllers/"));
+#endif
     m_pMainThreadUserMappingEnumerator =
-            QSharedPointer<MappingInfoEnumerator>::create(
-                    userMappingsPath(m_pConfig));
+            QSharedPointer<MappingInfoEnumerator>::create(userPaths);
     m_pMainThreadSystemMappingEnumerator =
             QSharedPointer<MappingInfoEnumerator>::create(
                     resourceMappingsPath(m_pConfig));
@@ -499,6 +506,10 @@ void ControllerManager::slotApplyMapping(Controller* pController,
 QList<QString> ControllerManager::getMappingPaths(UserSettingsPointer pConfig) {
     QList<QString> scriptPaths;
     scriptPaths.append(userMappingsPath(pConfig));
+#if defined(Q_OS_ANDROID)
+    scriptPaths.append(QStringLiteral("/storage/emulated/0/Mixxx/controllers/"));
+    scriptPaths.append(QStandardPaths::writableLocation(QStandardPaths::MusicLocation) + QStringLiteral("/Mixxx/controllers/"));
+#endif
     scriptPaths.append(resourceMappingsPath(pConfig));
     return scriptPaths;
 }
