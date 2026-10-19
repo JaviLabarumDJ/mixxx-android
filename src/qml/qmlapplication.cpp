@@ -36,6 +36,7 @@
 #include <android/api-level.h>
 #include <android/log.h>
 #include <android/performance_hint.h>
+#include <dlfcn.h>
 
 #include <QDir>
 #include <QFile>
@@ -67,6 +68,16 @@ auto lambda_to_singleton_type_factory_ptr(F&& f) {
     };
 }
 #if defined(Q_OS_ANDROID)
+using PFN_APerformanceHint_getManager = APerformanceHintManager* (*)();
+using PFN_APerformanceHint_createSession = APerformanceHintSession* (*)(
+        APerformanceHintManager*, const int32_t*, size_t, int64_t);
+using PFN_APerformanceHint_setPreferPowerEfficiency = int (*)(
+        APerformanceHintSession*, bool);
+using PFN_APerformanceHint_reportActualWorkDuration = int (*)(
+        APerformanceHintSession*, int64_t);
+
+static PFN_APerformanceHint_reportActualWorkDuration s_pfnReportActualWorkDuration = nullptr;
+
 // Directories under res/qml/ that are compiled into the binary as QML modules
 // and should not be copied to external storage.
 const QStringList kSkipQmlDirs = {
@@ -360,18 +371,29 @@ QmlApplication::QmlApplication(
             });
 
 #if defined(Q_OS_ANDROID)
-    APerformanceHintManager* manager = APerformanceHint_getManager();
-    VERIFY_OR_DEBUG_ASSERT(manager) {
-        return;
-    }
-    int32_t thread32 = gettid();
-    m_perfSession = APerformanceHint_createSession(manager, &thread32, 1, 1e9 / 60);
-    VERIFY_OR_DEBUG_ASSERT(m_perfSession) {
-        __android_log_print(ANDROID_LOG_WARN, "mixxx", "unable to create a ADPF session!");
-    }
-    else {
-        APerformanceHint_setPreferPowerEfficiency(m_perfSession, false);
-        __android_log_print(ANDROID_LOG_VERBOSE, "mixxx", "ADPF session ready");
+    auto pfnGetManager = reinterpret_cast<PFN_APerformanceHint_getManager>(
+            dlsym(RTLD_DEFAULT, "APerformanceHint_getManager"));
+    auto pfnCreateSession = reinterpret_cast<PFN_APerformanceHint_createSession>(
+            dlsym(RTLD_DEFAULT, "APerformanceHint_createSession"));
+    auto pfnSetPreferPowerEfficiency = reinterpret_cast<PFN_APerformanceHint_setPreferPowerEfficiency>(
+            dlsym(RTLD_DEFAULT, "APerformanceHint_setPreferPowerEfficiency"));
+    s_pfnReportActualWorkDuration = reinterpret_cast<PFN_APerformanceHint_reportActualWorkDuration>(
+            dlsym(RTLD_DEFAULT, "APerformanceHint_reportActualWorkDuration"));
+
+    if (pfnGetManager && pfnCreateSession) {
+        APerformanceHintManager* manager = pfnGetManager();
+        if (manager) {
+            int32_t thread32 = gettid();
+            m_perfSession = pfnCreateSession(manager, &thread32, 1, 1e9 / 60);
+            if (m_perfSession) {
+                if (pfnSetPreferPowerEfficiency) {
+                    pfnSetPreferPowerEfficiency(m_perfSession, false);
+                }
+                __android_log_print(ANDROID_LOG_VERBOSE, "mixxx", "ADPF session ready");
+            } else {
+                __android_log_print(ANDROID_LOG_WARN, "mixxx", "unable to create a ADPF session!");
+            }
+        }
     }
 #endif
 }
@@ -397,14 +419,11 @@ void QmlApplication::slotFrameSwapped() {
     }
 #endif
 #if defined(Q_OS_ANDROID)
-    VERIFY_OR_DEBUG_ASSERT(m_perfSession) {
-        return;
+    if (m_perfSession && s_pfnReportActualWorkDuration) {
+        auto lastFrameDurationNs = m_frameTimer.elapsed().toIntegerNanos();
+        s_pfnReportActualWorkDuration(m_perfSession, lastFrameDurationNs);
+        m_frameTimer.restart();
     }
-    auto lastFrameDurationNs = m_frameTimer.elapsed().toIntegerNanos();
-    auto t = std::chrono::steady_clock::now() - std::chrono::steady_clock::time_point{};
-    APerformanceHint_reportActualWorkDuration(m_perfSession,
-            lastFrameDurationNs);
-    m_frameTimer.restart();
 #endif
 }
 
