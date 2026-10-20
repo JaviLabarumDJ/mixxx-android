@@ -379,19 +379,28 @@ Popup {
                         enabled: visible
                     }
 
+                    Settings.About {
+                        id: aboutSection
+                        anchors.fill: parent
+                        visible: categoryList.currentIndex === 5
+                        enabled: visible
+                    }
+
                     Component.onCompleted: {
                         root.categoryItems = [
                             soundHardwareSection,
                             controllerSection,
                             librarySection,
                             waveformSection,
-                            interfaceSection
+                            interfaceSection,
+                            aboutSection
                         ];
                         soundHardwareSection.activated.connect(function() { categoryList.currentIndex = 0; });
                         controllerSection.activated.connect(function() { categoryList.currentIndex = 1; });
                         librarySection.activated.connect(function() { categoryList.currentIndex = 2; });
                         waveformSection.activated.connect(function() { categoryList.currentIndex = 3; });
                         interfaceSection.activated.connect(function() { categoryList.currentIndex = 4; });
+                        aboutSection.activated.connect(function() { categoryList.currentIndex = 5; });
                         root.updateActiveCategory();
                     }
                 }
@@ -429,6 +438,11 @@ Popup {
             label: "Interfaz"
             iconGlyph: "📱"
             subtext: "Tema, Decks, Visualización"
+        }
+        ListElement {
+            label: "Acerca de"
+            iconGlyph: "✨"
+            subtext: "JaviLabarum, RRSS & Info"
         }
     }
 }

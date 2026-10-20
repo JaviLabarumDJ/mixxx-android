@@ -65,74 +65,134 @@ ApplicationWindow {
     }
     Rectangle {
         id: splash
-        visible: opacity > 0
-        color: Theme.backgroundColor
         anchors.fill: parent
+        color: "#0e1117"
+        z: 99999
+        visible: opacity > 0
 
-        property bool ready: false
+        property real progress: 0.0
+        property bool fadingOut: false
 
-        Component.onCompleted: {
-            ready = true
+        opacity: fadingOut ? 0.0 : 1.0
+        Behavior on opacity {
+            NumberAnimation { duration: 500; easing.type: Easing.InOutQuad }
+        }
+
+        Timer {
+            id: loadProgressTimer
+            interval: 35
+            running: !splash.fadingOut && splash.visible
+            repeat: true
+            property int ticks: 0
+            onTriggered: {
+                ticks++;
+                var isReady = (content.status === Loader.Ready && content.item !== null);
+
+                // Give at least 40 ticks * 35ms = 1400ms so user clearly sees startup progress
+                if (!isReady || ticks < 40) {
+                    if (splash.progress < 0.35) {
+                        splash.progress = Math.min(0.35, splash.progress + 0.045);
+                    } else if (splash.progress < 0.75) {
+                        splash.progress = Math.min(0.75, splash.progress + 0.025);
+                    } else if (splash.progress < 0.94) {
+                        splash.progress = Math.min(0.94, splash.progress + 0.012);
+                    }
+                } else {
+                    splash.progress = 1.0;
+                    loadProgressTimer.stop();
+                    dismissTimer.start();
+                }
+            }
+        }
+
+        Timer {
+            id: dismissTimer
+            interval: 320
+            repeat: false
+            onTriggered: {
+                splash.fadingOut = true;
+            }
         }
 
         Column {
             id: splashContent
             anchors.centerIn: parent
             spacing: 14
-            opacity: 0
+            opacity: 1
 
+            // Mixxx Logo (Icon and MIXXX together)
             Image {
                 id: logo
                 anchors.horizontalCenter: parent.horizontalCenter
                 source: "qrc:/images/mixxx-icon-logo-symbolic.svg"
                 fillMode: Image.PreserveAspectFit
-                height: 72
-                width: 72
+                width: 280
+                height: 60
+                smooth: true
+                antialiasing: true
             }
 
-            Text {
-                id: titleText
-                anchors.horizontalCenter: parent.horizontalCenter
-                color: Theme.white
-                font.pixelSize: 28
-                font.bold: true
-                font.letterSpacing: 2
-                text: "MIXXX"
-            }
-
+            // Subtitle
             Text {
                 id: subtitleText
                 anchors.horizontalCenter: parent.horizontalCenter
-                color: Theme.accentColor
-                font.pixelSize: 14
-                font.weight: Font.DemiBold
-                text: "by JaviLabarum on Android"
+                color: "#ff9100"
+                font.pixelSize: 15
+                font.bold: true
+                font.letterSpacing: 0.8
+                text: "By JaviLabarumDJ on Android"
             }
 
-            Behavior on opacity {
-                NumberAnimation { duration: 1000; easing.type: Easing.InOutQuad }
+            Item {
+                // Spacer
+                height: 8
+                width: 1
             }
-        }
 
-        states: [
-            State {
-                when: splash.ready && content.status != Loader.Ready
+            // Progress bar
+            Item {
+                id: progressBarContainer
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: 260
+                height: 32
 
-                PropertyChanges {
-                    splashContent.opacity: 1
+                Rectangle {
+                    id: progressTrack
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: parent.top
+                    width: parent.width
+                    height: 6
+                    radius: 3
+                    color: "#161b24"
+                    border.color: "#283444"
+                    border.width: 1
+                    clip: true
+
+                    Rectangle {
+                        id: progressFill
+                        anchors.left: parent.left
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        width: Math.max(6, parent.width * splash.progress)
+                        radius: 3
+                        color: "#00e5ff"
+
+                        Behavior on width {
+                            NumberAnimation { duration: 150; easing.type: Easing.OutCubic }
+                        }
+                    }
                 }
-            },
-            State {
-                when: content.status == Loader.Ready && content.active
 
-                PropertyChanges {
-                    splash.opacity: 0
+                Text {
+                    anchors.top: progressTrack.bottom
+                    anchors.topMargin: 7
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: splash.progress >= 1.0 ? "¡Listo para pinchar!" : (splash.progress > 0.7 ? "Optimizando controles DJ..." : (splash.progress > 0.35 ? "Cargando librería y decks..." : "Iniciando motor de audio..."))
+                    font.pixelSize: 11
+                    font.weight: Font.DemiBold
+                    color: "#8fa1b8"
                 }
             }
-        ]
-
-        Behavior on opacity {
-            NumberAnimation { duration: 500; easing.type: Easing.InOutQuad }
         }
     }
 }

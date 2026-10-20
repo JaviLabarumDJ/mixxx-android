@@ -27,6 +27,7 @@ Item {
     property bool editMode: false
     required property string group
     property bool minimized: false
+    property int mobilePadView: 0 // 0: Hotcue & Stem, 1: Loop
     clip: true
 
     signal toggleFocus
@@ -100,8 +101,7 @@ Item {
                                                     "type": "row",
                                                     "items": [
                                                         {
-                                                            "type": "hotcueAndStem",
-                                                            "minWidth": 520
+                                                            "type": "hotcueAndStem"
                                                         },
                                                         {
                                                             "type": "beatjump",
@@ -132,7 +132,7 @@ Item {
                         },
                         {
                             "type": "tempo",
-                            "minWidth": 320
+                            "minWidth": 220
                         }
                     ]
                 }
@@ -241,6 +241,7 @@ Item {
                 editLabel.text: "Loop"
                 editOverlay.color: Theme.midGray
                 height: 92
+                visible: root.width >= 520 || root.mobilePadView === 1
 
                 DeckComponent.Loop {
                     anchors.fill: parent
@@ -310,7 +311,7 @@ Item {
 
             LayoutItem {
                 Layout.fillHeight: true
-                Layout.preferredWidth: 75
+                Layout.preferredWidth: root.width < 320 ? 65 : 75
                 blurRadius: 4
                 editLabel.color: Theme.white
                 editLabel.text: "Tempo"
@@ -412,6 +413,7 @@ Item {
 
                 DeckComponent.Toolbar {
                     anchors.fill: parent
+                    deck: root
                     group: root.group
                 }
             }
@@ -421,13 +423,14 @@ Item {
 
             LayoutItem {
                 Layout.fillWidth: true
-                Layout.minimumWidth: 250
+                Layout.minimumWidth: 120
                 blurRadius: 4
                 editLabel.color: Theme.white
                 editLabel.font.pixelSize: 14
                 editLabel.text: "Hotcue & Stem"
                 editOverlay.color: Qt.alpha('black', 0.5)
                 height: 92
+                visible: root.width >= 520 || root.mobilePadView === 0
 
                 DeckComponent.HotcueAndStem {
                     anchors.fill: parent
