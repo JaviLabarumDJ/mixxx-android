@@ -29,6 +29,10 @@
 #include "util/color/color.h"
 #include "util/db/dbconnectionpooled.h"
 #include "util/db/dbconnectionpooler.h"
+#include "util/removablestorage.h"
+#ifdef __ANDROID_USB_DRIVE__
+#include "library/usbdrive/androidusbdrive.h"
+#endif
 #include "util/sandbox.h"
 #include "waveform/waveform.h"
 #include "widget/wlibrary.h"
@@ -214,6 +218,23 @@ QList<TreeItem*> findRekordboxDevices() {
             auto* pFoundDevice = new TreeItem(
                     std::move(displayPath),
                     QVariant(data));
+            foundDevices << pFoundDevice;
+        }
+    }
+#elif defined(__ANDROID__)
+    // USB drives are mounted under /storage
+    const QFileInfoList devices = mixxx::removableStorageRoots();
+    for (const QFileInfo& device : devices) {
+#ifdef __ANDROID_USB_DRIVE__
+        // Copies the database of drives that Mixxx reads itself
+        mixxx::usbdrive::prepareFiles(device.filePath(),
+                {QStringLiteral("PIONEER/rekordbox/export.pdb"),
+                        QStringLiteral(".PIONEER/rekordbox/export.pdb")});
+#endif
+        if (!findRekordboxPdbPath(device.filePath()).isEmpty()) {
+            auto* pFoundDevice = new TreeItem(
+                    device.fileName(),
+                    QVariant(QList<QString>{device.filePath(), IS_RECORDBOX_DEVICE}));
             foundDevices << pFoundDevice;
         }
     }

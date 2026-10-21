@@ -27,6 +27,15 @@
 #include <sys/syscall.h>
 
 #include <QJniObject>
+
+#include <cstdlib>
+
+/// Called by PortAudio instead of malloc() (see CMakeLists.txt): its Oboe
+/// host API allocates strlen(name) bytes for a copy of each device name and
+/// strcpy() then writes the terminating null byte past the end.
+extern "C" void* mixxx_portaudio_malloc(size_t size) {
+    return std::malloc(size + 1);
+}
 #endif
 
 typedef PaError (*SetJackClientName)(const char* name);

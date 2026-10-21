@@ -1741,6 +1741,7 @@ add_library(
   src/util/runtimeloggingcategory.cpp
   src/util/safelywritablefile.cpp
   src/util/sample.cpp
+  src/util/removablestorage.cpp
   src/util/sandbox.cpp
   src/util/screensaver.cpp
   src/util/screensavermanager.cpp
@@ -3567,6 +3568,7 @@ if(ENGINEPRIME)
   target_sources(
     mixxx-lib
     PRIVATE
+      src/library/enginedj/enginedjfeature.cpp
       src/library/export/dlglibraryexport.cpp
       src/library/export/engineprimeexportjob.cpp
       src/library/export/libraryexporter.cpp
@@ -3858,6 +3860,28 @@ target_link_libraries(
 
 # PortAudio
 find_package(PortAudio REQUIRED)
+if(ANDROID)
+  # The Oboe host API of PortAudio copies the device names with
+  # malloc(strlen(name)) and strcpy(), writing one byte past the allocation.
+  # That corrupts the heap (Scudo aborts later, at random places) when a name
+  # length is a multiple of 16, e.g. "TB331FC: Speaker". Its allocations are
+  # redirected to mixxx_portaudio_malloc(), which adds the missing byte.
+  set(MIXXX_PATCHED_PORTAUDIO "${CMAKE_CURRENT_BINARY_DIR}/libportaudio-mixxx.a")
+  add_custom_command(
+    OUTPUT "${MIXXX_PATCHED_PORTAUDIO}"
+    COMMAND
+      "${CMAKE_OBJCOPY}" --redefine-sym malloc=mixxx_portaudio_malloc
+      "${PortAudio_LIBRARY}" "${MIXXX_PATCHED_PORTAUDIO}"
+    DEPENDS "${PortAudio_LIBRARY}"
+    COMMENT "Fixing the device name allocation of PortAudio"
+  )
+  add_custom_target(mixxx-portaudio-patched DEPENDS "${MIXXX_PATCHED_PORTAUDIO}")
+  set_target_properties(
+    PortAudio::PortAudio
+    PROPERTIES IMPORTED_LOCATION "${MIXXX_PATCHED_PORTAUDIO}"
+  )
+  add_dependencies(mixxx-lib mixxx-portaudio-patched)
+endif()
 target_link_libraries(mixxx-lib PUBLIC PortAudio::PortAudio)
 
 if(ANDROID)
@@ -5503,7 +5527,16 @@ if(BULK)
         src/soundio/androidusbaudiodevice.cpp
         src/soundio/usbaudiodescriptors.cpp
         src/soundio/sounddeviceandroidusb.cpp
+        # Read-only reader for USB drives that Android doesn't mount
+        src/library/usbdrive/androidusbdrive.cpp
+        src/library/usbdrive/fatvolume.cpp
+        src/library/usbdrive/usbmassstorage.cpp
     )
+    target_compile_definitions(mixxx-lib PUBLIC __ANDROID_USB_DRIVE__)
+    if(QML)
+      # The QML proxies copy the tracks of these drives before loading them
+      target_compile_definitions(mixxx-qml-lib PUBLIC __ANDROID_USB_DRIVE__)
+    endif()
   endif()
   if(QML)
     target_compile_definitions(mixxx-qml-lib PUBLIC __BULK__)

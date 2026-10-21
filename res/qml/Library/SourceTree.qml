@@ -162,6 +162,34 @@ Mixxx.LibrarySourceTree {
         columns: root.defaultColumns
         label: qsTr("All...")
     }
+    Mixxx.LibraryFeatureSource {
+        columns: root.defaultColumns
+        feature: Mixxx.LibraryFeatureSource.Feature.Playlists
+    }
+    Mixxx.LibraryFeatureSource {
+        columns: root.defaultColumns
+        feature: Mixxx.LibraryFeatureSource.Feature.Crates
+    }
+    Mixxx.LibraryFeatureSource {
+        columns: root.defaultColumns
+        feature: Mixxx.LibraryFeatureSource.Feature.History
+    }
+    Mixxx.LibraryFeatureSource {
+        columns: root.defaultColumns
+        feature: Mixxx.LibraryFeatureSource.Feature.Browse
+    }
+    Mixxx.LibraryFeatureSource {
+        columns: root.defaultColumns
+        feature: Mixxx.LibraryFeatureSource.Feature.Rekordbox
+    }
+    Mixxx.LibraryFeatureSource {
+        columns: root.defaultColumns
+        feature: Mixxx.LibraryFeatureSource.Feature.EngineDJ
+    }
+    Mixxx.LibraryFeatureSource {
+        columns: root.defaultColumns
+        feature: Mixxx.LibraryFeatureSource.Feature.Recordings
+    }
 
     component DefaultDelegate: LibraryComponent.Cell {
         id: cell

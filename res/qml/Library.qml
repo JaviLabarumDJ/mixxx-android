@@ -16,7 +16,7 @@ Item {
 
     property var sidebar: librarySources.sidebar()
     property int librarySourceMode: 0 // 0: Local, 1: Streaming Hub
-    property bool showSidebar: false
+    property bool showSidebar: true
 
     function applySearch() {
         if (root.sidebar && root.sidebar.tracklist && root.librarySourceMode === 0) {
@@ -33,6 +33,56 @@ Item {
 
     LibraryComponent.SourceTree {
         id: librarySources
+    }
+
+    // The controller's browse knob moves through the sidebar or the tracks,
+    // pressing it switches between them and opens playlists and folders
+    LibraryComponent.Control {
+        id: libraryControl
+
+        onFocusWidgetChanged: {
+            switch (focusWidget) {
+            case Skin.FocusedWidgetControl.WidgetKind.LibraryView:
+                trackList.focusList();
+                break;
+            case Skin.FocusedWidgetControl.WidgetKind.Sidebar:
+                root.librarySourceMode = 0;
+                root.showSidebar = true;
+                if (browser.currentRow() < 0) {
+                    browser.selectRow(0);
+                }
+                break;
+            }
+        }
+        onActivateSidebarItem: {
+            if (browser.activateCurrent()) {
+                focusWidget = Skin.FocusedWidgetControl.WidgetKind.LibraryView;
+            }
+        }
+        onCollapseSidebarItem: browser.collapseCurrent()
+        onLoadSelectedTrack: (group, play) => {
+            trackList.loadSelectedTrack(group, play);
+        }
+        onLoadSelectedTrackIntoNextAvailableDeck: play => {
+            trackList.loadSelectedTrackIntoNextAvailableDeck(play);
+        }
+        onMoveSidebar: offset => {
+            browser.moveSelection(offset);
+        }
+        onMoveVertical: offset => {
+            trackList.moveSelectionVertical(offset);
+        }
+    }
+
+    Connections {
+        target: root.sidebar
+
+        // Playlists, crates and folders bring their own track list
+        function onTracklistChanged() {
+            if (searchField.text.length > 0) {
+                root.applySearch();
+            }
+        }
     }
 
     // ================= SOURCE SELECTOR TAB BAR =================
@@ -84,7 +134,7 @@ Item {
                 checked: root.showSidebar
                 font.bold: true
                 font.pixelSize: 10
-                text: root.showSidebar ? "OCULTAR" : "CARPETAS"
+                text: root.showSidebar ? "OCULTAR" : "PLAYLISTS"
                 onClicked: root.showSidebar = !root.showSidebar
             }
 
@@ -190,19 +240,22 @@ Item {
                     }
 
                     LibraryComponent.Browser {
+                        id: browser
+
+                        onStorageAccessNeeded: storageAccessPopup.open()
+
+                        highlighted: libraryControl.sidebarFocused
                         SplitView.fillHeight: true
-                        SplitView.minimumHeight: 200
+                        SplitView.minimumHeight: 100
                         SplitView.preferredHeight: 500
                         model: root.sidebar
-                    }
-                    Skin.PreviewDeck {
-                        SplitView.maximumHeight: 200
-                        SplitView.minimumHeight: 100
-                        SplitView.preferredHeight: 100
                     }
                 }
 
                 LibraryComponent.TrackList {
+                    id: trackList
+
+                    highlighted: libraryControl.sidebarFocused === false && root.showSidebar
                     SplitView.fillHeight: true
                     clip: true
                     model: root.sidebar ? root.sidebar.tracklist : null
@@ -215,6 +268,64 @@ Item {
             id: streamingHubArea
             anchors.fill: parent
             visible: root.librarySourceMode === 1
+        }
+    }
+
+    Popup {
+        id: storageAccessPopup
+
+        anchors.centerIn: parent
+        width: Math.min(460, root.width - 20)
+        modal: true
+        padding: 16
+
+        background: Rectangle {
+            color: Theme.darkGray2
+            border.color: Theme.darkGray3
+            radius: 8
+        }
+
+        contentItem: ColumnLayout {
+            spacing: 12
+
+            Text {
+                Layout.fillWidth: true
+                color: Theme.white
+                font.bold: true
+                font.pixelSize: 15
+                text: qsTr("Permiso para leer USB")
+            }
+            Text {
+                Layout.fillWidth: true
+                color: Theme.textColor
+                font.pixelSize: 13
+                text: qsTr("Para leer las playlists de Rekordbox y Engine DJ de un USB, Android tiene que permitir a Mixxx el acceso a todos los archivos. Actívalo en la pantalla que se abre y vuelve a tocar la sección.")
+                wrapMode: Text.WordWrap
+            }
+            RowLayout {
+                Layout.alignment: Qt.AlignRight
+                spacing: 8
+
+                Skin.Button {
+                    Layout.preferredHeight: 44
+                    Layout.preferredWidth: 110
+                    text: qsTr("AHORA NO")
+                    onClicked: storageAccessPopup.close()
+                }
+                Skin.Button {
+                    Layout.preferredHeight: 44
+                    Layout.preferredWidth: 150
+                    activeColor: Theme.accentColor
+                    backgroundColor: "#1565c0"
+                    normalColor: "#ffffff"
+                    font.bold: true
+                    text: qsTr("DAR PERMISO")
+                    onClicked: {
+                        storageAccessPopup.close();
+                        Mixxx.Library.requestFullStorageAccess();
+                    }
+                }
+            }
         }
     }
 }

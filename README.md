@@ -5,8 +5,8 @@
 ![Android Version](https://img.shields.io/badge/Android-10.0%2B%20(API%2029--35)-brightgreen?logo=android&logoColor=white)
 ![Architecture](https://img.shields.io/badge/Arch-ARM64%20(arm64--v8a)-blue?logo=arm)
 ![Framework](https://img.shields.io/badge/Qt-6.8%20%7C%20QML-41cd52?logo=qt)
-[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.1.0-android)
-[![Download APK](https://img.shields.io/badge/Download-APK%20(248%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.1.0-android/mixxx-android-v1.1.0.apk)
+[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.2.0-android)
+[![Download APK](https://img.shields.io/badge/Download-APK%20(248%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.2.0-android/mixxx-android-v1.2.0.apk)
 ![License](https://img.shields.io/badge/License-GPL%20v2-orange.svg)
 
 **The world's premier open-source DJ software, fully ported, modernized, and touch-optimized for Android smartphones, tablets, and standalone hardware setups.**
@@ -28,7 +28,16 @@ Whether you're performing live sets using a USB DJ controller, mixing on the go 
 <!-- START_AI_GENERATED_DISCLAIMER -->
 <!-- This section was written with the assistance of an AI Agent (Claude). -->
 
-## 🆕 What's New in v1.1.0
+## 🆕 What's New in v1.2.0
+
+* **Play straight from Rekordbox and Engine DJ USB drives:** plug in the drive you use on Pioneer or Denon players and its playlists show up in the library (*Rekordbox* and *Engine DJ* sections). Engine DJ 2.x–4.x libraries are read directly; tracks are copied to the tablet when you load them into a deck.
+* **Built-in USB drive reader:** drives that Android doesn't mount (e.g. FAT32 sticks formatted without a partition table, which Pioneer players accept) are read by Mixxx itself, read-only. Nothing is ever written to the drive.
+* **Organized library:** sidebar with Tracks, Playlists, Crates, History, folders of the tablet (*Computer*) and Recordings. Create playlists and add tracks from the tablet with **+ PLAYLIST**.
+* **Browse from the controller:** the BROWSE knob moves through the list and keeps the selection visible, stops at the first and last track, and pressing it switches to the sidebar to open playlists and folders (SHIFT + press goes back up).
+* **Smoother scrolling:** cover art and track data are no longer loaded on the main thread while scrolling.
+* **Stability:** fixed random crashes at startup caused by a memory bug in the audio library (PortAudio) when listing sound devices.
+
+## 🗂️ What was new in v1.1.0
 
 * **Built-in USB audio driver for DJ controllers:** Mixxx now drives class compliant USB sound cards itself (USB Audio Class 1 and 2, synchronous, adaptive and asynchronous endpoints). This fixes controllers whose headphone output (channels 3-4) Android can't play to, e.g. the Pioneer DDJ-400 on tablets with Qualcomm USB audio offload. Configurable in *Settings → Audio → Mixxx USB driver* (auto / always / never).
 * **Native Android MIDI:** USB and Bluetooth MIDI controllers are detected through Android's MIDI service, hot-plugged at any time, and get their official mapping assigned automatically on first connection.
@@ -78,6 +87,8 @@ Whether you're performing live sets using a USB DJ controller, mixing on the go 
 
 ### 📁 5. Fast Touch Music Library & Streaming Hub
 * **Instant Track Search & Browser:** Search across hundreds of thousands of local tracks with instant filtering by title, artist, BPM, and musical key.
+* **Sidebar (`PLAYLISTS` button):** Tracks, Playlists, Crates, History, the tablet's folders, Recordings, and the playlists of **Rekordbox** and **Engine DJ** USB drives. The controller's BROWSE knob moves through the list; pressing it switches to the sidebar.
+* **USB drives:** Rekordbox and Engine DJ exports can be played straight from the drive. Reading them needs Android's *All files access* permission, which Mixxx asks for. Drives that Android doesn't mount are read by Mixxx itself, read-only.
 * **QuickLoad Drawers (`LOAD 1` / `LOAD 2`):** Slide-out drawer to search and load tracks into any deck without obstructing your active mixer or waveforms.
 * **Streaming & Remote Sources:** Support for local SD card music collections, USB flash drives, and online streaming endpoints (Subsonic / Web stream audio).
 
@@ -101,7 +112,7 @@ Whether you're performing live sets using a USB DJ controller, mixing on the go 
 ## 🚀 Installation & Quick Start
 
 ### Option A: Install Pre-Built Signed APK
-1. Download [**mixxx-android-v1.1.0.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.1.0-android/mixxx-android-v1.1.0.apk) from the [Official GitHub Release v1.1.0](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.1.0-android).
+1. Download [**mixxx-android-v1.2.0.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.2.0-android/mixxx-android-v1.2.0.apk) from the [Official GitHub Release v1.2.0](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.2.0-android).
 2. Enable *"Install unknown apps"* in your Android device settings.
 3. Install and launch **MIXXX**.
 4. Grant storage and audio permissions when prompted.

@@ -13,6 +13,7 @@
 #include "analyzer/analyzerscheduledtrack.h"
 #include "control/controlobject.h"
 #include "library/dao/analysisdao.h"
+#include "library/dao/playlistdao.h"
 #include "library/library.h"
 #include "library/library_prefs.h"
 #include "library/librarytablemodel.h"
@@ -30,6 +31,9 @@
 #include "track/track.h"
 #include "util/assert.h"
 #include "util/db/dbconnectionpooled.h"
+#ifdef __ANDROID__
+#include "util/androidpermissions.h"
+#endif
 
 namespace mixxx {
 namespace qml {
@@ -371,6 +375,70 @@ void QmlLibraryProxy::createPlaylist() {
         return;
     }
     s_pLibrary->slotCreatePlaylist();
+}
+
+QVariantList QmlLibraryProxy::playlists() const {
+    QVariantList result;
+    VERIFY_OR_DEBUG_ASSERT(m_pTrackCollectionManager) {
+        return result;
+    }
+    const PlaylistDAO& playlistDao =
+            m_pTrackCollectionManager->internalCollection()->getPlaylistDAO();
+    const auto playlists = playlistDao.getPlaylists(PlaylistDAO::PLHT_NOT_HIDDEN);
+    for (const auto& [id, name] : playlists) {
+        result.append(QVariantMap{
+                {QStringLiteral("id"), id},
+                {QStringLiteral("name"), name},
+                {QStringLiteral("locked"), playlistDao.isPlaylistLocked(id)},
+        });
+    }
+    return result;
+}
+
+int QmlLibraryProxy::createNamedPlaylist(const QString& name) {
+    VERIFY_OR_DEBUG_ASSERT(m_pTrackCollectionManager) {
+        return -1;
+    }
+    const QString trimmedName = name.trimmed();
+    if (trimmedName.isEmpty()) {
+        return -1;
+    }
+    PlaylistDAO& playlistDao = m_pTrackCollectionManager->internalCollection()->getPlaylistDAO();
+    if (playlistDao.getPlaylistIdFromName(trimmedName) != -1) {
+        return -1;
+    }
+    return playlistDao.createPlaylist(trimmedName);
+}
+
+bool QmlLibraryProxy::addTrackToPlaylist(int playlistId, const QUrl& trackUrl) {
+    VERIFY_OR_DEBUG_ASSERT(m_pTrackCollectionManager) {
+        return false;
+    }
+    PlaylistDAO& playlistDao = m_pTrackCollectionManager->internalCollection()->getPlaylistDAO();
+    if (!playlistDao.playlistExists(playlistId) || playlistDao.isPlaylistLocked(playlistId)) {
+        return false;
+    }
+    const TrackPointer pTrack = m_pTrackCollectionManager->getOrAddTrack(
+            TrackRef::fromUrl(trackUrl));
+    if (!pTrack || !pTrack->getId().isValid()) {
+        qWarning() << "Unable to add" << trackUrl << "to playlist" << playlistId;
+        return false;
+    }
+    return playlistDao.appendTrackToPlaylist(pTrack->getId(), playlistId);
+}
+
+bool QmlLibraryProxy::hasFullStorageAccess() const {
+#ifdef __ANDROID__
+    return mixxx::android::hasFullExternalStorageAccess();
+#else
+    return true;
+#endif
+}
+
+void QmlLibraryProxy::requestFullStorageAccess() const {
+#ifdef __ANDROID__
+    mixxx::android::requestFullExternalStorageAccess();
+#endif
 }
 
 bool QmlLibraryProxy::enginePrimeExportAvailable() const {

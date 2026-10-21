@@ -237,6 +237,9 @@ Mixxx busca mapeos en dos ubicaciones:
 - El driver USB solo se ha probado con hardware UAC1 síncrono (DDJ-400). UAC2 y los endpoints asíncronos están probados con descriptores sintéticos, no con hardware real.
 - BEAT ◀/▶ de la DDJ-400 cambian el efecto enfocado (como el mapeo oficial de Mixxx), no la fracción de beat como en rekordbox.
 - Mientras Mixxx usa una tarjeta con el driver propio, ninguna otra app puede usarla hasta desenchufarla y volver a enchufarla.
+- En la vista LIB, el primer toque en el panel lateral justo después de cambiar de vista a veces no hace nada; el segundo funciona.
+- Engine DJ: los cues y la rejilla de Engine no se importan (Mixxx analiza la pista al cargarla). Las entradas de playlists cuyas pistas no se exportaron al USB no aparecen.
+- El lector USB propio solo lee FAT16/FAT32 (no exFAT ni HFS+) y solo actúa si Android no ha montado ningún USB.
 
 ### 6.5. Compilación
 ```bash
@@ -270,9 +273,31 @@ Nota: `make mixxx` por sí solo **no** actualiza el `.so` del proyecto Gradle; h
 - Errores del HAL de Qualcomm: `adb logcat | grep -E "PAL|AGM|AHAL"`.
 
 ### 6.9. Publicar una release
-1. Subir `android:versionCode` y `android:versionName` en `packaging/android/AndroidManifest.xml` (la v1.1.0 es `versionCode 2`).
+1. Subir `android:versionCode` y `android:versionName` en `packaging/android/AndroidManifest.xml` (la v1.1.0 es `versionCode 2`, la v1.2.0 `versionCode 3`).
 2. Actualizar las insignias y los enlaces de descarga del `README.md`.
 3. `make -C build-android -j12 apk`, firmar como `mixxx-android-vX.Y.Z.apk` y verificar con `apksigner verify` y `aapt2 dump badging`.
 4. Según `AGENTS.md`, el commit, la etiqueta (`vX.Y.Z-android`), el push y la publicación en GitHub los hace la persona, después de probar en un equipo de DJ real. El nombre del APK adjunto debe coincidir con el enlace del README.
+
+### 6.10. Biblioteca, playlists y USB de Rekordbox / Engine DJ (v1.2.0)
+- **Panel lateral QML** (`res/qml/Library/SourceTree.qml`): fuentes `LibraryAllTrackSource` y `LibraryFeatureSource` (`src/qml/qmllibrarysource.{h,cpp}`). Estas reutilizan las *features* que ya crea `Library` (playlists, cajas, historial, carpetas, grabaciones, Rekordbox, Engine DJ) a través de `Library::features()`; no son propiedad del panel.
+- **Modelo de la lista** (`src/qml/qmllibrarytracklistmodel.cpp`): `sourceColumn()` traduce las columnas al navegador de carpetas (`BrowseTableModel`, envuelto en un `ProxyTrackModel`). Los roles `track` y `cover_art` no cargan pistas fuera de la biblioteca, porque `getTrack()` las añadiría.
+- **Rendimiento:** las celdas no piden el rol `track`, el menú de pulsación larga se crea al abrirlo (`Track.qml`) y las carátulas se leen de la base de datos en un hilo aparte con caché en memoria (`src/qml/asyncimageprovider.cpp`).
+- **Ruleta BROWSE** (`res/qml/Library/Control.qml`, `Library.qml`): `MoveVertical` mueve la lista o el panel según `[Library],focused_widget`; `MoveFocusForward` pasa al panel o abre el elemento; `MoveFocusBackward` cierra o sube un nivel. Los pasos que llegan juntos se aplican de una vez y la selección se para en los extremos.
+- **Playlists desde la tablet:** `QmlLibraryProxy::playlists()`, `createNamedPlaylist()` y `addTrackToPlaylist()`, usados por el botón **+ PLAYLIST** de `TrackList.qml`.
+- **Engine DJ** (`src/library/enginedj/enginedjfeature.{h,cpp}`): las bases Engine DJ 2.x–4.x (`Engine Library/Database2/m.db`, esquema 3.0.2 en la prueba) se leen con SQL en solo lectura, porque libdjinterop 0.x no admite esos esquemas. Las entradas de `PlaylistEntity` de otra biblioteca (`databaseUuid` distinto) se traducen con `Track.originDatabaseUuid/originTrackId`. Las bibliotecas Engine Prime 1.x siguen usando libdjinterop. Tablas temporales `enginedj_*`.
+- **Rekordbox:** en Android `findRekordboxDevices()` usa `mixxx::removableStorageRoots()` (`src/util/removablestorage.{h,cpp}`); antes buscaba en `/Volumes`.
+- **Lector USB propio** (`src/library/usbdrive/`, `__ANDROID_USB_DRIVE__`): para pendrives que Android no monta (p. ej. FAT32 sin tabla de particiones, que `vold` rechaza y las Pioneer aceptan).
+  - `usbmassstorage`: Bulk-Only Transport y SCSI de solo lectura sobre libusb.
+  - `fatvolume`: FAT16/FAT32 con nombres largos, sin tabla de particiones, MBR o GPT.
+  - `androidusbdrive`: permiso USB, `claimInterface(force)` y copia bajo demanda a `cache/usbdrives/<etiqueta>/`. Las bases de datos se refrescan si cambian; las pistas se copian al cargarlas (`QmlPlayerProxy`, `QmlPlayerManagerProxy`) y la caché de pistas se limita a 4 GB.
+  - Solo actúa si Android no ha montado ningún USB (`/storage` sin volúmenes extraíbles).
+- **Permiso:** leer las bases de datos de un USB necesita «Acceso a todos los archivos»; `Browser.qml` lo detecta al abrir Rekordbox o Engine DJ y ofrece abrir el ajuste (`QmlLibraryProxy::requestFullStorageAccess()`).
+
+### 6.11. Cierres aleatorios al arrancar (corregido en v1.2.0)
+- **Síntoma:** `Scudo ERROR: corrupted chunk header` en 1 de cada 4-6 arranques, en sitios distintos (hilos gráficos, finalizador de Java, SQLite en `RekordboxFeature::RekordboxFeature`).
+- **Causa:** `OboeEngine::registerDevice()` de PortAudio (`libportaudio.a` de vcpkg) copia el nombre de cada dispositivo con `malloc(strlen(name))` y `strcpy()`, sin reservar el byte nulo. Si la longitud es múltiplo de 16 (p. ej. «TB331FC: Speaker»), el nulo cae en la cabecera del siguiente bloque de Scudo. Se ve desensamblando: `__strlen_chk` → `malloc` sin `+1`.
+- **Corrección:** CMake genera `build-android/libportaudio-mixxx.a` con `llvm-objcopy --redefine-sym malloc=mixxx_portaudio_malloc`, y `mixxx_portaudio_malloc()` (`src/soundio/portaudioenumerator.cpp`) reserva un byte más. Verificado: 15 de 15 arranques sin cierre, frente a 4 de 15 antes. Al actualizar PortAudio hay que comprobar si el fallo sigue ahí y, si no, quitar el parche.
+- **Diagnóstico útil:** `android:gwpAsanMode="always"` en `<application>` del manifiesto (solo para depurar), arranques en bucle, y `llvm-addr2line -C -f -i -e build-android/libmixxx_arm64-v8a.so <pc>` para los frames de `libmixxx`.
+- **Además:** el mapeo de la DDJ-400 pide 16 samplers con `engine.setValue("[App]", "num_samplers", 16)` desde el hilo de la controladora, y `PlayerManager` los creaba en ese hilo. Ahora `slotChangeNum*()` pasa las peticiones de otros hilos al hilo principal, y en Android se crean 16 samplers al arrancar (`kSamplerCount`, `src/coreservices.cpp`).
 
 <!-- DISCLAIMER: The preceding documentation was autonomously generated by an AI Agent as required by AGENTS.md. -->

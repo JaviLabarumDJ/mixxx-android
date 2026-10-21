@@ -14,6 +14,18 @@ Item {
     function hasCapabilities(caps) {
         return (root.capabilities & caps) == caps;
     }
+    // Loading the track is expensive, only do it when it's needed
+    function currentTrack() {
+        return tableView.model.getTrack(row);
+    }
+    function loadToDeck(group) {
+        Mixxx.PlayerManager.getPlayer(group).loadTrackFromLocationUrl(file_url, false);
+    }
+    // Every cell has a menu, it's only created when it's opened
+    function openContextMenu() {
+        contextMenuLoader.active = true;
+        contextMenuLoader.item.popup();
+    }
 
     DragHandler {
         id: dragHandler
@@ -26,128 +38,136 @@ Item {
         gesturePolicy: TapHandler.DragThreshold
 
         onLongPressed: mouse => {
-            contextMenu.popup();
+            root.openContextMenu();
         }
         onTapped: (eventPoint, button) => {
             if (button === Qt.RightButton) {
-                contextMenu.popup();
+                root.openContextMenu();
             }
         }
     }
-    Menu {
-        id: contextMenu
+    Loader {
+        id: contextMenuLoader
 
-        title: qsTr("File")
+        active: false
 
-        MenuItem {
-            text: qsTr("◀ Cargar en Deck 1 / Load Deck 1")
-            onTriggered: Mixxx.PlayerManager.getPlayer("[Channel1]").loadTrack(track)
-        }
-        MenuItem {
-            text: qsTr("Cargar en Deck 2 ▶ / Load Deck 2")
-            onTriggered: Mixxx.PlayerManager.getPlayer("[Channel2]").loadTrack(track)
-        }
-        MenuSeparator {
-        }
-
-        Menu {
-            enabled: {
-                hasCapabilities(Mixxx.LibraryTrackListModel.Capability.LoadToDeck) || hasCapabilities(Mixxx.LibraryTrackListModel.Capability.LoadToSampler) || hasCapabilities(Mixxx.LibraryTrackListModel.Capability.LoadToPreviewDeck);
-            }
-            title: qsTr("Load to")
-
+        sourceComponent: Component {
             Menu {
-                id: loadToDeckMenu
+                id: contextMenu
 
-                enabled: hasCapabilities(Mixxx.LibraryTrackListModel.Capability.LoadToDeck)
-                title: qsTr("Deck")
+                title: qsTr("File")
 
-                Instantiator {
-                    model: 4
+                MenuItem {
+                    text: qsTr("◀ Cargar en Deck 1 / Load Deck 1")
+                    onTriggered: root.loadToDeck("[Channel1]")
+                }
+                MenuItem {
+                    text: qsTr("Cargar en Deck 2 ▶ / Load Deck 2")
+                    onTriggered: root.loadToDeck("[Channel2]")
+                }
+                MenuSeparator {
+                }
 
-                    delegate: MenuItem {
-                        text: qsTr("Deck %1").arg(modelData + 1)
+                Menu {
+                    enabled: {
+                        hasCapabilities(Mixxx.LibraryTrackListModel.Capability.LoadToDeck) || hasCapabilities(Mixxx.LibraryTrackListModel.Capability.LoadToSampler) || hasCapabilities(Mixxx.LibraryTrackListModel.Capability.LoadToPreviewDeck);
+                    }
+                    title: qsTr("Load to")
 
-                        onTriggered: Mixxx.PlayerManager.getPlayer(`[Channel${modelData + 1}]`).loadTrack(track)
+                    Menu {
+                        id: loadToDeckMenu
+
+                        enabled: hasCapabilities(Mixxx.LibraryTrackListModel.Capability.LoadToDeck)
+                        title: qsTr("Deck")
+
+                        Instantiator {
+                            model: 4
+
+                            delegate: MenuItem {
+                                text: qsTr("Deck %1").arg(modelData + 1)
+
+                                onTriggered: root.loadToDeck(`[Channel${modelData + 1}]`)
+                            }
+
+                            onObjectAdded: (index, object) => loadToDeckMenu.insertItem(index, object)
+                            onObjectRemoved: (index, object) => loadToDeckMenu.removeItem(object)
+                        }
+                    }
+                    Menu {
+                        enabled: hasCapabilities(Mixxx.LibraryTrackListModel.Capability.LoadToSampler)
+                        title: qsTr("Sampler")
                     }
 
-                    onObjectAdded: (index, object) => loadToDeckMenu.insertItem(index, object)
-                    onObjectRemoved: (index, object) => loadToDeckMenu.removeItem(object)
+                    // Instantiator {
+                    //     id: recentFilesInstantiator
+                    //     model: settings.recentFiles
+                    //     delegate: MenuItem {
+                    //         text: settings.displayableFilePath(modelData)
+                    //         onTriggered: loadFile(modelData)
+                    //     }
+
+                    //     onObjectAdded: (index, object) => recentFilesMenu.insertItem(index, object)
+                    //     onObjectRemoved: (index, object) => recentFilesMenu.removeItem(object)
+                    // }
                 }
-            }
-            Menu {
-                enabled: hasCapabilities(Mixxx.LibraryTrackListModel.Capability.LoadToSampler)
-                title: qsTr("Sampler")
-            }
+                Menu {
+                    id: addToPlaylistMenu
 
-            // Instantiator {
-            //     id: recentFilesInstantiator
-            //     model: settings.recentFiles
-            //     delegate: MenuItem {
-            //         text: settings.displayableFilePath(modelData)
-            //         onTriggered: loadFile(modelData)
-            //     }
+                    enabled: {
+                        hasCapabilities(Mixxx.LibraryTrackListModel.Capability.AddToTrackSet);
+                    }
+                    title: qsTr("Add to playlists")
 
-            //     onObjectAdded: (index, object) => recentFilesMenu.insertItem(index, object)
-            //     onObjectRemoved: (index, object) => recentFilesMenu.removeItem(object)
-            // }
-        }
-        Menu {
-            id: addToPlaylistMenu
-
-            enabled: {
-                hasCapabilities(Mixxx.LibraryTrackListModel.Capability.AddToTrackSet);
-            }
-            title: qsTr("Add to playlists")
-
-            MenuSeparator {
-            }
-            MenuItem {
-                enabled: false // TODO implement
-                text: qsTr("Create New Playlist")
-            }
-        }
-        Menu {
-            id: addToCrateMenu
-
-            enabled: {
-                hasCapabilities(Mixxx.LibraryTrackListModel.Capability.AddToTrackSet);
-            }
-            title: qsTr("Crates")
-
-            MenuSeparator {
-            }
-            MenuItem {
-                enabled: false // TODO implement
-                text: qsTr("Create New Crate")
-            }
-        }
-        Menu {
-            id: analyzeMenu
-
-            enabled: {
-                hasCapabilities(Mixxx.LibraryTrackListModel.Capability.EditMetadata) || hasCapabilities(Mixxx.LibraryTrackListModel.Capability.Analyze);
-            }
-            title: qsTr("Analyze")
-
-            MenuItem {
-                text: qsTr("Analyze")
-
-                onTriggered: {
-                    library.analyze(track);
+                    MenuSeparator {
+                    }
+                    MenuItem {
+                        enabled: false // TODO implement
+                        text: qsTr("Create New Playlist")
+                    }
                 }
-            }
-            MenuItem {
-                enabled: false // TODO implement
-                text: qsTr("Reanalyze")
-            }
-            MenuItem {
-                enabled: false // TODO implement
-                text: qsTr("Reanalyze (constant BPM)")
-            }
-            MenuItem {
-                enabled: false // TODO implement
-                text: qsTr("Reanalyze (variable BPM)")
+                Menu {
+                    id: addToCrateMenu
+
+                    enabled: {
+                        hasCapabilities(Mixxx.LibraryTrackListModel.Capability.AddToTrackSet);
+                    }
+                    title: qsTr("Crates")
+
+                    MenuSeparator {
+                    }
+                    MenuItem {
+                        enabled: false // TODO implement
+                        text: qsTr("Create New Crate")
+                    }
+                }
+                Menu {
+                    id: analyzeMenu
+
+                    enabled: {
+                        hasCapabilities(Mixxx.LibraryTrackListModel.Capability.EditMetadata) || hasCapabilities(Mixxx.LibraryTrackListModel.Capability.Analyze);
+                    }
+                    title: qsTr("Analyze")
+
+                    MenuItem {
+                        text: qsTr("Analyze")
+
+                        onTriggered: {
+                            library.analyze(root.currentTrack());
+                        }
+                    }
+                    MenuItem {
+                        enabled: false // TODO implement
+                        text: qsTr("Reanalyze")
+                    }
+                    MenuItem {
+                        enabled: false // TODO implement
+                        text: qsTr("Reanalyze (constant BPM)")
+                    }
+                    MenuItem {
+                        enabled: false // TODO implement
+                        text: qsTr("Reanalyze (variable BPM)")
+                    }
+                }
             }
         }
     }

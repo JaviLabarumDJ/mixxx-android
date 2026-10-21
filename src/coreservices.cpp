@@ -91,7 +91,13 @@ namespace {
 const mixxx::Logger kLogger("CoreServices");
 constexpr int kMicrophoneCount = 4;
 constexpr int kAuxiliaryCount = 4;
+#ifdef __ANDROID__
+// Mappings like the DDJ-400 one ask for 16 samplers when they start. They
+// are created here, on the main thread, so controllers don't have to.
+constexpr int kSamplerCount = 16;
+#else
 constexpr int kSamplerCount = 4;
+#endif
 
 #define CLEAR_AND_CHECK_DELETED(x) clearHelper(x, #x);
 

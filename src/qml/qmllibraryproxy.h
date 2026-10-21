@@ -196,6 +196,18 @@ class QmlLibraryProxy : public QObject {
     Q_INVOKABLE void analyzeUnanalyzedTracks() const;
     Q_INVOKABLE void createCrate();
     Q_INVOKABLE void createPlaylist();
+    /// The visible playlists as a list of {id, name, locked}
+    Q_INVOKABLE QVariantList playlists() const;
+    /// Creates a playlist without asking for the name. Returns its id, or -1
+    /// if the name is empty or already used.
+    Q_INVOKABLE int createNamedPlaylist(const QString& name);
+    /// Appends the track, adding it to the library if needed
+    Q_INVOKABLE bool addTrackToPlaylist(int playlistId, const QUrl& trackUrl);
+    /// Whether the databases on USB drives (Rekordbox, Engine DJ) can be
+    /// read. On Android this needs "All files access".
+    Q_INVOKABLE bool hasFullStorageAccess() const;
+    /// Opens the system settings to grant "All files access"
+    Q_INVOKABLE void requestFullStorageAccess() const;
     Q_INVOKABLE void exportLibrary();
     Q_INVOKABLE void rescanLibrary();
     Q_INVOKABLE void searchInCurrentView();
