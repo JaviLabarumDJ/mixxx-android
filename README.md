@@ -5,8 +5,8 @@
 ![Android Version](https://img.shields.io/badge/Android-10.0%2B%20(API%2029--35)-brightgreen?logo=android&logoColor=white)
 ![Architecture](https://img.shields.io/badge/Arch-ARM64%20(arm64--v8a)-blue?logo=arm)
 ![Framework](https://img.shields.io/badge/Qt-6.8%20%7C%20QML-41cd52?logo=qt)
-[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.0.0-android)
-[![Download APK](https://img.shields.io/badge/Download-APK%20(248%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.0.0-android/mixxx-android-v1.0.0.apk)
+[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.1.0-android)
+[![Download APK](https://img.shields.io/badge/Download-APK%20(248%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.1.0-android/mixxx-android-v1.1.0.apk)
 ![License](https://img.shields.io/badge/License-GPL%20v2-orange.svg)
 
 **The world's premier open-source DJ software, fully ported, modernized, and touch-optimized for Android smartphones, tablets, and standalone hardware setups.**
@@ -25,11 +25,27 @@ Whether you're performing live sets using a USB DJ controller, mixing on the go 
 
 ---
 
+<!-- START_AI_GENERATED_DISCLAIMER -->
+<!-- This section was written with the assistance of an AI Agent (Claude). -->
+
+## 🆕 What's New in v1.1.0
+
+* **Built-in USB audio driver for DJ controllers:** Mixxx now drives class compliant USB sound cards itself (USB Audio Class 1 and 2, synchronous, adaptive and asynchronous endpoints). This fixes controllers whose headphone output (channels 3-4) Android can't play to, e.g. the Pioneer DDJ-400 on tablets with Qualcomm USB audio offload. Configurable in *Settings → Audio → Mixxx USB driver* (auto / always / never).
+* **Native Android MIDI:** USB and Bluetooth MIDI controllers are detected through Android's MIDI service, hot-plugged at any time, and get their official mapping assigned automatically on first connection.
+* **Automatic routing:** when a DJ controller with 4 outputs is connected, Main goes to channels 1-2 (RCA) and the headphone cue to channels 3-4, at the controller's own sample rate and full volume.
+* **Manual beatmatching:** per deck quantize (Q) and hold-to-nudge (◀ ▶) buttons; the tempo fader no longer jumps when touched; tapping SYNC matches the beat once instead of locking.
+* **Effects:** effect units are ready on first launch, BEAT FX on the DDJ-400 works from the start, channel assignment (1 / 2 / M) in the FX panel, safer XY pad and Quick Filter controls.
+* **Stability:** fixed waveforms jumping back to the cue point, a crash at startup, USB permission handling on Android 12+, settings and effects now survive Android closing the app in the background.
+
+<!-- END_AI_GENERATED_DISCLAIMER -->
+
+---
+
 ## ✨ Key Features
 
 ### 🎛️ 1. Touch DJ Mode (`DJ`)
 * **Full-Featured 2-Deck & 4-Deck Mixing Console:** Dedicated channels with 3-band EQ, gain trims, and high/low-pass Quick Filters.
-* **Touch-Optimized Faders:** Responsive volume sliders and crossfader designed specifically for capacitive touchscreen dragging, direct tapping, and double-tap centering.
+* **Touch-Optimized Faders:** Responsive volume sliders and crossfader designed for capacitive touchscreens: faders move relative to your finger (no jumps when you touch them) and double-tap resets them.
 * **Virtual Platters (Spinny):** Low-latency vinyl emulation scratching, touch pitch bend, and visual cue point markers.
 * **Performance Hotcues & Stems:** Instantaneous trigger pads for cues, loops, and real-time audio stem isolation.
 
@@ -78,7 +94,7 @@ Whether you're performing live sets using a USB DJ controller, mixing on the go 
 ## 🚀 Installation & Quick Start
 
 ### Option A: Install Pre-Built Signed APK
-1. Download [**mixxx-android-v1.0.0.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.0.0-android/mixxx-android-v1.0.0.apk) from the [Official GitHub Release v1.0.0](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.0.0-android).
+1. Download [**mixxx-android-v1.1.0.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.1.0-android/mixxx-android-v1.1.0.apk) from the [Official GitHub Release v1.1.0](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.1.0-android).
 2. Enable *"Install unknown apps"* in your Android device settings.
 3. Install and launch **MIXXX**.
 4. Grant storage and audio permissions when prompted.

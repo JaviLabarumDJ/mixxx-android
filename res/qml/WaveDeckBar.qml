@@ -31,6 +31,31 @@ Item {
         }
     }
 
+    component NudgeButton: Rectangle {
+        required property var control
+        required property string label
+
+        Layout.preferredWidth: 24
+        radius: 4
+        color: control.value > 0 ? "#37474f" : "#141924"
+        border.color: "#37474f"
+        border.width: 1
+
+        Text {
+            anchors.centerIn: parent
+            text: parent.label
+            font.pixelSize: 10
+            color: "#b0bec5"
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onPressed: parent.control.value = 1
+            onReleased: parent.control.value = 0
+            onCanceled: parent.control.value = 0
+        }
+    }
+
     // ================= REUSABLE DECK CARD COMPONENT =================
     component DeckCard: Rectangle {
         id: card
@@ -60,6 +85,12 @@ Item {
         Mixxx.ControlProxy { id: cueControl; group: card.group; key: "cue_default" }
         Mixxx.ControlProxy { id: syncEnabledControl; group: card.group; key: "sync_enabled" }
         Mixxx.ControlProxy { id: syncModeControl; group: card.group; key: "sync_mode" }
+        Mixxx.ControlProxy { id: syncLeaderControl; group: card.group; key: "sync_leader" }
+        Mixxx.ControlProxy { id: beatSyncControl; group: card.group; key: "beatsync" }
+        Mixxx.ControlProxy { id: rateRatioControl; group: card.group; key: "rate_ratio" }
+        Mixxx.ControlProxy { id: quantizeControl; group: card.group; key: "quantize" }
+        Mixxx.ControlProxy { id: rateTempDownControl; group: card.group; key: "rate_temp_down" }
+        Mixxx.ControlProxy { id: rateTempUpControl; group: card.group; key: "rate_temp_up" }
 
         property int timeDisplayMode: 0 // 0: REMAIN, 1: ELAPSED
 
@@ -127,6 +158,31 @@ Item {
                         font.pixelSize: 10
                     }
                 }
+
+                // Quantize: snaps play, cue and hotcues to the beat grid.
+                // Turn it off to drop a track slightly off the beat.
+                Rectangle {
+                    Layout.preferredHeight: 18
+                    Layout.preferredWidth: 26
+                    radius: 3
+                    color: quantizeControl.value > 0 ? card.accentColor : "#182030"
+                    border.color: card.accentColor
+                    border.width: 1
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "Q"
+                        color: quantizeControl.value > 0 ? "#000000" : "#78909c"
+                        font.bold: true
+                        font.pixelSize: 10
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        anchors.margins: -4
+                        onClicked: quantizeControl.value = quantizeControl.value > 0 ? 0 : 1
+                    }
+                }
             }
 
             // -------- 2. MIDDLE DASHBOARD ROW (TIME, BPM, PITCH & TRANSPORT) --------
@@ -190,6 +246,14 @@ Item {
                     }
                 }
 
+                // Hold to bend the tempo for manual beatmatching. Unlike a
+                // scratch, the engine keeps this offset while sync is locked.
+                NudgeButton {
+                    Layout.preferredHeight: parent.height
+                    control: rateTempDownControl
+                    label: "◀"
+                }
+
                 // Pitch / Tempo Percentage
                 Rectangle {
                     Layout.preferredHeight: parent.height
@@ -216,11 +280,17 @@ Item {
                             font.pixelSize: 10
                             color: card.accentColor
                             text: {
-                                var p = (rateControl.value || 0) * 8.0;
+                                var p = ((rateRatioControl.value || 1) - 1) * 100.0;
                                 return (p >= 0 ? "+" : "") + p.toFixed(1) + "%";
                             }
                         }
                     }
+                }
+
+                NudgeButton {
+                    Layout.preferredHeight: parent.height
+                    control: rateTempUpControl
+                    label: "▶"
                 }
 
                 // BPM Box (Hero display)
@@ -258,25 +328,44 @@ Item {
                             }
                         }
 
-                        // MASTER / SYNC tag
+                        // SYNC tag. A tap matches tempo and phase once
+                        // (beatsync) so an accidental touch never locks the
+                        // deck; a long press toggles sync lock, and a long
+                        // press while locked toggles the leader.
                         Rectangle {
-                            Layout.preferredHeight: 18
-                            Layout.preferredWidth: 32
-                            radius: 2
-                            color: (syncModeControl.value >= 2) ? "#ff9100" : (syncEnabledControl.value > 0 ? "#00e676" : "#1a2230")
+                            Layout.preferredHeight: 24
+                            Layout.preferredWidth: 38
+                            radius: 3
+                            color: (syncModeControl.value >= 2) ? "#ff9100" : (syncEnabledControl.value > 0 ? "#00e676" : (syncMouse.pressed ? "#263238" : "#1a2230"))
+                            border.color: "#00e676"
+                            border.width: 1
 
                             Text {
                                 anchors.centerIn: parent
-                                text: (syncModeControl.value >= 2) ? "MSTR" : (syncEnabledControl.value > 0 ? "SYNC" : "SYNC")
+                                text: (syncModeControl.value >= 2) ? "MSTR" : (syncEnabledControl.value > 0 ? "LOCK" : "SYNC")
                                 font.bold: true
-                                font.pixelSize: 8
-                                color: (syncModeControl.value >= 2 || syncEnabledControl.value > 0) ? "#000000" : "#78909c"
+                                font.pixelSize: 9
+                                color: (syncModeControl.value >= 2 || syncEnabledControl.value > 0) ? "#000000" : "#b0bec5"
                             }
 
                             MouseArea {
+                                id: syncMouse
                                 anchors.fill: parent
-                                onClicked: syncEnabledControl.value = !syncEnabledControl.value
-                                onPressAndHold: syncModeControl.value = (syncModeControl.value >= 2 ? 0 : 2)
+                                anchors.margins: -3
+                                onClicked: {
+                                    if (syncEnabledControl.value > 0) {
+                                        syncEnabledControl.value = 0;
+                                    } else {
+                                        beatSyncControl.value = 1;
+                                    }
+                                }
+                                onPressAndHold: {
+                                    if (syncEnabledControl.value > 0) {
+                                        syncLeaderControl.value = syncLeaderControl.value > 0 ? 0 : 1;
+                                    } else {
+                                        syncEnabledControl.value = 1;
+                                    }
+                                }
                             }
                         }
                     }

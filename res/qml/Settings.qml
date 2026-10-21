@@ -26,6 +26,18 @@ Popup {
         root.activeCategory?.activated();
     }
 
+    function resetSearch() {
+        searchSetting.active = false;
+        searchInput.text = "";
+        // Assigning text doesn't emit textEdited, so reset the filter too
+        root.manager.search("");
+        root.forceActiveFocus();
+    }
+
+    onOpened: {
+        resetSearch();
+    }
+
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
     focus: true
     horizontalPadding: 8
@@ -131,21 +143,38 @@ Popup {
 
                         TextInput {
                             id: searchInput
+                            focus: false
+                            activeFocusOnTab: false
                             anchors.left: parent.left
-                            anchors.right: parent.right
+                            anchors.right: clearSearchBtn.visible ? clearSearchBtn.left : parent.right
                             anchors.leftMargin: 8
-                            anchors.rightMargin: 8
+                            anchors.rightMargin: 4
                             anchors.verticalCenter: parent.verticalCenter
                             color: Theme.white
                             font.pixelSize: 12
                             visible: parent.active || text.length > 0
-                            width: parent.width
 
-                            onActiveFocusChanged: {
-                                parent.active = activeFocus;
-                            }
                             onTextEdited: {
                                 root.manager.search(text);
+                            }
+                        }
+
+                        Text {
+                            id: clearSearchBtn
+                            anchors.right: parent.right
+                            anchors.rightMargin: 8
+                            anchors.verticalCenter: parent.verticalCenter
+                            color: "#bbdefb"
+                            font.pixelSize: 12
+                            font.bold: true
+                            text: "✕"
+                            visible: parent.active || searchInput.text.length > 0
+                            MouseArea {
+                                anchors.fill: parent
+                                anchors.margins: -6
+                                onClicked: {
+                                    root.resetSearch();
+                                }
                             }
                         }
 
@@ -217,6 +246,12 @@ Popup {
                                         font.pixelSize: 10
                                         text: subtext
                                     }
+                                }
+                            }
+
+                            TapHandler {
+                                onTapped: {
+                                    categoryList.currentIndex = index;
                                 }
                             }
 
@@ -397,6 +432,7 @@ Popup {
                         ];
                         soundHardwareSection.activated.connect(function() { categoryList.currentIndex = 0; });
                         controllerSection.activated.connect(function() { categoryList.currentIndex = 1; });
+                        controllerSection.requestNavigateToAudio.connect(function() { categoryList.currentIndex = 0; });
                         librarySection.activated.connect(function() { categoryList.currentIndex = 2; });
                         waveformSection.activated.connect(function() { categoryList.currentIndex = 3; });
                         interfaceSection.activated.connect(function() { categoryList.currentIndex = 4; });

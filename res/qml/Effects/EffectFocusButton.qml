@@ -18,7 +18,9 @@ Skin.Button {
     TapHandler {
         acceptedButtons: Qt.LeftButton
 
-        onTapped: focusedEffectControl.value = root.focused ? 0 : root.effectNumber
+        // Never remove the focus: controllers (e.g. the DDJ-400 BEAT FX)
+        // act on the focused effect
+        onTapped: focusedEffectControl.value = root.effectNumber
     }
     TapHandler {
         acceptedButtons: Qt.RightButton

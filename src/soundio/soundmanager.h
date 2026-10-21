@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QSharedPointer>
 #include <QString>
+#include <QTimer>
 #include <memory>
 
 #include "audio/types.h"
@@ -67,6 +68,19 @@ class SoundManager : public QObject {
     QList<QString> getHostAPIList() const;
     SoundManagerConfig getConfig() const;
     SoundDeviceStatus setConfig(const SoundManagerConfig& config);
+
+    /// Android only: when enabled (the default), a USB sound card with at
+    /// least 4 output channels (a DJ controller) automatically gets the Main
+    /// output on channels 1-2 and the Headphones on channels 3-4 as soon as
+    /// it is present. Disabled when the user picks another routing.
+    bool getAutoRouteController() const;
+    void setAutoRouteController(bool enabled);
+
+    /// Android only: when Mixxx drives USB sound cards itself, see
+    /// mixxx::androidusb::DirectMode (0 = auto, 1 = always, 2 = never).
+    /// Takes effect after a restart.
+    int getAndroidUsbDirectMode() const;
+    void setAndroidUsbDirectMode(int mode);
     // Due to a bug in in PulseAudio, we must give at least 5 seconds of cool
     // down before performing further audio related operation. This sleep
     // happens during the function call by default (synchronous blocking), but
@@ -169,6 +183,11 @@ class SoundManager : public QObject {
 
   private slots:
     void completeDevicesClosing();
+#ifdef __ANDROID_USB_AUDIO__
+    /// Reconfigures the audio when a directly driven USB sound card is
+    /// plugged in or out
+    void slotAndroidUsbDevicesChanged();
+#endif
 
   public slots:
     void addDevice(SoundDevicePointer pDevice);
@@ -184,6 +203,12 @@ class SoundManager : public QObject {
     // (from PortAudio) and attempts to close them all. Closing a soundcard that
     // isn't open is safe.
     void closeDevices(bool sleepAfterClosing, bool async = false);
+
+#ifdef Q_OS_ANDROID
+    /// Routes the outputs to a connected DJ controller sound card, see
+    /// getAutoRouteController(). Modifies and saves m_config.
+    void autoRouteToController();
+#endif
 
     bool jackApiUsed() const {
         return m_config.getAPI() == SoundManagerConfig::kAPIJack;
@@ -207,6 +232,11 @@ class SoundManager : public QObject {
     PollingControlProxy m_audioLatencyOverload;
 
     std::unique_ptr<SoundDeviceEnumerator> m_pEnumerator;
+#ifdef __ANDROID_USB_AUDIO__
+    /// Debounces USB hotplug notifications
+    QTimer* m_pAndroidUsbTimer = nullptr;
+    int m_androidUsbListenerId = 0;
+#endif
 
     QSharedPointer<EngineNetworkStream> m_pNetworkStream;
     QSharedPointer<SoundDeviceNetwork> m_pNetworkDevice;

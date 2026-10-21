@@ -3904,6 +3904,7 @@ if(PORTMIDI)
   )
 endif()
 
+
 # Protobuf
 add_subdirectory(src/proto)
 target_link_libraries(mixxx-lib PUBLIC mixxx-proto)
@@ -5446,6 +5447,15 @@ if(HID)
 
   if(ANDROID)
     target_sources(mixxx-lib PRIVATE src/controllers/android.cpp)
+    # Android MIDI (android.media.midi + NDK AMidi, resolved at runtime). It
+    # relies on the JNI glue in android.cpp.
+    target_compile_definitions(mixxx-lib PUBLIC __ANDROID_MIDI__)
+    target_sources(
+      mixxx-lib
+      PRIVATE
+        src/controllers/midi/androidmidicontroller.cpp
+        src/controllers/midi/androidmidienumerator.cpp
+    )
   else()
     # Android doesn't support QWidget and is not able to compile this manager due to compiler lacking support for structure binding (error: capturing a structured binding is not yet supported)
     target_sources(
@@ -5484,6 +5494,17 @@ if(BULK)
   endif()
   target_compile_definitions(mixxx-lib PUBLIC __BULK__)
   target_link_libraries(mixxx-lib PRIVATE LibUSB::LibUSB)
+  if(ANDROID)
+    # Direct USB audio/MIDI driver for sound cards that Android can't play to
+    target_compile_definitions(mixxx-lib PUBLIC __ANDROID_USB_AUDIO__)
+    target_sources(
+      mixxx-lib
+      PRIVATE
+        src/soundio/androidusbaudiodevice.cpp
+        src/soundio/usbaudiodescriptors.cpp
+        src/soundio/sounddeviceandroidusb.cpp
+    )
+  endif()
   if(QML)
     target_compile_definitions(mixxx-qml-lib PUBLIC __BULK__)
   endif()

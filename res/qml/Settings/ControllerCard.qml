@@ -31,11 +31,24 @@ Item {
         root.modelData.mapping?.saveSettingTree(root.settings);
     }
 
+    function suggestMapping() {
+        // Devices without any mapping get the best matching one of their
+        // type pre-selected; it is only applied once the user saves.
+        if (root.modelData.mapping)
+            return;
+        let suggestion = Mixxx.ControllerManager.suggestedMapping(root.modelData);
+        if (!suggestion)
+            return;
+        root.modelData.mapping = suggestion;
+        root.modelData.enabled = true;
+    }
+
     Layout.alignment: Qt.AlignTop
     Layout.fillWidth: true
     Layout.preferredHeight: root.focused ? settingsAndScreenItem.y + settingsAndScreenItem.height + 40 : 180
 
     Component.onCompleted: {
+        suggestMapping();
         loadSettingLayout();
     }
 
@@ -56,6 +69,8 @@ Item {
         anchors.margins: 8
         color: '#181818'
         radius: root.focused ? 18 : 22
+        border.color: root.focused ? "#2979ff" : (root.knownDevice ? "#2e7d32" : "#37474f")
+        border.width: root.focused ? 2 : 1
 
         Item {
             id: label
@@ -452,18 +467,18 @@ Item {
             clip: true
             currentIndex: model.indexOf(root.modelData.mapping)
             font.pixelSize: 10
-            footerItems: [
+            footerItems: showAllMappings ? [] : [
                 {
-                    text: qsTr("Show all mappings..."),
+                    text: qsTr("Ver todos los mapeos (MIDI/HID)..."),
                     suffix: "+"
                 }
             ]
             implicitHeight: 32
             indicator.width: 0
             model: Mixxx.ControllerManager.mappings(modelData.type)
-            popupMaxItem: showAllMappings ? 6 : matchingMappings?.length + 1
+            popupMaxItem: showAllMappings ? 8 : matchingMappings.length + 1
             spacing: 2
-            width: 180
+            width: root.focused ? 260 : 180
 
             contentItem: Item {
                 Text {
@@ -473,9 +488,11 @@ Item {
                     anchors.margins: 6
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
-                    color: Theme.deckTextColor
+                    color: mappingsCombobox.currentIndex >= 0 ? Theme.deckTextColor : "#ffb74d"
                     font: mappingsCombobox.font
-                    text: mappingsCombobox.currentIndex >= 0 ? mappingsCombobox.model[mappingsCombobox.currentIndex]?.name : ""
+                    text: mappingsCombobox.currentIndex >= 0 
+                          ? mappingsCombobox.model[mappingsCombobox.currentIndex]?.name 
+                          : qsTr("Seleccionar mapeo...")
                 }
                 InfoBubble {
                     id: infoBubble
@@ -639,11 +656,14 @@ Item {
                 mappingsCombobox.footerItems = [];
                 mappingsCombobox.showAllMappings = true;
             }
-            onCurrentIndexChanged: {
-                if (currentIndex == -1)
+            onActivated: index => {
+                if (index == -1)
                     return;
 
-                root.modelData.mapping = mappingsCombobox.model[currentIndex];
+                // Only react to the user picking a mapping, not to currentIndex
+                // being re-evaluated when the card is created.
+                root.modelData.mapping = mappingsCombobox.model[index];
+                root.modelData.enabled = true;
             }
         }
         Skin.Button {

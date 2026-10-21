@@ -106,7 +106,7 @@ Item {
     function releasePrimary() {
         if (root.powerWindow) {
             if (!powerWindowTimer.running && !root.powerWindowLatched &&
-                    !(interactionArea.pressedButtons & Qt.RightButton)) {
+                    !secondaryArea.pressed) {
                 control.value = root.pressStartValue;
             }
             powerWindowTimer.stop();
@@ -132,7 +132,7 @@ Item {
     }
 
     function releaseSecondary() {
-        if (root.powerWindow && (interactionArea.pressedButtons & Qt.LeftButton)) {
+        if (root.powerWindow && primaryHandler.pressed) {
             root.powerWindowLatched = true;
         }
         if (root.rightClickKey.length > 0) {

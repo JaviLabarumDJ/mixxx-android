@@ -105,6 +105,26 @@ QmlSoundManagerProxy::QmlSoundManagerProxy(
     });
 }
 
+int QmlSoundManagerProxy::getAndroidUsbDirectMode() const {
+    return m_pSoundManager->getAndroidUsbDirectMode();
+}
+
+void QmlSoundManagerProxy::setAndroidUsbDirectMode(int mode) {
+    m_pSoundManager->setAndroidUsbDirectMode(mode);
+}
+
+bool QmlSoundManagerProxy::getAutoRouteController() const {
+    return m_pSoundManager->getAutoRouteController();
+}
+
+void QmlSoundManagerProxy::setAutoRouteController(bool enabled) {
+    m_pSoundManager->setAutoRouteController(enabled);
+}
+
+void QmlSoundManagerProxy::reload() {
+    m_config = m_pSoundManager->getConfig();
+}
+
 // static
 QmlSoundManagerProxy* QmlSoundManagerProxy::create(
         QQmlEngine* pQmlEngine,

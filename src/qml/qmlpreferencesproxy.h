@@ -336,6 +336,7 @@ class QmlControllerManagerProxy : public QObject {
     Q_PROPERTY(QList<QmlControllerDeviceProxy*> unknownDevices MEMBER
                     m_unknownDevicesFound NOTIFY deviceListChanged)
     Q_PROPERTY(bool showControllerScreen MEMBER s_controllerPreviewScreens CONSTANT)
+    Q_PROPERTY(QString mappingsDirectory READ getMappingsDirectory CONSTANT)
     QML_SINGLETON
   public:
     explicit QmlControllerManagerProxy(
@@ -349,10 +350,21 @@ class QmlControllerManagerProxy : public QObject {
 
     std::shared_ptr<ControllerManager> internal() const;
 
+    QString getMappingsDirectory() const;
+    Q_INVOKABLE void copyToClipboard(const QString& text);
+
     Q_INVOKABLE mixxx::qml::QmlControllerMappingProxyList mappings(
             mixxx::qml::QmlControllerDeviceProxy::Type type) const {
         return m_knownMappings.value(type);
     }
+
+    /// Returns the mapping of the same type whose name best matches the
+    /// device name, or nullptr. Used to suggest a mapping for new devices.
+    Q_INVOKABLE mixxx::qml::QmlControllerMappingProxy* suggestedMapping(
+            mixxx::qml::QmlControllerDeviceProxy* pDevice) const;
+
+    QmlControllerMappingProxy* findMapping(
+            QmlControllerDeviceProxy::Type type, const QString& path) const;
 
     Q_INVOKABLE void rescan();
 

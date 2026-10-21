@@ -81,3 +81,4 @@ res/qrc_mixxx.cc
 *.jpeg
 *.jpg
 
+/.release/

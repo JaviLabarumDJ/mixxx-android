@@ -25,7 +25,8 @@ Item {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.top: parent.top
-        width: Math.min(root.width, root.maxSelectorWidth)
+        // Leave room for the parameter knobs when expanded
+        width: Math.min(root.expanded ? root.width * 0.45 : root.width, root.maxSelectorWidth)
 
         EffectFocusButton {
             id: focusButton
@@ -86,6 +87,9 @@ Item {
         anchors.top: parent.top
         clip: true
         model: root.slot.parametersModel
+        // Not flickable: on touch screens the list would take the drag
+        // gestures of the parameter knobs
+        interactive: false
         orientation: ListView.Horizontal
         spacing: 5
         visible: root.expanded

@@ -18,6 +18,13 @@ Category {
     property var selectedController: null
     property bool isRescanning: false
     property bool showGuide: true
+    // MIDI controllers carry no product information, so they are never
+    // "known" devices. Show every device with a mapping as a card and only
+    // list the remaining ones as unmapped.
+    readonly property var activeDevices: Array.from(manager.knownDevices).concat(
+        Array.from(manager.unknownDevices).filter(device => !!device.mapping))
+    readonly property var unmappedDevices: Array.from(manager.unknownDevices).filter(device => !device.mapping)
+    signal requestNavigateToAudio()
 
     function load() {
         for (let controller of root.editedControllers) {
@@ -113,11 +120,14 @@ Category {
                                 color: "#ffffff"
                             }
                             Text {
-                                text: manager.knownDevices.length > 0 
-                                      ? qsTr("✓ %1 controladora(s) conectada(s) y activa(s)").arg(manager.knownDevices.length)
-                                      : qsTr("No hay ninguna controladora USB detectada actualmente")
+                                text: root.activeDevices.length > 0
+                                      ? qsTr("✓ %1 controladora(s) con mapeo").arg(root.activeDevices.length)
+                                        + (root.unmappedDevices.length > 0 ? qsTr(" · %1 sin mapear").arg(root.unmappedDevices.length) : "")
+                                      : (root.unmappedDevices.length > 0
+                                         ? qsTr("%1 dispositivo(s) detectado(s) sin mapeo").arg(root.unmappedDevices.length)
+                                         : qsTr("No hay ninguna controladora USB detectada actualmente"))
                                 font.pixelSize: 12
-                                color: manager.knownDevices.length > 0 ? "#4caf50" : "#9e9e9e"
+                                color: root.activeDevices.length > 0 ? "#4caf50" : (root.unmappedDevices.length > 0 ? "#ffb74d" : "#9e9e9e")
                             }
                         }
 
@@ -292,7 +302,7 @@ Category {
                             }
                         }
 
-                        // Step 2: Alimentación eléctrica
+                        // Step 2: Alimentación eléctrica y HUB
                         RowLayout {
                             Layout.fillWidth: true
                             spacing: 10
@@ -313,15 +323,15 @@ Category {
 
                             ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: 1
+                                spacing: 2
                                 Text {
-                                    text: qsTr("⚡ Alimentación Externa (Imprescindible para la mayoría)")
+                                    text: qsTr("⚡ Alimentación Eléctrica: Conexión mediante HUB USB-C")
                                     font.pixelSize: 13
                                     font.bold: true
                                     color: "#ffa726"
                                 }
                                 Text {
-                                    text: qsTr("Los móviles entregan poca energía. Si tu controladora (ej: DDJ-FLX4, Traktor, Inpulse) tiene segundo puerto USB o fuente de corriente, conéctala a la pared o usa un HUB USB con alimentación. De lo contrario, se apagará o fallarán los jogs.")
+                                    text: qsTr("Las tablets solo dan ~500mA de energía. Para que tu mesa (Pioneer DDJ-400, etc.) no parpadee ni se desconecte, conecta el cargador de la tablet al puerto USB-C PD del HUB, la mesa a un puerto USB del HUB, y el cable del HUB a la tablet.")
                                     font.pixelSize: 11
                                     color: "#cfd8dc"
                                     wrapMode: Text.WordWrap
@@ -351,7 +361,7 @@ Category {
 
                             ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: 1
+                                spacing: 2
                                 Text {
                                     text: qsTr("Permiso USB en Android")
                                     font.pixelSize: 13
@@ -359,7 +369,7 @@ Category {
                                     color: "#ffffff"
                                 }
                                 Text {
-                                    text: qsTr("Al enchufar el cable, Android mostrará una ventana: '¿Permitir a Mixxx acceder al dispositivo USB?'. Marca 'Usar siempre para este dispositivo' y pulsa ACEPTAR.")
+                                    text: qsTr("Las controladoras MIDI (como la DDJ-400) no necesitan permiso. Si Android pregunta '¿Permitir a Mixxx acceder al dispositivo USB?' (controladoras HID), marca 'Usar siempre para este dispositivo' y pulsa ACEPTAR.")
                                     font.pixelSize: 11
                                     color: "#b0bec5"
                                     wrapMode: Text.WordWrap
@@ -389,24 +399,45 @@ Category {
 
                             ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: 1
+                                spacing: 3
                                 Text {
-                                    text: qsTr("Activar Audio en Controladora (Master + Auriculares)")
+                                    text: qsTr("Activar Audio en Controladora (Master + Auriculares CUE)")
                                     font.pixelSize: 13
                                     font.bold: true
                                     color: "#ffffff"
                                 }
                                 Text {
-                                    text: qsTr("Ve a la pestaña 'Audio & Salidas'. Selecciona el perfil 'Controladora DJ' para que el sonido de la fiesta y la preescucha CUE salgan directamente por la tarjeta de sonido de tu mesa.")
+                                    text: qsTr("• <b>Cabina DJ Completa</b>: Altavoces a las salidas RCA de la mesa y cascos al frontal. Selecciona el perfil 'Controladora DJ'.<br>• <b>Modo Híbrido</b>: Si no tienes altavoces externos, selecciona 'Tablet + Auriculares Mesa' para que la música suene por la tablet y la preescucha por los cascos.")
                                     font.pixelSize: 11
                                     color: "#b0bec5"
                                     wrapMode: Text.WordWrap
                                     Layout.fillWidth: true
                                 }
+
+                                Rectangle {
+                                    Layout.preferredWidth: 260
+                                    Layout.preferredHeight: 30
+                                    radius: 6
+                                    color: audioBtnMouse.pressed ? "#6a1b9a" : (audioBtnMouse.containsMouse ? "#8e24aa" : "#7b1fa2")
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "🎧 Ir a Salidas de Audio y Perfiles"
+                                        font.bold: true
+                                        font.pixelSize: 11
+                                        color: "#ffffff"
+                                    }
+                                    MouseArea {
+                                        id: audioBtnMouse
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: root.requestNavigateToAudio()
+                                    }
+                                }
                             }
                         }
 
-                        // Step 5: Mapeos Personalizados
+                        // Step 5: Mapeos Personalizados y de serie
                         RowLayout {
                             Layout.fillWidth: true
                             spacing: 10
@@ -427,19 +458,78 @@ Category {
 
                             ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: 1
+                                spacing: 4
                                 Text {
-                                    text: qsTr("Mapeos Personalizados (.midi.xml / .js)")
+                                    text: qsTr("Mapeos DJ (.midi.xml / .js)")
                                     font.pixelSize: 13
                                     font.bold: true
                                     color: "#80d8ff"
                                 }
                                 Text {
-                                    text: qsTr("¿Quieres usar un mapeo de la comunidad o propio? Cópialo a: <b>/storage/emulated/0/Mixxx/controllers/</b> con cualquier explorador de archivos o por PC. Pulsa el botón 'Buscar Dispositivos USB' arriba y podrás seleccionarlo directamente.")
+                                    text: qsTr("✓ <b>Pioneer DDJ-400</b>, FLX4, Inpulse y +100 mesas traen su mapeo oficial: al conectarlas por primera vez se les asigna y activa automáticamente.<br>Si quieres añadir un mapeo nuevo o modificado, cópialo a la carpeta pública de Mixxx y pulsa 'Buscar Dispositivos USB':")
                                     font.pixelSize: 11
                                     color: "#b0bec5"
                                     wrapMode: Text.WordWrap
                                     Layout.fillWidth: true
+                                }
+
+                                RowLayout {
+                                    spacing: 8
+                                    Layout.fillWidth: true
+
+                                    Rectangle {
+                                        Layout.fillWidth: true
+                                        Layout.preferredHeight: 28
+                                        color: "#10161a"
+                                        radius: 4
+                                        border.color: "#263238"
+                                        border.width: 1
+
+                                        Text {
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            anchors.left: parent.left
+                                            anchors.leftMargin: 8
+                                            anchors.right: parent.right
+                                            anchors.rightMargin: 8
+                                            elide: Text.ElideMiddle
+                                            text: root.manager.mappingsDirectory || "/storage/emulated/0/Mixxx/controllers/"
+                                            font.pixelSize: 11
+                                            font.family: "monospace"
+                                            color: "#80d8ff"
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        Layout.preferredWidth: 150
+                                        Layout.preferredHeight: 28
+                                        radius: 4
+                                        color: copyMouse.pressed ? "#00838f" : (copyMouse.containsMouse ? "#0097a7" : "#00695c")
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: copyTimer.running ? "✓ ¡Copiado!" : "📋 Copiar ruta"
+                                            font.pixelSize: 11
+                                            font.bold: true
+                                            color: "#ffffff"
+                                        }
+
+                                        MouseArea {
+                                            id: copyMouse
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                root.manager.copyToClipboard(root.manager.mappingsDirectory || "/storage/emulated/0/Mixxx/controllers/");
+                                                copyTimer.restart();
+                                            }
+                                        }
+
+                                        Timer {
+                                            id: copyTimer
+                                            interval: 2000
+                                            repeat: false
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -453,7 +543,7 @@ Category {
 
                             Text {
                                 anchors.centerIn: parent
-                                text: "✨ Compatible con Pioneer DDJ (FLX4, 400, SB3), Hercules Inpulse, Traktor S2/S4, Numark, Reloop y +100 controladores."
+                                text: "✨ Compatible con Pioneer DDJ (FLX4, 400, SB3, 200), Hercules Inpulse, Traktor S2/S4, Numark, Reloop y +100 controladores."
                                 font.pixelSize: 11
                                 color: "#81c784"
                             }
@@ -470,7 +560,7 @@ Category {
                 radius: 12
                 border.color: "#2c2c2c"
                 border.width: 1
-                visible: root.selectedController == null && manager.knownDevices.length === 0 && manager.unknownDevices.length === 0
+                visible: root.selectedController == null && root.activeDevices.length === 0 && root.unmappedDevices.length === 0
 
                 ColumnLayout {
                     anchors.centerIn: parent
@@ -499,6 +589,98 @@ Category {
                 }
             }
 
+            // ================= BANNER: DISPOSITIVO EN CONFIGURACIÓN =================
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 58
+                color: "#0d47a1"
+                radius: 10
+                border.color: "#42a5f5"
+                border.width: 1.5
+                visible: root.selectedController != null
+
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: 10
+                    spacing: 12
+
+                    Text {
+                        text: "🎛️"
+                        font.pixelSize: 22
+                    }
+
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 1
+                        Text {
+                            text: qsTr("Configurando: %1").arg(root.selectedController?.name || "")
+                            font.bold: true
+                            font.pixelSize: 13
+                            color: "#ffffff"
+                        }
+                        Text {
+                            text: root.selectedController?.mapping 
+                                  ? qsTr("Mapeo asignado: %1 (%2)").arg(root.selectedController.mapping.name).arg(root.selectedController.enabled ? "Habilitado" : "Deshabilitado")
+                                  : qsTr("Selecciona su mapeo en la lista desplegable y pulsa Guardar")
+                            font.pixelSize: 11
+                            color: root.selectedController?.mapping ? "#a7ffeb" : "#ffe082"
+                        }
+                    }
+
+                    // Botón directo a audio
+                    Rectangle {
+                        Layout.preferredWidth: 105
+                        Layout.preferredHeight: 32
+                        radius: 6
+                        color: audioNavMouse.pressed ? "#4a148c" : (audioNavMouse.containsMouse ? "#7b1fa2" : "#6a1b9a")
+                        border.color: "#ce93d8"
+                        border.width: 1
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: qsTr("🎧 Salidas Audio")
+                            font.pixelSize: 11
+                            font.bold: true
+                            color: "#ffffff"
+                        }
+                        MouseArea {
+                            id: audioNavMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: root.requestNavigateToAudio()
+                        }
+                    }
+
+                    // Botón Volver a la lista
+                    Rectangle {
+                        Layout.preferredWidth: 90
+                        Layout.preferredHeight: 32
+                        radius: 6
+                        color: backMouse.pressed ? "#0b3c8a" : (backMouse.containsMouse ? "#1565c0" : "#1976d2")
+                        border.color: "#90caf9"
+                        border.width: 1
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: qsTr("Ver todas")
+                            font.pixelSize: 11
+                            font.bold: true
+                            color: "#ffffff"
+                        }
+                        MouseArea {
+                            id: backMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                root.selectedController = null;
+                            }
+                        }
+                    }
+                }
+            }
+
             // ================= KNOWN CONTROLLERS =================
             GridLayout {
                 Layout.fillWidth: true
@@ -510,20 +692,17 @@ Category {
 
                     model: {
                         if (root.selectedController) {
-                            if (root.selectedController?.mapping?.hasSettings)
-                                return [root.selectedController];
-                            else if (manager.knownDevices.indexOf(root.selectedController) == -1)
-                                return [...manager.knownDevices, root.selectedController];
+                            return [root.selectedController];
                         }
-                        return manager.knownDevices;
+                        return root.activeDevices;
                     }
 
                     delegate: ControllerCard {
                         id: controller
 
-                        focused: knownDevice && root.selectedController == modelData
-                        knownDevice: manager.knownDevices.indexOf(modelData) > -1
-                        opacity: root.selectedController && !knownDevice && root.selectedController != modelData ? 0.2 : 1
+                        focused: root.selectedController == modelData
+                        knownDevice: Array.from(manager.knownDevices).indexOf(modelData) > -1
+                        opacity: root.selectedController && root.selectedController != modelData ? 0.2 : 1
 
                         onSelect: {
                             root.selectedController = modelData;
@@ -560,8 +739,8 @@ Category {
                 Layout.fillWidth: true
                 currentIndex: -1
                 implicitHeight: contentHeight
-                model: manager.unknownDevices
-                visible: root.selectedController == null || !root.selectedController.mapping?.hasSettings
+                model: root.unmappedDevices
+                visible: root.selectedController == null
 
                 delegate: Rectangle {
                     required property int index
@@ -576,6 +755,13 @@ Category {
 
                         anchors.fill: parent
                         hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            unknownDevicesList.currentIndex = index;
+                            root.selectedController = modelData;
+                            root.dirty = true;
+                            scrollView.contentItem.contentY = 0;
+                        }
                     }
                     RowLayout {
                         anchors.fill: parent
@@ -613,13 +799,15 @@ Category {
                             text: modelData.name
                         }
                         Skin.FormButton {
-                            activeColor: "#999999"
+                            activeColor: "#1e88e5"
                             text: qsTr("Configurar Mapeo")
-                            visible: unknownDeviceRow.containsMouse || hovered || unknownDevicesList.currentIndex == index
+                            visible: true
 
                             onPressed: {
+                                unknownDevicesList.currentIndex = index;
                                 root.selectedController = modelData;
                                 root.dirty = true;
+                                scrollView.contentItem.contentY = 0;
                             }
                         }
                         TapHandler {
@@ -633,7 +821,7 @@ Category {
                     color: "#161616"
                     implicitHeight: 36
                     width: ListView.view.width
-                    visible: manager.unknownDevices.length > 0
+                    visible: root.unmappedDevices.length > 0
 
                     Text {
                         anchors.fill: parent
@@ -672,8 +860,8 @@ Category {
                 Layout.preferredHeight: 34
                 Layout.preferredWidth: statusRow.implicitWidth + 24
                 radius: 17
-                color: root.dirty ? "#332200" : (manager.knownDevices.length > 0 ? "#0d2b1a" : "#1a2233")
-                border.color: root.dirty ? "#ffb300" : (manager.knownDevices.length > 0 ? "#00c853" : "#2196f3")
+                color: root.dirty ? "#332200" : (root.activeDevices.length > 0 ? "#0d2b1a" : "#1a2233")
+                border.color: root.dirty ? "#ffb300" : (root.activeDevices.length > 0 ? "#00c853" : "#2196f3")
                 border.width: 1
 
                 RowLayout {
@@ -681,20 +869,20 @@ Category {
                     anchors.centerIn: parent
                     spacing: 8
                     Text {
-                        text: root.dirty ? "●" : (manager.knownDevices.length > 0 ? "✓" : "🎛️")
+                        text: root.dirty ? "●" : (root.activeDevices.length > 0 ? "✓" : "🎛️")
                         font.bold: true
                         font.pixelSize: 13
-                        color: root.dirty ? "#ffb300" : (manager.knownDevices.length > 0 ? "#00e676" : "#64b5f6")
+                        color: root.dirty ? "#ffb300" : (root.activeDevices.length > 0 ? "#00e676" : "#64b5f6")
                     }
                     Text {
                         text: root.dirty 
                               ? qsTr("Cambios pendientes") 
                               : (root.selectedController 
                                  ? qsTr("Editando controladora") 
-                                 : (manager.knownDevices.length > 0 ? qsTr("Controladora lista") : qsTr("USB MIDI")))
+                                 : (root.activeDevices.length > 0 ? qsTr("Controladora lista") : qsTr("USB MIDI")))
                         font.bold: true
                         font.pixelSize: 12
-                        color: root.dirty ? "#ffe082" : (manager.knownDevices.length > 0 ? "#b9f6ca" : "#bbdefb")
+                        color: root.dirty ? "#ffe082" : (root.activeDevices.length > 0 ? "#b9f6ca" : "#bbdefb")
                     }
                 }
             }

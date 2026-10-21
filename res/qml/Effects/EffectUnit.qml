@@ -7,6 +7,9 @@ Item {
     id: root
 
     readonly property bool expanded: expandedControl.value > 0
+    // On narrow screens (tablets showing two units side by side) the three
+    // slots don't fit in one row: stack them so names and knobs stay usable
+    readonly property bool stacked: root.expanded || effectContainer.width < 480
     readonly property string group: unit.group
     readonly property Mixxx.EffectUnitProxy unit: Mixxx.EffectsManager.getEffectUnit(unitNumber)
     required property int unitNumber
@@ -21,7 +24,7 @@ Item {
         anchors.margins: 5
         anchors.right: effectUnitControlsFrame.left
         anchors.top: parent.top
-        height: root.expanded ? 160 : 85
+        height: root.expanded ? 160 : (root.stacked ? 132 : 116)
 
         EffectSlot {
             id: effect1
@@ -30,31 +33,31 @@ Item {
             anchors.top: parent.top
             effectNumber: 1
             expanded: root.expanded
-            height: 50
+            height: root.expanded ? 50 : 44
             unitNumber: root.unitNumber
-            width: root.expanded ? parent.width : parent.width / 3
+            width: root.stacked ? parent.width : parent.width / 3
         }
         EffectSlot {
             id: effect2
 
-            anchors.left: root.expanded ? parent.left : effect1.right
-            anchors.top: root.expanded ? effect1.bottom : parent.top
+            anchors.left: root.stacked ? parent.left : effect1.right
+            anchors.top: root.stacked ? effect1.bottom : parent.top
             effectNumber: 2
             expanded: root.expanded
-            height: 50
+            height: root.expanded ? 50 : 44
             unitNumber: root.unitNumber
-            width: root.expanded ? parent.width : parent.width / 3
+            width: root.stacked ? parent.width : parent.width / 3
         }
         EffectSlot {
             id: effect3
 
-            anchors.left: root.expanded ? parent.left : effect2.right
-            anchors.top: root.expanded ? effect2.bottom : parent.top
+            anchors.left: root.stacked ? parent.left : effect2.right
+            anchors.top: root.stacked ? effect2.bottom : parent.top
             effectNumber: 3
             expanded: root.expanded
-            height: 50
+            height: root.expanded ? 50 : 44
             unitNumber: root.unitNumber
-            width: root.expanded ? parent.width : parent.width / 3
+            width: root.stacked ? parent.width : parent.width / 3
         }
     }
     Rectangle {
@@ -129,8 +132,40 @@ Item {
                     group: root.group
                     height: 40
                     key: "super1"
-                    visible: showSuperKnobsControl.value > 0
-                    width: visible ? 40 : 0
+                    width: 40
+                }
+            }
+            // Which channels go through this effect unit
+            Row {
+                spacing: 5
+
+                Repeater {
+                    model: [
+                        {
+                            "label": "1",
+                            "channel": "[Channel1]"
+                        },
+                        {
+                            "label": "2",
+                            "channel": "[Channel2]"
+                        },
+                        {
+                            "label": "M",
+                            "channel": "[Master]"
+                        }
+                    ]
+
+                    Skin.ControlButton {
+                        required property var modelData
+
+                        activeColor: Theme.effectUnitColor
+                        group: root.group
+                        height: 26
+                        key: "group_" + modelData.channel + "_enable"
+                        text: modelData.label
+                        toggleable: true
+                        width: 43
+                    }
                 }
             }
         }
@@ -148,11 +183,5 @@ Item {
 
         group: root.group
         key: "show_parameters"
-    }
-    Mixxx.ControlProxy {
-        id: showSuperKnobsControl
-
-        group: "[Skin]"
-        key: "show_superknobs"
     }
 }

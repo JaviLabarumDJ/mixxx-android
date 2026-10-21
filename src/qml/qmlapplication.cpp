@@ -24,6 +24,7 @@
 #include "qml/qmlapplicationproxy.h"
 #include "qml/qmlconfigproxy.h"
 #include "qml/qmlcoreservices.h"
+#include "effects/effectsmanager.h"
 #include "qml/qmldlgpreferencesproxy.h"
 #include "qml/qmlrecordingproxy.h"
 #include "soundio/soundmanager.h"
@@ -354,6 +355,22 @@ QmlApplication::QmlApplication(
         m_pGuiTick->process();
     });
     m_guiTickTimer.start(std::chrono::milliseconds(16));
+
+#if defined(Q_OS_ANDROID)
+    // Android kills apps in the background without a regular shutdown, so
+    // save the configuration and the effects whenever Mixxx leaves the
+    // foreground.
+    connect(app, &QGuiApplication::applicationStateChanged, this, [this](Qt::ApplicationState state) {
+        if (state != Qt::ApplicationSuspended && state != Qt::ApplicationHidden) {
+            return;
+        }
+        qInfo() << "Saving settings, Mixxx went to the background";
+        m_pCoreServices->getSettings()->save();
+        if (auto pEffectsManager = m_pCoreServices->getEffectsManager()) {
+            pEffectsManager->saveEffectsXml();
+        }
+    });
+#endif
 
     m_pCoreServices->getControllerManager()->setUpDevices();
 

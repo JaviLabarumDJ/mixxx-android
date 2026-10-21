@@ -11,90 +11,151 @@ Category {
     property bool committing: false
     property bool hasChanges: router.hasChanges
     property string activePreset: ""
+    // True once the user tapped a preset in this session. Only then are the
+    // outputs rebuilt on save; otherwise the configured routing is kept.
+    property bool presetChosen: false
+    // Warning or error about the selected preset, shown below the presets
+    property string presetMessage: ""
+    property bool presetError: false
+    property bool loading: false
     property bool showAdvancedRouter: false
 
-    function getSpeakerDevice(devices) {
-        if (!devices || devices.length === 0) return null;
+    // The Android enumerator suffixes device names with their type, e.g.
+    // "TB331FC: Speaker", "DDJ-400: USB" or "Buds: Bluetooth".
+    function outputDeviceKinds() {
+        let kinds = {
+            speaker: null,
+            wired: null,
+            bluetooth: null,
+            usb: null,
+            other: null
+        };
+        let devices = Mixxx.SoundManager.availableOutputDevices(soundApi.selected) || [];
         for (let d of devices) {
-            let n = (d.displayName || "").toLowerCase();
-            if (n.includes("speaker") || n.includes("altavoz")) return d;
+            let n = d.displayName || "";
+            if (n.endsWith(": USB")) {
+                // Prefer the device exposing the most channels (a DJ
+                // controller rather than e.g. a USB headset)
+                if (!kinds.usb || d.channelCount > kinds.usb.channelCount)
+                    kinds.usb = d;
+            } else if (n.endsWith(": Speaker") || n.endsWith(": Altavoz")) {
+                kinds.speaker = kinds.speaker || d;
+            } else if (n.endsWith(": Wired headphones") || n.endsWith(": Wired headset")) {
+                kinds.wired = kinds.wired || d;
+            } else if (n.endsWith(": Bluetooth")) {
+                kinds.bluetooth = kinds.bluetooth || d;
+            } else if (d.channelCount >= 4) {
+                kinds.usb = kinds.usb || d;
+            } else {
+                kinds.other = kinds.other || d;
+            }
         }
-        for (let d of devices) {
-            let n = (d.displayName || "").toLowerCase();
-            if (n.includes("usb") || n.includes("headphone") || n.includes("headset")) return d;
-        }
-        for (let d of devices) {
-            let n = (d.displayName || "").toLowerCase();
-            if (!n.includes("earpiece")) return d;
-        }
-        return devices[0];
+        return kinds;
     }
 
-    function getMultiChannelDevice(devices) {
-        if (!devices || devices.length === 0) return null;
-        for (let d of devices) {
-            let n = (d.displayName || "").toLowerCase();
-            if (n.includes("earpiece")) continue;
-            if (d.channelCount >= 4) return d;
+    function isUsbDevice(device) {
+        return !!device && ((device.displayName || "").endsWith(": USB") || device.channelCount >= 4);
+    }
+
+    // Returns the outputs a preset needs, without touching anything:
+    // {outputs: [{device, type, channel}], headSplit, syncBuffers, sampleRate, message, error}
+    // Output types: 0 = Main, 1 = Headphones
+    function presetPlan(presetType) {
+        let k = outputDeviceKinds();
+        let plan = {
+            outputs: [],
+            headSplit: 0,
+            syncBuffers: -1,
+            sampleRate: 0,
+            message: "",
+            error: false
+        };
+        if (presetType === "single") {
+            let dev = k.bluetooth || k.wired || k.speaker || k.other;
+            if (!dev) {
+                plan.error = true;
+                plan.message = qsTr("No se ha encontrado ninguna salida de audio.");
+                return plan;
+            }
+            plan.outputs.push({ device: dev, type: 0, channel: 0 });
+            plan.message = qsTr("Master por: %1").arg(dev.displayName);
+        } else if (presetType === "splitter") {
+            // Mixxx's head split mode: left = CUE (mono), right = Master (mono)
+            let dev = k.wired || k.speaker || k.other;
+            if (!dev) {
+                plan.error = true;
+                plan.message = qsTr("No se ha encontrado la salida de auriculares de la tablet.");
+                return plan;
+            }
+            plan.outputs.push({ device: dev, type: 1, channel: 0 });
+            plan.headSplit = 1;
+            plan.message = qsTr("Canal izquierdo = CUE (pre-escucha), canal derecho = Master, por: %1").arg(dev.displayName);
+        } else if (presetType === "controller") {
+            if (!k.usb) {
+                plan.error = true;
+                plan.message = qsTr("No se detecta la tarjeta de sonido USB de la controladora. Conéctala, espera unos segundos y vuelve a abrir Ajustes.");
+                return plan;
+            }
+            plan.outputs.push({ device: k.usb, type: 0, channel: 0 });
+            plan.sampleRate = 44100;
+            if (k.usb.channelCount >= 4) {
+                plan.outputs.push({ device: k.usb, type: 1, channel: 2 });
+                plan.message = qsTr("Master → canales 1-2 (RCA) y CUE → canales 3-4 (auriculares) de %1").arg(k.usb.displayName);
+            } else {
+                plan.message = qsTr("Android solo expone %1 canales de %2: el Master sonará por la mesa, pero sus auriculares no recibirán CUE. Usa el modo Splitter para pre-escuchar.").arg(k.usb.channelCount).arg(k.usb.displayName);
+            }
+        } else if (presetType === "hybrid") {
+            let mainDev = k.speaker || k.wired || k.bluetooth || k.other;
+            if (!k.usb || k.usb.channelCount < 4) {
+                plan.error = true;
+                plan.message = k.usb
+                    ? qsTr("Android solo expone %1 canales de %2, así que sus auriculares (canales 3-4) no están disponibles.").arg(k.usb.channelCount).arg(k.usb.displayName)
+                    : qsTr("No se detecta la tarjeta de sonido USB de la controladora.");
+                return plan;
+            }
+            if (!mainDev) {
+                plan.error = true;
+                plan.message = qsTr("No se ha encontrado el altavoz de la tablet.");
+                return plan;
+            }
+            plan.outputs.push({ device: mainDev, type: 0, channel: 0 });
+            plan.outputs.push({ device: k.usb, type: 1, channel: 2 });
+            // Two sound cards with independent clocks need drift compensation
+            plan.syncBuffers = 2;
+            plan.message = qsTr("Master por %1 y CUE por los auriculares de %2. Al usar dos tarjetas puede oírse algún clic leve en el CUE.").arg(mainDev.displayName).arg(k.usb.displayName);
         }
-        for (let d of devices) {
-            let n = (d.displayName || "").toLowerCase();
-            if ((n.includes("usb") || n.includes("external")) && !n.includes("earpiece")) return d;
-        }
-        return getSpeakerDevice(devices);
+        return plan;
     }
 
     function applyPreset(presetType) {
+        let plan = presetPlan(presetType);
         root.activePreset = presetType;
-        const manager = Mixxx.SoundManager;
-        if (presetType === "single") {
-            mainMixEnabled.selected = "on";
-            mainOutputMode.selected = "stereo";
-            monoMix.value = 0;
-            mainEnabled.value = 1;
-            headEnabled.value = 0;
-            let devices = manager.availableOutputDevices(soundApi.selected);
-            let dev = getSpeakerDevice(devices);
-            if (dev) {
-                manager.clearOutputs();
-                manager.addOutput(dev, 0, 0, 0); // Main: Channels 1-2
+        root.presetChosen = true;
+        root.presetMessage = plan.message;
+        root.presetError = plan.error;
+        // Only the form is updated here; the engine changes on save
+        mainMixEnabled.selected = "on";
+        mainOutputMode.selected = "stereo";
+        if (plan.sampleRate > 0) {
+            let rate = qsTr("%1 Hz").arg(plan.sampleRate);
+            if (sampleRate.options.indexOf(rate) !== -1) {
+                sampleRate.selected = rate;
             }
-        } else if (presetType === "splitter") {
-            mainMixEnabled.selected = "on";
-            mainOutputMode.selected = "mono";
-            monoMix.value = 1;
-            mainEnabled.value = 1;
-            headEnabled.value = 1;
-            let devices = manager.availableOutputDevices(soundApi.selected);
-            let dev = getSpeakerDevice(devices);
-            if (dev) {
-                manager.clearOutputs();
-                manager.addOutput(dev, 0, 0, 0); // Main (Left)
-                manager.addOutput(dev, 1, 0, 0); // Headphone CUE (Right)
-            }
-        } else if (presetType === "controller") {
-            mainMixEnabled.selected = "on";
-            mainOutputMode.selected = "stereo";
-            monoMix.value = 0;
-            mainEnabled.value = 1;
-            headEnabled.value = 1;
-            let devices = manager.availableOutputDevices(soundApi.selected);
-            let targetDev = getMultiChannelDevice(devices);
-            if (targetDev) {
-                manager.clearOutputs();
-                manager.addOutput(targetDev, 0, 0, 0); // Main: Channels 1-2
-                if (targetDev.channelCount >= 4) {
-                    manager.addOutput(targetDev, 1, 2, 0); // Headphone CUE: Channels 3-4
-                } else {
-                    manager.addOutput(targetDev, 1, 0, 0);
-                }
-            }
+        }
+        if (plan.syncBuffers >= 0) {
+            router.multiSoundcard.selected = router.multiSoundcard.options[plan.syncBuffers];
         }
         root.hasChanges = true;
     }
 
     function load() {
         const manager = Mixxx.SoundManager;
+        // The engine may have rerouted the outputs (DJ controller plugged in)
+        manager.reload();
+        root.loading = true;
+        root.presetChosen = false;
+        root.presetMessage = "";
+        root.presetError = false;
         mainMixEnabled.selected = mainMixEnabled.options[mainEnabled.value ? 0 : 1];
         mainOutputMode.selected = mainOutputMode.options[monoMix.value ? 0 : 1];
         soundClock.selected = soundClock.options[manager.getForceNetworkClock() ? 1 : 0];
@@ -112,15 +173,48 @@ Category {
         soundApi.selected = curApi;
         keylock.update();
         keylock.selected = keylock.options[manager.getKeylockEngine()];
+        usbDirectMode.selected = usbDirectMode.options[Math.max(0, Math.min(2, manager.getAndroidUsbDirectMode()))];
 
-        // Detect current preset
-        if (monoMix.value === 1) {
-            root.activePreset = "splitter";
-        } else if (headEnabled.value === 1) {
-            root.activePreset = "controller";
-        } else {
-            root.activePreset = "single";
+        // Detect current preset by analyzing real SoundManager output connections
+        let detected = "custom";
+        try {
+            let devices = manager.availableOutputDevices(soundApi.selected);
+            let mainDevs = [];
+            let headDev = null;
+            let headChannel = 0;
+            let otherOutputs = false;
+
+            for (let d of devices) {
+                let conns = d.connections(manager);
+                if (!conns) continue;
+                for (let c of conns) {
+                    if (c.type === 0) { // Main
+                        mainDevs.push(d);
+                    } else if (c.type === 1) { // Headphones (PFL / Preescucha)
+                        headDev = d;
+                        headChannel = c.channelGroup;
+                    } else {
+                        otherOutputs = true;
+                    }
+                }
+            }
+
+            let mainDev = mainDevs.length === 1 ? mainDevs[0] : null;
+            if (otherOutputs || mainDevs.length > 1) {
+                detected = "custom";
+            } else if (!mainDev && headDev && headSplit.value > 0) {
+                detected = "splitter";
+            } else if (mainDev && !headDev) {
+                detected = isUsbDevice(mainDev) ? "controller" : "single";
+            } else if (mainDev && headDev && isUsbDevice(headDev) && headChannel >= 2) {
+                detected = mainDev === headDev ? "controller" : "hybrid";
+            } else if (!mainDev && !headDev) {
+                detected = "";
+            }
+        } catch (e) {
+            console.error("Error detecting active audio preset:", e);
         }
+        root.activePreset = detected;
 
         // Router
         router.multiSoundcard.selected = router.multiSoundcard.options[manager.getSyncBuffers()];
@@ -140,11 +234,12 @@ Category {
         root.hasChanges = Qt.binding(function () {
             return router.hasChanges;
         });
+        root.loading = false;
     }
 
     function save() {
         const manager = Mixxx.SoundManager;
-        mainEnabled.value = mainMixEnabled.options.indexOf(mainMixEnabled.selected);
+        mainEnabled.value = mainMixEnabled.selected === "on" ? 1 : 0;
         monoMix.value = !mainOutputMode.options.indexOf(mainOutputMode.selected);
         manager.setForceNetworkClock(soundClock.options[1] == soundClock.selected);
         manager.setSampleRate(parseInt(sampleRate.selected));
@@ -152,6 +247,7 @@ Category {
         micMonitorMode.value = microphoneMonitorMode.currentIndex;
         manager.setAPI(soundApi.selected);
         manager.setKeylockEngine(keylock.options.indexOf(keylock.selected));
+        manager.setAndroidUsbDirectMode(Math.max(0, usbDirectMode.options.indexOf(usbDirectMode.selected)));
 
         // Router
         manager.setSyncBuffers(router.multiSoundcard.options.indexOf(router.multiSoundcard.selected));
@@ -219,31 +315,7 @@ Category {
             }
         };
 
-        if (root.activePreset === "single") {
-            manager.clearOutputs();
-            let devices = manager.availableOutputDevices(soundApi.selected);
-            let dev = getSpeakerDevice(devices);
-            if (dev) {
-                manager.addOutput(dev, 0, 0, 0);
-            }
-        } else if (root.activePreset === "splitter") {
-            manager.clearOutputs();
-            let devices = manager.availableOutputDevices(soundApi.selected);
-            let dev = getSpeakerDevice(devices);
-            if (dev) {
-                manager.addOutput(dev, 0, 0, 0); // Main
-                manager.addOutput(dev, 1, 0, 0); // Headphones CUE
-            }
-        } else if (root.activePreset === "controller") {
-            manager.clearOutputs();
-            let devices = manager.availableOutputDevices(soundApi.selected);
-            let targetDev = getMultiChannelDevice(devices);
-            if (targetDev) {
-                manager.addOutput(targetDev, 0, 0, 0); // Main (1-2)
-                manager.addOutput(targetDev, 1, targetDev.channelCount >= 4 ? 2 : 0, 0); // Headphones (3-4 or 1-2)
-            }
-        } else {
-            manager.clearOutputs();
+        let rebuildFromRouter = () => {
             for (let device of Object.keys(router.outputs)) {
                 for (let address of Object.keys(router.outputs[device].gateways)) {
                     let gateway = router.outputs[device].gateways[address];
@@ -251,14 +323,39 @@ Category {
                     connectionsHandler(connections, gateway.device);
                 }
             }
+        };
+
+        // Outputs are only rebuilt when the user picked a preset or edited the
+        // matrix; any other change (buffer size, sample rate...) keeps the
+        // configured routing untouched.
+        const routerEdited = root.showAdvancedRouter && router.hasChanges;
+        if (routerEdited) {
+            manager.clearOutputs();
+            rebuildFromRouter();
+            // Respect the manual routing even when a controller is plugged in
+            manager.setAutoRouteController(false);
+        } else if (root.presetChosen) {
+            // Only the controller preset follows the controller automatically
+            manager.setAutoRouteController(root.activePreset === "controller");
+            let plan = presetPlan(root.activePreset);
+            if (!plan.error) {
+                manager.clearOutputs();
+                for (let output of plan.outputs) {
+                    manager.addOutput(output.device, output.type, output.channel, 0);
+                }
+                headSplit.value = plan.headSplit;
+                monoMix.value = 0;
+            }
         }
 
-        manager.clearInputs();
-        for (let device of Object.keys(router.inputs)) {
-            for (let address of Object.keys(router.inputs[device].gateways)) {
-                let gateway = router.inputs[device].gateways[address];
-                let connections = gateway.node && gateway.node.assignedEdges ? gateway.node.assignedEdges() : {};
-                connectionsHandler(connections, gateway.device);
+        if (routerEdited) {
+            manager.clearInputs();
+            for (let device of Object.keys(router.inputs)) {
+                for (let address of Object.keys(router.inputs[device].gateways)) {
+                    let gateway = router.inputs[device].gateways[address];
+                    let connections = gateway.node && gateway.node.assignedEdges ? gateway.node.assignedEdges() : {};
+                    connectionsHandler(connections, gateway.device);
+                }
             }
         }
 
@@ -306,6 +403,11 @@ Category {
         id: boothDelay
         group: "[Master]"
         key: "boothDelay"
+    }
+    Mixxx.ControlProxy {
+        id: headSplit
+        group: "[Master]"
+        key: "headSplit"
     }
     Mixxx.ControlProxy {
         id: monoMix
@@ -371,15 +473,17 @@ Category {
                             }
                         }
 
-                        // 3 Interactive Preset Cards
-                        RowLayout {
+                        // 4 Interactive Preset Cards (2x2 Grid)
+                        GridLayout {
                             Layout.fillWidth: true
-                            spacing: 10
+                            columns: 2
+                            columnSpacing: 10
+                            rowSpacing: 10
 
                             // Preset 1: Móvil / Bluetooth (Salida simple)
                             Rectangle {
                                 Layout.fillWidth: true
-                                Layout.preferredHeight: 105
+                                Layout.preferredHeight: 96
                                 radius: 10
                                 color: root.activePreset === "single" ? "#1e3a5f" : (p1Mouse.containsMouse ? "#212b38" : "#1a222c")
                                 border.color: root.activePreset === "single" ? "#42a5f5" : "#324050"
@@ -407,7 +511,7 @@ Category {
                                         }
                                     }
                                     Text {
-                                        text: qsTr("Salida única estéreo. Todo el sonido va a los altavoces del teléfono o a un altavoz/auricular Bluetooth.")
+                                        text: qsTr("Salida única estéreo. Todo el sonido va a los altavoces de la tablet o auriculares Bluetooth.")
                                         font.pixelSize: 11
                                         color: "#90a4ae"
                                         wrapMode: Text.WordWrap
@@ -427,7 +531,7 @@ Category {
                             // Preset 2: Cable Splitter DJ
                             Rectangle {
                                 Layout.fillWidth: true
-                                Layout.preferredHeight: 105
+                                Layout.preferredHeight: 96
                                 radius: 10
                                 color: root.activePreset === "splitter" ? "#3e2723" : (p2Mouse.containsMouse ? "#2d221f" : "#1e1a19")
                                 border.color: root.activePreset === "splitter" ? "#ff7043" : "#4e342e"
@@ -455,7 +559,7 @@ Category {
                                         }
                                     }
                                     Text {
-                                        text: qsTr("Separa el jack en dos: Canal Izq a los altavoces de la fiesta y Canal Der a tus auriculares para hacer CUE.")
+                                        text: qsTr("Cable divisor en el jack: canal izquierdo = CUE (tus cascos) y canal derecho = Master (altavoz), ambos en mono.")
                                         font.pixelSize: 11
                                         color: "#b0bec5"
                                         wrapMode: Text.WordWrap
@@ -475,7 +579,7 @@ Category {
                             // Preset 3: Controladora DJ / 4 Canales
                             Rectangle {
                                 Layout.fillWidth: true
-                                Layout.preferredHeight: 105
+                                Layout.preferredHeight: 96
                                 radius: 10
                                 color: root.activePreset === "controller" ? "#1b3a24" : (p3Mouse.containsMouse ? "#1c2b1e" : "#172218")
                                 border.color: root.activePreset === "controller" ? "#66bb6a" : "#2e4c34"
@@ -489,7 +593,7 @@ Category {
                                     RowLayout {
                                         Text { text: "🎛️"; font.pixelSize: 16 }
                                         Text {
-                                            text: qsTr("Controladora DJ")
+                                            text: qsTr("Controladora DJ (RCA + Cascos)")
                                             font.pixelSize: 13
                                             font.bold: true
                                             color: root.activePreset === "controller" ? "#ffffff" : "#cfd8dc"
@@ -503,7 +607,7 @@ Category {
                                         }
                                     }
                                     Text {
-                                        text: qsTr("Audio Pro multicanal: Canales 1-2 al Master (altavoces) y Canales 3-4 independientes a los auriculares de la mesa.")
+                                        text: qsTr("Audio Pro: Canales 1-2 al Master RCA (altavoces) y Canales 3-4 al jack de auriculares de la mesa.")
                                         font.pixelSize: 11
                                         color: "#a5d6a7"
                                         wrapMode: Text.WordWrap
@@ -517,6 +621,139 @@ Category {
                                     hoverEnabled: true
                                     cursorShape: Qt.PointingHandCursor
                                     onClicked: root.applyPreset("controller")
+                                }
+                            }
+
+                            // Preset 4: Híbrido (Tablet Master + Auriculares Mesa)
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 96
+                                radius: 10
+                                color: root.activePreset === "hybrid" ? "#311b92" : (p4Mouse.containsMouse ? "#211a36" : "#191624")
+                                border.color: root.activePreset === "hybrid" ? "#b388ff" : "#4527a0"
+                                border.width: root.activePreset === "hybrid" ? 2 : 1
+
+                                ColumnLayout {
+                                    anchors.fill: parent
+                                    anchors.margins: 10
+                                    spacing: 4
+
+                                    RowLayout {
+                                        Text { text: "🔊"; font.pixelSize: 16 }
+                                        Text {
+                                            text: qsTr("Tablet + Auriculares Mesa (Híbrido)")
+                                            font.pixelSize: 13
+                                            font.bold: true
+                                            color: root.activePreset === "hybrid" ? "#ffffff" : "#cfd8dc"
+                                        }
+                                        Item { Layout.fillWidth: true }
+                                        Text {
+                                            text: root.activePreset === "hybrid" ? "✓ ACTIVO" : ""
+                                            font.pixelSize: 10
+                                            font.bold: true
+                                            color: "#b388ff"
+                                        }
+                                    }
+                                    Text {
+                                        text: qsTr("Master por altavoces de la tablet y Preescucha CUE por los auriculares (canales 3-4) de la mesa.")
+                                        font.pixelSize: 11
+                                        color: "#d1c4e9"
+                                        wrapMode: Text.WordWrap
+                                        Layout.fillWidth: true
+                                    }
+                                }
+
+                                MouseArea {
+                                    id: p4Mouse
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: root.applyPreset("hybrid")
+                                }
+                            }
+                        }
+
+                        // Result of the selected preset (target devices or problem)
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: presetMessageText.implicitHeight + 16
+                            radius: 8
+                            visible: root.presetMessage.length > 0
+                            color: root.presetError ? "#3b1d1d" : "#16261c"
+                            border.color: root.presetError ? "#ef5350" : "#66bb6a"
+                            border.width: 1
+
+                            Text {
+                                id: presetMessageText
+                                anchors.fill: parent
+                                anchors.margins: 8
+                                text: (root.presetError ? "⚠️ " : (root.presetChosen ? "💾 " : "")) + root.presetMessage
+                                      + (root.presetChosen && !root.presetError ? qsTr(" — pulsa Guardar para aplicarlo.") : "")
+                                wrapMode: Text.WordWrap
+                                font.pixelSize: 12
+                                color: root.presetError ? "#ffcdd2" : "#c8e6c9"
+                            }
+                        }
+
+                        // Banner informativo cuando el ruteo es Personalizado (Matriz)
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 38
+                            radius: 8
+                            visible: root.activePreset === "custom"
+                            color: "#1e293b"
+                            border.color: "#38bdf8"
+                            border.width: 1
+
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.margins: 10
+                                spacing: 8
+
+                                Text { text: "🎛️"; font.pixelSize: 14 }
+                                Text {
+                                    text: qsTr("Ruteo Personalizado Activo (Cables Virtuales en Matriz)")
+                                    font.pixelSize: 12
+                                    font.bold: true
+                                    color: "#38bdf8"
+                                }
+                                Item { Layout.fillWidth: true }
+                                Text {
+                                    text: qsTr("Configuración manual en uso")
+                                    font.pixelSize: 11
+                                    color: "#94a3b8"
+                                }
+                            }
+                        }
+
+                        // Card explicativa de conexiones de audio físicas
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: audioExplCol.implicitHeight + 16
+                            radius: 8
+                            color: "#141c24"
+                            border.color: "#213144"
+                            border.width: 1
+
+                            ColumnLayout {
+                                id: audioExplCol
+                                anchors.fill: parent
+                                anchors.margins: 10
+                                spacing: 4
+
+                                Text {
+                                    text: qsTr("💡 ¿Cómo conectar tus altavoces y auriculares?")
+                                    font.pixelSize: 12
+                                    font.bold: true
+                                    color: "#90caf9"
+                                }
+
+                                Text {
+                                    text: qsTr("• <b>Salida Master (1-2)</b>: Sonido para el público. Conecta tus altavoces a las clavijas RCA traseras de tu mesa.<br>• <b>Preescucha CUE (3-4)</b>: Sonido privado. Conecta tus cascos a la clavija de auriculares de la mesa.<br>• <b>Modo Híbrido</b>: ¿No tienes altavoces externos? Elige <i>'Tablet + Auriculares Mesa'</i> para que la música salga por la tablet y la preescucha por los cascos.<br>• <b>Importante</b>: Tras elegir tu perfil, pulsa el botón azul <b>'Aplicar y guardar salidas'</b> abajo del todo.")
+                                    font.pixelSize: 11
+                                    color: "#b0bec5"
+                                    wrapMode: Text.WordWrap
+                                    Layout.fillWidth: true
                                 }
                             }
                         }
@@ -737,6 +974,38 @@ Category {
                                     }
                                 }
                             }
+
+                            // Mixxx's own USB audio driver (Android)
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: 2
+
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    Text {
+                                        Layout.fillWidth: true
+                                        color: Theme.white
+                                        font.pixelSize: 13
+                                        text: qsTr("Driver USB de Mixxx")
+                                    }
+                                    RatioChoice {
+                                        id: usbDirectMode
+                                        // Indexed by the config value: 0 = auto, 1 = always, 2 = never
+                                        options: ["auto", "siempre", "nunca"]
+                                        tooltips: [qsTr("Solo tarjetas multicanal (controladoras DJ)"), qsTr("Todas las tarjetas USB compatibles"), qsTr("Usar siempre el audio de Android")]
+                                        onSelectedChanged: {
+                                            root.hasChanges = true;
+                                        }
+                                    }
+                                }
+                                Text {
+                                    Layout.fillWidth: true
+                                    wrapMode: Text.WordWrap
+                                    color: "#90a4ae"
+                                    font.pixelSize: 11
+                                    text: qsTr("Mixxx controla directamente la tarjeta de sonido USB cuando Android no puede usar todos sus canales (p. ej. los auriculares de una controladora DJ). Los cambios se aplican al reiniciar Mixxx.")
+                                }
+                            }
                         }
 
                         // Network Clock (oculto / avanzado)
@@ -806,9 +1075,6 @@ Category {
                                     cursorShape: Qt.PointingHandCursor
                                     onClicked: {
                                         root.showAdvancedRouter = !root.showAdvancedRouter;
-                                        if (root.showAdvancedRouter) {
-                                            root.activePreset = ""; // switched to manual routing
-                                        }
                                     }
                                 }
                             }
@@ -823,6 +1089,13 @@ Category {
                             AudioRouter {
                                 id: router
                                 anchors.fill: parent
+                                onHasChangesChanged: {
+                                    if (hasChanges && !root.loading && root.showAdvancedRouter) {
+                                        root.activePreset = "custom";
+                                        root.presetChosen = false;
+                                        root.presetMessage = "";
+                                    }
+                                }
                             }
 
                             Rectangle {

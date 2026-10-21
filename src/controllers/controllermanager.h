@@ -45,6 +45,11 @@ class ControllerManager : public QObject {
 
     static QList<QString> getMappingPaths(UserSettingsPointer pConfig);
 
+    /// Returns how well a mapping name matches a device name, 0 meaning no
+    /// match. Model numbers (tokens with digits like "400" or "S4") must match
+    /// exactly, so "DDJ-400" never matches "DDJ-4000" or "DDJ-SB2".
+    static int mappingNameMatchScore(const QString& deviceName, const QString& mappingName);
+
   signals:
     void initialized();
     void devicesChanged();
@@ -72,6 +77,9 @@ class ControllerManager : public QObject {
 
   private:
     void updateControllerList();
+    /// Assigns and enables a system mapping matching the controller name if
+    /// the controller has never been configured. Returns true on success.
+    bool autoAssignMapping(Controller* pController);
     void startPolling();
     void stopPolling();
     void pollIfAnyControllersOpen();
@@ -83,6 +91,9 @@ class ControllerManager : public QObject {
     // because the CM is moved to its own thread and runs its own event loop.
     std::unique_ptr<ControllerLearningEventFilter> m_pControllerLearningEventFilter;
     QTimer m_pollTimer;
+    /// Debounces hotplug notifications, which arrive in bursts.
+    QTimer m_hotplugTimer;
+    int m_hotplugListenerId = 0;
     mutable QMutex m_mutex;
     /// Guarded by m_mutex for main-thread reads.
     /// Written/iterated only on the ControllerManager thread

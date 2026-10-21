@@ -1,5 +1,6 @@
 #include "controllers/controllermanager.h"
 
+#include <QRegularExpression>
 #include <QSet>
 #include <QStandardPaths>
 #include <QThread>
@@ -23,6 +24,14 @@
 
 #ifdef __HSS1394__
 #include "controllers/midi/hss1394enumerator.h"
+#endif
+
+#ifdef __ANDROID_MIDI__
+#include "controllers/midi/androidmidienumerator.h"
+#endif
+
+#ifdef __ANDROID__
+#include "controllers/android.h"
 #endif
 
 #ifdef __HID__
@@ -100,6 +109,7 @@ ControllerManager::ControllerManager(UserSettingsPointer pConfig)
           m_pControllerLearningEventFilter(
                   std::make_unique<ControllerLearningEventFilter>()),
           m_pollTimer(this),
+          m_hotplugTimer(this),
           m_pThread(std::make_unique<QThread>()),
           m_skipPoll(false) {
     qRegisterMetaType<std::shared_ptr<LegacyControllerMapping>>(
@@ -114,6 +124,10 @@ ControllerManager::ControllerManager(UserSettingsPointer pConfig)
 
     m_pollTimer.setInterval(kPollInterval.toIntegerMillis());
     connect(&m_pollTimer, &QTimer::timeout, this, &ControllerManager::slotPollDevices);
+
+    m_hotplugTimer.setSingleShot(true);
+    m_hotplugTimer.setInterval(750);
+    connect(&m_hotplugTimer, &QTimer::timeout, this, &ControllerManager::slotSetUpDevices);
 
     m_pThread->setObjectName("ControllerManager");
 
@@ -180,6 +194,9 @@ void ControllerManager::slotInitialize() {
 #ifdef __PORTMIDI__
         m_enumerators.push_back(std::make_unique<PortMidiEnumerator>(m_pConfig));
 #endif
+#ifdef __ANDROID_MIDI__
+        m_enumerators.push_back(std::make_unique<AndroidMidiEnumerator>());
+#endif
 #ifdef __HSS1394__
         m_enumerators.push_back(std::make_unique<Hss1394Enumerator>());
 #endif
@@ -190,11 +207,23 @@ void ControllerManager::slotInitialize() {
         m_enumerators.push_back(std::make_unique<HidEnumerator>());
 #endif
     } // Mutex locker released here
+
+#ifdef __ANDROID__
+    // USB and MIDI hotplug notifications arrive on Java threads.
+    m_hotplugListenerId = mixxx::android::addDevicesChangedListener([this]() {
+        QMetaObject::invokeMethod(
+                this, [this]() { m_hotplugTimer.start(); }, Qt::QueuedConnection);
+    });
+#endif
     emit initialized();
 }
 
 void ControllerManager::slotShutdown() {
     DEBUG_ASSERT_THIS_QOBJECT_THREAD_AFFINITY();
+#ifdef __ANDROID__
+    mixxx::android::removeDevicesChangedListener(m_hotplugListenerId);
+#endif
+    m_hotplugTimer.stop();
     stopPolling();
 
     // Clear m_enumerators before deleting the enumerators to prevent other code
@@ -240,8 +269,18 @@ void ControllerManager::updateControllerList() {
     if (newDeviceList == m_controllers) {
         return;
     }
-    m_controllers = std::move(newDeviceList);
+    const QList<Controller*> oldDeviceList = std::exchange(m_controllers, newDeviceList);
     locker.unlock();
+
+    // Close controllers that have been unplugged. They stay allocated (owned
+    // by their enumerator) so that pointers held by the GUI remain valid.
+    for (Controller* pController : oldDeviceList) {
+        if (!newDeviceList.contains(pController) && pController->isOpen()) {
+            qInfo() << "Closing unplugged controller" << pController->getName();
+            pController->close();
+        }
+    }
+    pollIfAnyControllersOpen();
     emit devicesChanged();
 }
 
@@ -286,12 +325,22 @@ void ControllerManager::slotSetUpDevices() {
     for (Controller* pController : deviceList) {
         QString name = pController->getName();
 
+        // Rescans and hotplug events must not restart controllers that are
+        // already running, it would reset their scripts and LEDs.
         if (pController->isOpen()) {
-            pController->close();
+            continue;
         }
 
         // The filename for this device name.
         QString deviceName = sanitizeDeviceName(name);
+
+        // Plug and play: a controller that has never been configured gets a
+        // matching mapping from the ones shipped with Mixxx.
+        if (!m_pConfig->exists(ConfigKey("[Controller]", deviceName)) &&
+                getConfiguredMappingFileForDevice(deviceName).isEmpty() &&
+                autoAssignMapping(pController)) {
+            continue;
+        }
 
         // Check if device is enabled
         if (!m_pConfig->getValue(ConfigKey("[Controller]", deviceName), 0)) {
@@ -500,6 +549,141 @@ void ControllerManager::slotApplyMapping(Controller* pController,
             this,
             [this, pController]() { openController(pController); },
             Qt::QueuedConnection);
+}
+
+namespace {
+
+const QSet<QString> kGenericNameTokens = {
+        QStringLiteral("midi"),
+        QStringLiteral("usb"),
+        QStringLiteral("hid"),
+        QStringLiteral("port"),
+        QStringLiteral("in"),
+        QStringLiteral("out"),
+        QStringLiteral("dj"),
+        QStringLiteral("controller"),
+        QStringLiteral("audio"),
+        QStringLiteral("device"),
+        QStringLiteral("corporation"),
+        QStringLiteral("inc"),
+        QStringLiteral("ltd"),
+};
+
+QStringList significantNameTokens(QString name) {
+    // Strip port numbers like in "DDJ-400 MIDI 1"
+    static const QRegularExpression kPortSuffix(
+            QStringLiteral("\\b(midi|port)\\s*\\d+\\s*$"),
+            QRegularExpression::CaseInsensitiveOption);
+    static const QRegularExpression kSeparators(QStringLiteral("[^a-z0-9]+"));
+    name.remove(kPortSuffix);
+    QStringList tokens = name.toLower().split(kSeparators, Qt::SkipEmptyParts);
+    tokens.removeIf([](const QString& token) {
+        return kGenericNameTokens.contains(token);
+    });
+    return tokens;
+}
+
+bool isModelToken(const QString& token) {
+    return std::any_of(token.cbegin(), token.cend(), [](QChar c) { return c.isDigit(); });
+}
+
+} // namespace
+
+// static
+int ControllerManager::mappingNameMatchScore(
+        const QString& deviceName, const QString& mappingName) {
+    const QStringList deviceTokens = significantNameTokens(deviceName);
+    const QStringList mappingTokens = significantNameTokens(mappingName);
+    if (deviceTokens.isEmpty() || mappingTokens.isEmpty()) {
+        return 0;
+    }
+    const QString compactDevice = deviceTokens.join(QString());
+    const QString compactMapping = mappingTokens.join(QString());
+    if (compactDevice == compactMapping) {
+        return 1000;
+    }
+
+    // A model number of the mapping must appear in the device name
+    for (const QString& token : mappingTokens) {
+        if (isModelToken(token) && !deviceTokens.contains(token) &&
+                !compactDevice.contains(token)) {
+            return 0;
+        }
+    }
+    // Handles spelling differences like "DDJ400" vs "Pioneer DDJ-400"
+    const bool compactDeviceIsNumber = std::all_of(compactDevice.cbegin(),
+            compactDevice.cend(),
+            [](QChar c) { return c.isDigit(); });
+    if (compactMapping.contains(compactDevice) && isModelToken(compactDevice) &&
+            !compactDeviceIsNumber) {
+        return static_cast<int>(compactDevice.size());
+    }
+
+    int score = 0;
+    int matchedTokens = 0;
+    for (const QString& token : deviceTokens) {
+        if (mappingTokens.contains(token)) {
+            score += static_cast<int>(token.size());
+            ++matchedTokens;
+        } else if (isModelToken(token)) {
+            // The device has a model number the mapping doesn't mention
+            return 0;
+        }
+    }
+    // A model number alone is not enough ("DDJ-400" vs "Vestax VCI-400")
+    if (matchedTokens < 2) {
+        return 0;
+    }
+    return score;
+}
+
+bool ControllerManager::autoAssignMapping(Controller* pController) {
+    DEBUG_ASSERT_THIS_QOBJECT_THREAD_AFFINITY();
+    if (CmdlineArgs::Instance().getSafeMode()) {
+        return false;
+    }
+
+    MappingInfoEnumerator enumerator(resourceMappingsPath(m_pConfig));
+    enumerator.loadSupportedMappings();
+    const QList<MappingInfo> mappings =
+            enumerator.getMappingsByExtension(pController->mappingExtension());
+
+    const MappingInfo* pBestMatch = nullptr;
+    int bestScore = 0;
+    for (const MappingInfo& mapping : mappings) {
+        const int score = pController->matchMapping(mapping)
+                ? 10000
+                : mappingNameMatchScore(pController->getName(), mapping.getName());
+        if (score <= 0) {
+            continue;
+        }
+        if (score > bestScore ||
+                (score == bestScore &&
+                        mapping.getName().size() < pBestMatch->getName().size())) {
+            bestScore = score;
+            pBestMatch = &mapping;
+        }
+    }
+    if (!pBestMatch) {
+        qInfo() << "No mapping found for new controller" << pController->getName();
+        return false;
+    }
+
+    std::shared_ptr<LegacyControllerMapping> pMapping =
+            LegacyControllerMappingFileHandler::loadMapping(
+                    QFileInfo(pBestMatch->getPath()), resourceMappingsPath(m_pConfig));
+    if (!pMapping) {
+        return false;
+    }
+    qInfo() << "Automatically assigning mapping" << pBestMatch->getName()
+            << "to new controller" << pController->getName();
+    pMapping->loadSettings(m_pConfig, pController->getName());
+    m_pConfig->set(ConfigKey(kSettingsGroup, sanitizeDeviceName(pController->getName())),
+            pMapping->filePath());
+    pController->setMapping(std::move(pMapping));
+    // Marks the controller as enabled in the configuration on success
+    openController(pController);
+    return true;
 }
 
 // static

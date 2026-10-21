@@ -26,6 +26,16 @@ Rectangle {
         group: "[QuickEffectRack1_" + root.targetDeck + "]"
         key: "super1"
     }
+    Mixxx.ControlProxy {
+        id: filterDeck1Proxy
+        group: "[QuickEffectRack1_[Channel1]]"
+        key: "super1"
+    }
+    Mixxx.ControlProxy {
+        id: filterDeck2Proxy
+        group: "[QuickEffectRack1_[Channel2]]"
+        key: "super1"
+    }
 
     Mixxx.ControlProxy {
         id: fxMixProxy
@@ -33,10 +43,80 @@ Rectangle {
         key: "mix"
     }
 
+    // One proxy per deck, so the routing of the previous deck can be
+    // restored after the target deck changed
     Mixxx.ControlProxy {
-        id: fxSuperProxy
+        id: routingDeck1Proxy
         group: "[EffectRack1_EffectUnit1]"
-        key: "super1"
+        key: "group_[Channel1]_enable"
+    }
+    Mixxx.ControlProxy {
+        id: routingDeck2Proxy
+        group: "[EffectRack1_EffectUnit1]"
+        key: "group_[Channel2]_enable"
+    }
+
+    function filterProxyFor(deck) {
+        return deck === "[Channel2]" ? filterDeck2Proxy : filterDeck1Proxy;
+    }
+
+    function routingProxyFor(deck) {
+        return deck === "[Channel2]" ? routingDeck2Proxy : routingDeck1Proxy;
+    }
+
+    Mixxx.ControlProxy {
+        id: slot1EnabledProxy
+        group: "[EffectRack1_EffectUnit1_Effect1]"
+        key: "enabled"
+    }
+    Mixxx.ControlProxy {
+        id: slot2EnabledProxy
+        group: "[EffectRack1_EffectUnit1_Effect2]"
+        key: "enabled"
+    }
+    Mixxx.ControlProxy {
+        id: slot3EnabledProxy
+        group: "[EffectRack1_EffectUnit1_Effect3]"
+        key: "enabled"
+    }
+
+    // State before the pad was touched, restored in SNAP mode
+    property bool hasSavedState: false
+    property real savedFilter: 0.5
+    property real savedMix: 0.0
+    property real savedRouting: 0
+    property string savedDeck: ""
+    property bool enabledSlotForPad: false
+
+    function saveState() {
+        if (root.hasSavedState) {
+            return;
+        }
+        root.savedFilter = filterProxy.value;
+        root.savedMix = fxMixProxy.value;
+        root.savedDeck = root.targetDeck;
+        root.savedRouting = routingProxyFor(root.savedDeck).value;
+        // The pad must be audible: route the effect unit to the deck and
+        // switch on its first effect if none is on
+        routingProxyFor(root.savedDeck).value = 1;
+        root.enabledSlotForPad = !slot1EnabledProxy.value && !slot2EnabledProxy.value && !slot3EnabledProxy.value;
+        if (root.enabledSlotForPad) {
+            slot1EnabledProxy.value = 1;
+        }
+        root.hasSavedState = true;
+    }
+
+    function restoreState() {
+        if (!root.hasSavedState) {
+            return;
+        }
+        filterProxyFor(root.savedDeck).value = root.savedFilter;
+        fxMixProxy.value = root.savedMix;
+        routingProxyFor(root.savedDeck).value = root.savedRouting;
+        if (root.enabledSlotForPad) {
+            slot1EnabledProxy.value = 0;
+        }
+        root.hasSavedState = false;
     }
 
     function applyValues(nx, ny) {
@@ -44,12 +124,33 @@ Rectangle {
         root.currentY = Math.max(0.0, Math.min(1.0, ny));
 
         filterProxy.value = root.currentX;
+        // Only the dry/wet mix: super1 drives the linked effect parameters
+        // and the controller's own knobs
         fxMixProxy.value = root.currentY;
-        fxSuperProxy.value = root.currentY;
     }
 
     function resetNeutral() {
-        applyValues(0.5, 0.0);
+        if (root.hasSavedState) {
+            restoreState();
+        } else {
+            // Neutral filter, effect off
+            filterProxy.value = 0.5;
+            fxMixProxy.value = 0.0;
+        }
+        root.currentX = filterProxy.value;
+        root.currentY = fxMixProxy.value;
+    }
+
+    onTargetDeckChanged: {
+        // The saved state belongs to the previous deck
+        restoreState();
+    }
+
+    onVisibleChanged: {
+        if (visible) {
+            root.currentX = filterProxy.value;
+            root.currentY = fxMixProxy.value;
+        }
     }
 
     ColumnLayout {
@@ -325,6 +426,8 @@ Rectangle {
 
                 onPressed: touchPoints => {
                     root.isTouching = true;
+                    snapBackAnim.stop();
+                    root.saveState();
                     if (touchPoints.length > 0) {
                         var pt = touchPoints[0];
                         var nx = pt.x / touchSurface.width;
@@ -345,8 +448,10 @@ Rectangle {
                 onReleased: {
                     root.isTouching = false;
                     if (!root.holdMode) {
-                        snapBackAnimX.to = 0.5;
-                        snapBackAnimY.to = 0.0;
+                        // Animate the cursor back, then restore exactly the
+                        // values from before the touch
+                        snapBackAnimX.to = root.hasSavedState ? root.savedFilter : 0.5;
+                        snapBackAnimY.to = root.hasSavedState ? root.savedMix : 0.0;
                         snapBackAnim.restart();
                     }
                 }
@@ -369,9 +474,7 @@ Rectangle {
                     easing.type: Easing.OutQuad
                 }
                 onFinished: {
-                    filterProxy.value = root.currentX;
-                    fxMixProxy.value = root.currentY;
-                    fxSuperProxy.value = root.currentY;
+                    root.restoreState();
                 }
             }
         }

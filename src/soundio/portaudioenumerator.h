@@ -26,10 +26,21 @@ class PortAudioEnumerator : public SoundDeviceEnumerator {
     void initialize() override;
     void deinitialize() override;
 
+#ifdef __ANDROID_USB_AUDIO__
+    /// Rescans the USB sound cards driven directly by Mixxx. Returns true if
+    /// the set changed; the devices that disappeared are added to pRemoved.
+    bool refreshAndroidUsbDevices(
+            std::vector<SoundDevicePointer>* pRemoved, bool waitForPermission);
+#endif
+
   private:
     void setJACKName() const;
 
     std::vector<QSharedPointer<SoundDevicePortAudio>> m_devices;
+#ifdef __ANDROID_USB_AUDIO__
+    /// USB audio interfaces driven directly by Mixxx, see SoundDeviceAndroidUsb
+    std::vector<SoundDevicePointer> m_androidUsbDevices;
+#endif
     mixxx::audio::SampleRate m_jackSampleRate;
 
     UserSettingsPointer m_pConfig;
