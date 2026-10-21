@@ -16,34 +16,26 @@ Rectangle {
 
     color: Theme.darkGray
 
-    // Shows that the controller's browse knob moves through this list
-    property bool highlighted: false
+    LibraryComponent.Control {
+        id: libraryControl
 
-    function focusList() {
-        view.forceActiveFocus();
+        onFocusWidgetChanged: {
+            switch (focusWidget) {
+            case Skin.FocusedWidgetControl.WidgetKind.LibraryView:
+                view.forceActiveFocus();
+                break;
+            }
+        }
+        onLoadSelectedTrack: (group, play) => {
+            view.loadSelectedTrack(group, play);
+        }
+        onLoadSelectedTrackIntoNextAvailableDeck: play => {
+            view.loadSelectedTrackIntoNextAvailableDeck(play);
+        }
+        onMoveVertical: offset => {
+            view.selectionModel.moveSelectionVertical(offset);
+        }
     }
-    function loadSelectedTrack(group, play) {
-        view.loadSelectedTrack(group, play);
-    }
-    function loadSelectedTrackIntoNextAvailableDeck(play) {
-        view.loadSelectedTrackIntoNextAvailableDeck(play);
-    }
-    // Knob turns that arrive together are applied at once, so fast turns
-    // don't queue up a relayout per step
-    property int pendingMove: 0
-
-    function applyPendingMove() {
-        const offset = root.pendingMove;
-        root.pendingMove = 0;
-        view.selectionModel.moveSelectionVertical(offset);
-    }
-    function moveSelectionVertical(offset) {
-        root.pendingMove += offset;
-        Qt.callLater(root.applyPendingMove);
-    }
-
-    border.color: Theme.accentColor
-    border.width: highlighted ? 2 : 0
     HorizontalHeaderView {
         id: horizontalHeader
 
@@ -205,7 +197,7 @@ Rectangle {
             return oldDynamicColumnCount != dynamicColumnCount || oldUsedWidth != usedWidth;
         }
 
-        anchors.bottom: quickLoadBar.top
+        anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.margins: 5
         anchors.right: parent.right
@@ -225,31 +217,13 @@ Rectangle {
             const span = columnDef.fillSpan || 1;
             return span * (view.width - view.usedWidth) / view.dynamicColumnCount;
         }
-        flickableDirection: Flickable.VerticalFlick
-        boundsBehavior: Flickable.StopAtBounds
-        interactive: true
         keyNavigationEnabled: false
         model: root.model
         pointerNavigationEnabled: false
         reuseItems: true
 
         ScrollBar.vertical: ScrollBar {
-            id: verticalScrollBar
             policy: ScrollBar.AlwaysOn
-            width: 16
-            interactive: true
-            contentItem: Rectangle {
-                implicitWidth: 12
-                implicitHeight: 48
-                radius: 6
-                color: verticalScrollBar.pressed ? "#00e5ff" : (verticalScrollBar.hovered ? "#78909c" : "#546e7a")
-            }
-            background: Rectangle {
-                implicitWidth: 16
-                color: "#181a20"
-                opacity: 0.7
-                radius: 4
-            }
         }
         delegate: Item {
             id: item
@@ -260,8 +234,9 @@ Rectangle {
             required property string file_url
             required property int row
             required property bool selected
+            required property var track
 
-            implicitHeight: 38
+            implicitHeight: 30
 
             Loader {
                 id: loader
@@ -274,6 +249,7 @@ Rectangle {
                 property int row: item.row
                 property bool selected: item.selected
                 property var tableView: view
+                property var track: item.track
 
                 anchors.fill: parent
                 focus: true
@@ -291,13 +267,6 @@ Rectangle {
             //         Mixxx.Library.analyze(track)
             // }
         }
-        Timer {
-            id: relayoutTimer
-
-            interval: 150
-            onTriggered: view.forceLayout()
-        }
-
         selectionModel: ItemSelectionModel {
             function moveSelectionVertical(value) {
                 if (value == 0)
@@ -313,11 +282,8 @@ Rectangle {
                     this.clear();
                     return;
                 }
-                // Stay at the first or last track instead of wrapping around
-                const newRow = Math.max(0, Math.min(rowCount - 1, row));
+                const newRow = Mixxx.MathUtils.positiveModulo(row, rowCount);
                 this.select(this.model.index(newRow, 0), ItemSelectionModel.Rows | ItemSelectionModel.Select | ItemSelectionModel.Clear | ItemSelectionModel.Current);
-                // Keep the selection visible, e.g. when moving it with the controller
-                view.positionViewAtRow(newRow, TableView.Contain);
             }
             function selectedTrackUrls() {
                 return this.selectedIndexes.map(index => {
@@ -329,237 +295,15 @@ Rectangle {
         }
 
         Component.onCompleted: this.updateColumnSize()
-        Keys.onDownPressed: root.moveSelectionVertical(1)
+        Keys.onDownPressed: this.selectionModel.moveSelectionVertical(1)
         Keys.onEnterPressed: this.loadSelectedTrackIntoNextAvailableDeck(false)
         Keys.onReturnPressed: this.loadSelectedTrackIntoNextAvailableDeck(false)
-        Keys.onUpPressed: root.moveSelectionVertical(-1)
+        Keys.onUpPressed: this.selectionModel.moveSelectionVertical(-1)
         onModelChanged: this.updateColumnSize()
-        // The library grows when switching to the LIB view, rows have to be
-        // created for the new space once the layout has settled
-        onHeightChanged: relayoutTimer.restart()
         onWidthChanged: {
             if (view.updateColumnSize()) {
                 // forceLayout is costly - only invoke if there was a change in the column layouts
                 view.forceLayout();
-            }
-        }
-    }
-    Rectangle {
-        id: quickLoadBar
-
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        color: Theme.sunkenBackgroundColor
-        height: 48
-        border.color: Theme.panelSplitterBackground
-        border.width: 1
-
-        readonly property var selectedUrls: view.selectionModel.selectedTrackUrls()
-        readonly property bool hasTrack: selectedUrls && selectedUrls.length > 0
-
-        RowLayout {
-            anchors.fill: parent
-            anchors.margins: 5
-            spacing: 8
-
-            Rectangle {
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-                color: Theme.darkGray3
-                radius: 4
-
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.margins: 6
-
-                    Text {
-                        Layout.fillWidth: true
-                        color: quickLoadBar.hasTrack ? Theme.white : Theme.lightGray3
-                        elide: Text.ElideRight
-                        font.bold: quickLoadBar.hasTrack
-                        font.pixelSize: 13
-                        text: {
-                            if (!quickLoadBar.hasTrack)
-                                return qsTr("Select a track to load");
-                            const urlStr = quickLoadBar.selectedUrls[0].toString();
-                            const filename = decodeURIComponent(urlStr.substring(urlStr.lastIndexOf('/') + 1));
-                            return filename;
-                        }
-                    }
-                }
-            }
-
-            Skin.Button {
-                id: addToPlaylistBtn
-
-                Layout.preferredHeight: 38
-                Layout.preferredWidth: 110
-                activeColor: Theme.accentColor
-                backgroundColor: quickLoadBar.hasTrack ? "#2e3440" : "#262930"
-                normalColor: quickLoadBar.hasTrack ? "#ffffff" : "#78909c"
-                enabled: quickLoadBar.hasTrack
-                font.bold: true
-                text: "+ PLAYLIST"
-
-                onClicked: playlistPopup.openFor(quickLoadBar.selectedUrls[0])
-            }
-
-            Skin.Button {
-                id: loadDeck1Btn
-
-                Layout.preferredHeight: 38
-                Layout.preferredWidth: 115
-                activeColor: "#64b5f6"
-                backgroundColor: quickLoadBar.hasTrack ? "#1565c0" : "#262930"
-                normalColor: quickLoadBar.hasTrack ? "#ffffff" : "#78909c"
-                highlight: quickLoadBar.hasTrack
-                enabled: quickLoadBar.hasTrack
-                font.bold: true
-                text: "◀ DECK 1"
-
-                onClicked: {
-                    view.loadSelectedTrack("[Channel1]", false);
-                }
-            }
-
-            Skin.Button {
-                id: loadDeck2Btn
-
-                Layout.preferredHeight: 38
-                Layout.preferredWidth: 115
-                activeColor: "#ffb74d"
-                backgroundColor: quickLoadBar.hasTrack ? "#e65100" : "#262930"
-                normalColor: quickLoadBar.hasTrack ? "#ffffff" : "#78909c"
-                highlight: quickLoadBar.hasTrack
-                enabled: quickLoadBar.hasTrack
-                font.bold: true
-                text: "DECK 2 ▶"
-
-                onClicked: {
-                    view.loadSelectedTrack("[Channel2]", false);
-                }
-            }
-        }
-    }
-
-    Popup {
-        id: playlistPopup
-
-        property url trackUrl
-        property var playlists: []
-        property string message: ""
-
-        function openFor(url) {
-            trackUrl = url;
-            message = "";
-            newPlaylistName.text = "";
-            playlists = Mixxx.Library.playlists();
-            open();
-        }
-        function addTo(playlistId, name) {
-            if (Mixxx.Library.addTrackToPlaylist(playlistId, trackUrl)) {
-                close();
-            } else {
-                message = qsTr("Could not add to %1").arg(name);
-            }
-        }
-
-        anchors.centerIn: parent
-        width: Math.min(380, root.width - 20)
-        height: Math.min(440, root.height - 20)
-        modal: true
-        focus: true
-        padding: 10
-
-        background: Rectangle {
-            color: Theme.darkGray2
-            border.color: Theme.darkGray3
-            radius: 8
-        }
-
-        contentItem: ColumnLayout {
-            spacing: 8
-
-            Text {
-                Layout.fillWidth: true
-                color: Theme.white
-                font.bold: true
-                font.pixelSize: 15
-                text: qsTr("Add to playlist")
-            }
-            ListView {
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-                clip: true
-                model: playlistPopup.playlists
-                spacing: 4
-
-                delegate: Skin.Button {
-                    required property var modelData
-
-                    width: ListView.view.width
-                    height: 44
-                    enabled: !modelData.locked
-                    backgroundColor: "#262930"
-                    normalColor: Theme.white
-                    activeColor: Theme.accentColor
-                    font.pixelSize: 14
-                    text: modelData.locked ? qsTr("%1 (bloqueada)").arg(modelData.name) : modelData.name
-                    onClicked: playlistPopup.addTo(modelData.id, modelData.name)
-                }
-
-                Text {
-                    anchors.centerIn: parent
-                    visible: playlistPopup.playlists.length === 0
-                    color: Theme.lightGray2
-                    font.pixelSize: 13
-                    text: qsTr("You have no playlists yet")
-                }
-            }
-            Text {
-                Layout.fillWidth: true
-                visible: playlistPopup.message.length > 0
-                color: Theme.red
-                font.pixelSize: 12
-                text: playlistPopup.message
-                wrapMode: Text.WordWrap
-            }
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: 6
-
-                Skin.TextField {
-                    id: newPlaylistName
-
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 44
-                    font.pixelSize: 14
-                    placeholderText: qsTr("New playlist")
-                    onAccepted: createPlaylistBtn.clicked()
-                }
-                Skin.Button {
-                    id: createPlaylistBtn
-
-                    Layout.preferredHeight: 44
-                    Layout.preferredWidth: 90
-                    enabled: newPlaylistName.text.trim().length > 0
-                    activeColor: Theme.accentColor
-                    backgroundColor: "#1565c0"
-                    normalColor: "#ffffff"
-                    font.bold: true
-                    text: qsTr("CREAR")
-
-                    onClicked: {
-                        const name = newPlaylistName.text.trim();
-                        const playlistId = Mixxx.Library.createNamedPlaylist(name);
-                        if (playlistId < 0) {
-                            playlistPopup.message = qsTr("A playlist named %1 already exists").arg(name);
-                            return;
-                        }
-                        playlistPopup.addTo(playlistId, name);
-                    }
-                }
             }
         }
     }

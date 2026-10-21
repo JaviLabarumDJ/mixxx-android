@@ -9,7 +9,6 @@ Item {
 
     property color buttonColor: trackLoadedControl.value > 0 ? Theme.buttonActiveColor : Theme.buttonDisableColor
     required property string group
-    property var deck: null
 
     Mixxx.ControlProxy {
         id: trackLoadedControl
@@ -21,7 +20,6 @@ Item {
         id: reverseButton
 
         activeColor: Theme.deckActiveColor
-        anchors.left: parent.left
         group: root.group
         implicitHeight: 22
         implicitWidth: 22
@@ -61,63 +59,7 @@ Item {
         anchors.rightMargin: 5
         implicitHeight: 22
         text: "Beatgrid"
-        visible: root.deck ? (root.deck.width >= 520 && root.width > 165) : root.width > 165
-    }
-    Row {
-        id: padSwitcher
-        anchors.centerIn: parent
-        spacing: 4
-        visible: root.deck ? root.deck.width < 520 : false
-
-        Rectangle {
-            id: cueBtn
-            width: 50
-            height: 22
-            radius: 3
-            color: (root.deck && root.deck.mobilePadView === 0) ? ((root.group === "[Channel2]") ? "#e65100" : "#1565c0") : "#1a1e24"
-            border.color: (root.deck && root.deck.mobilePadView === 0) ? "#ffffff" : "#2f3745"
-            border.width: 1
-
-            Text {
-                anchors.centerIn: parent
-                text: "PADS"
-                font.bold: true
-                font.pixelSize: 9
-                color: (root.deck && root.deck.mobilePadView === 0) ? "#ffffff" : "#9da5b4"
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    if (root.deck) root.deck.mobilePadView = 0;
-                }
-            }
-        }
-
-        Rectangle {
-            id: loopBtn
-            width: 54
-            height: 22
-            radius: 3
-            color: (root.deck && root.deck.mobilePadView === 1) ? "#00838f" : "#1a1e24"
-            border.color: (root.deck && root.deck.mobilePadView === 1) ? "#ffffff" : "#2f3745"
-            border.width: 1
-
-            Text {
-                anchors.centerIn: parent
-                text: "IN / OUT"
-                font.bold: true
-                font.pixelSize: 8
-                color: (root.deck && root.deck.mobilePadView === 1) ? "#ffffff" : "#9da5b4"
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    if (root.deck) root.deck.mobilePadView = 1;
-                }
-            }
-        }
+        visible: root.width > 165
     }
     Skin.ControlButton {
         id: ejectButton

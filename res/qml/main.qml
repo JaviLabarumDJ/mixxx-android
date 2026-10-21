@@ -29,12 +29,6 @@ ApplicationWindow {
                 : Window.Windowed;
     }
 
-    function openQuickLoad(group) {
-        if (content.item && typeof content.item.openQuickLoad === "function") {
-            content.item.openQuickLoad(group);
-        }
-    }
-
     Connections {
         target: Mixxx.Core
         function onReadyChanged() {
@@ -65,134 +59,69 @@ ApplicationWindow {
     }
     Rectangle {
         id: splash
-        anchors.fill: parent
-        color: "#0e1117"
-        z: 99999
         visible: opacity > 0
+        color: Theme.backgroundColor
+        anchors.fill: parent
 
-        property real progress: 0.0
-        property bool fadingOut: false
+        property bool ready: false
 
-        opacity: fadingOut ? 0.0 : 1.0
+        Component.onCompleted: {
+            ready = true
+        }
+
+        states: [
+            State {
+                when: splash.ready && content.status != Loader.Ready
+
+                PropertyChanges {
+                    text.opacity: 1
+                    logo.opacity: 1
+                    logo.y: root.height / 2 - logo.height / 2
+                }
+            },
+            State {
+                when: content.status == Loader.Ready && content.active
+
+                PropertyChanges {
+                    splash.opacity: 0
+                }
+            }
+        ]
+        Image {
+            id: logo
+            anchors.horizontalCenter: parent.horizontalCenter
+            source: "qrc:/images/mixxx-icon-logo-symbolic.svg"
+            // height: 64
+            opacity: 0
+            y: root.height / 2
+
+            Behavior on opacity {
+                NumberAnimation { duration: 1500; easing.type: Easing.InOutQuad }
+            }
+
+            Behavior on y {
+                NumberAnimation { duration: 1500; easing.type: Easing.InOutQuad }
+            }
+        }
+        Text {
+            id: text
+            opacity: 0
+            y: logo.y + logo.height*2
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.topMargin: 20
+            font.pixelSize: 12
+            color: Theme.lightGray3
+            text: "DJ your way"
+            Behavior on opacity {
+                SequentialAnimation {
+                    PauseAnimation { duration: 1000 }
+                    NumberAnimation { duration: 500; easing.type: Easing.InOutQuad }
+                }
+            }
+        }
+
         Behavior on opacity {
             NumberAnimation { duration: 500; easing.type: Easing.InOutQuad }
-        }
-
-        Timer {
-            id: loadProgressTimer
-            interval: 35
-            running: !splash.fadingOut && splash.visible
-            repeat: true
-            property int ticks: 0
-            onTriggered: {
-                ticks++;
-                var isReady = (content.status === Loader.Ready && content.item !== null);
-
-                // Give at least 40 ticks * 35ms = 1400ms so user clearly sees startup progress
-                if (!isReady || ticks < 40) {
-                    if (splash.progress < 0.35) {
-                        splash.progress = Math.min(0.35, splash.progress + 0.045);
-                    } else if (splash.progress < 0.75) {
-                        splash.progress = Math.min(0.75, splash.progress + 0.025);
-                    } else if (splash.progress < 0.94) {
-                        splash.progress = Math.min(0.94, splash.progress + 0.012);
-                    }
-                } else {
-                    splash.progress = 1.0;
-                    loadProgressTimer.stop();
-                    dismissTimer.start();
-                }
-            }
-        }
-
-        Timer {
-            id: dismissTimer
-            interval: 320
-            repeat: false
-            onTriggered: {
-                splash.fadingOut = true;
-            }
-        }
-
-        Column {
-            id: splashContent
-            anchors.centerIn: parent
-            spacing: 14
-            opacity: 1
-
-            // Mixxx Logo (Icon and MIXXX together)
-            Image {
-                id: logo
-                anchors.horizontalCenter: parent.horizontalCenter
-                source: "qrc:/images/mixxx-icon-logo-symbolic.svg"
-                fillMode: Image.PreserveAspectFit
-                width: 280
-                height: 60
-                smooth: true
-                antialiasing: true
-            }
-
-            // Subtitle
-            Text {
-                id: subtitleText
-                anchors.horizontalCenter: parent.horizontalCenter
-                color: "#ff9100"
-                font.pixelSize: 15
-                font.bold: true
-                font.letterSpacing: 0.8
-                text: "By JaviLabarumDJ on Android"
-            }
-
-            Item {
-                // Spacer
-                height: 8
-                width: 1
-            }
-
-            // Progress bar
-            Item {
-                id: progressBarContainer
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: 260
-                height: 32
-
-                Rectangle {
-                    id: progressTrack
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.top: parent.top
-                    width: parent.width
-                    height: 6
-                    radius: 3
-                    color: "#161b24"
-                    border.color: "#283444"
-                    border.width: 1
-                    clip: true
-
-                    Rectangle {
-                        id: progressFill
-                        anchors.left: parent.left
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        width: Math.max(6, parent.width * splash.progress)
-                        radius: 3
-                        color: "#00e5ff"
-
-                        Behavior on width {
-                            NumberAnimation { duration: 150; easing.type: Easing.OutCubic }
-                        }
-                    }
-                }
-
-                Text {
-                    anchors.top: progressTrack.bottom
-                    anchors.topMargin: 7
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: splash.progress >= 1.0 ? qsTr("Ready to mix!") : (splash.progress > 0.7 ? qsTr("Optimizing DJ controls...") : (splash.progress > 0.35 ? qsTr("Loading library and decks...") : qsTr("Starting audio engine...")))
-                    font.pixelSize: 11
-                    font.weight: Font.DemiBold
-                    color: "#8fa1b8"
-                }
-            }
         }
     }
 }

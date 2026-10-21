@@ -36,6 +36,40 @@ handlers is what allows two decks to be operated at the same time:
 | Drag on a knob or fader          | Change the value                           |
 | Long press on a hotcue           | Open the hotcue popup (right click on desktop) |
 
+## Android QML overrides
+
+> _The following section was written by an AI agent (Claude Code)._
+
+The upstream QML files in `res/qml/` are kept unmodified, so that merging
+`mixxxdj/mixxx` does not conflict. The Android versions live next to them in
+`+android/` folders, e.g. `res/qml/Settings/+android/Interface.qml` replaces
+`res/qml/Settings/Interface.qml`. This uses Qt's
+[QML file selectors](https://doc.qt.io/qt-6/qtquick-positioning-qml-file-selectors.html):
+the `android` selector is active automatically on Android, and the
+`QQmlApplicationEngine` applies it to the `assets:/` files.
+
+Rules when changing the UI:
+
+* To change an upstream QML file for Android, copy it to the `+android/`
+  folder next to it and edit the copy. Never edit the upstream file.
+* Relative imports and implicit same-folder types in an override resolve
+  against the original folder, not against `+android/`, so
+  `import "../Theme"` keeps working unchanged.
+* Files that only exist in this fork (e.g. `res/qml/WaveDeckBar.qml`,
+  `res/qml/Deck/TouchSpinny.qml`) are added as normal files, not into
+  `+android/`, so that other files can find them.
+* QML compiled into the binary (`res/qml/Mixxx/...`) cannot be overridden this
+  way; use a fork-owned copy instead, as `Deck/TouchSpinny.qml` does for
+  `Mixxx.Controls.Spinny`.
+* After merging upstream, check whether upstream changed a file that has an
+  override (`git diff <old-upstream> <new-upstream> -- res/qml`) and port the
+  change into the override by hand if needed.
+
+To run the Android UI on a desktop build, start Mixxx with
+`QT_FILE_SELECTORS=android mixxx --new-ui`.
+
+> _End of AI-written section._
+
 ## Translations
 
 > _The following section was written by an AI agent (Claude Code)._

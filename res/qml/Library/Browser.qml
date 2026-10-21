@@ -14,82 +14,17 @@ Rectangle {
     id: root
 
     readonly property var featureSelection: ItemSelectionModel {
-        model: root.model
     }
     required property var model
-    // Shows that the controller's browse knob moves through the sources
-    property bool highlighted: false
-
-    // Reading the databases on USB drives needs more than the music permission
-    signal storageAccessNeeded()
-
-    function checkStorageAccess(index) {
-        // SidebarModel::IconNameRole
-        const icon = root.model.data(index, Qt.UserRole + 1);
-        if ((icon === "rekordbox" || icon === "enginedj") && !Mixxx.Library.hasFullStorageAccess()) {
-            root.storageAccessNeeded();
-        }
-    }
-
-    function currentRow() {
-        return featureView.rowAtIndex(featureSelection.currentIndex);
-    }
-    function selectRow(row) {
-        featureSelection.setCurrentIndex(featureView.index(row, 0), ItemSelectionModel.ClearAndSelect | ItemSelectionModel.Rows);
-        featureView.positionViewAtRow(row, TableView.Contain);
-    }
-    function moveSelection(offset) {
-        if (featureView.rows <= 0) {
-            return;
-        }
-        const row = root.currentRow();
-        root.selectRow(row < 0 ? 0 : Math.max(0, Math.min(featureView.rows - 1, row + offset)));
-    }
-    // Opens the selected source. Returns true if it has no children, so
-    // the track list is what the user wants to browse next.
-    function activateCurrent() {
-        const row = root.currentRow();
-        if (row < 0) {
-            root.selectRow(0);
-            return false;
-        }
-        const index = featureView.index(row, 0);
-        root.checkStorageAccess(index);
-        root.model.activate(index);
-        if (root.model.hasChildren(index)) {
-            featureView.toggleExpanded(row);
-            return false;
-        }
-        return true;
-    }
-    // Collapses the selected source or moves to its parent
-    function collapseCurrent() {
-        const row = root.currentRow();
-        if (row < 0) {
-            return;
-        }
-        if (featureView.isExpanded(row)) {
-            featureView.collapse(row);
-            return;
-        }
-        const parentIndex = featureView.index(row, 0).parent;
-        if (parentIndex.valid) {
-            const parentRow = featureView.rowAtIndex(parentIndex);
-            featureView.collapse(parentRow);
-            root.selectRow(parentRow);
-        }
-    }
 
     color: Theme.backgroundColor
-    border.color: Theme.accentColor
-    border.width: highlighted ? 2 : 0
 
     Component.onCompleted: {
         root.model.activate(root.model.index(0, 0));
     }
 
     Rectangle {
-        anchors.bottomMargin: 7
+        anchors.bottomMargin: 40
         anchors.fill: parent
         anchors.leftMargin: 7
         anchors.rightMargin: 15
@@ -120,9 +55,9 @@ Rectangle {
                         required property int hasChildren
                         required property var icon
                         readonly property real indentation: 40
-                        // modelIndex() changed its signature after Qt 6.4.2, index() is unambiguous
+                        // FIXME The signature for that function has changed after Qt 6.4.2 (currently shipped on Ubuntu 24.04)
                         // See https://github.com/mixxxdj/mixxx/pull/14514#issuecomment-2770811094 for further details
-                        readonly property var index: treeView.index(row, column)
+                        readonly property var index: treeView.modelIndex(column, row)
 
                         // Rotate indicator when expanded by the user
                         // (requires TreeView to have a selectionModel)
@@ -164,8 +99,7 @@ Rectangle {
                                 hoverEnabled: true
 
                                 onClicked: event => {
-                                    treeView.selectionModel.setCurrentIndex(treeView.index(row, 0), ItemSelectionModel.ClearAndSelect | ItemSelectionModel.Rows);
-                                    root.checkStorageAccess(index);
+                                    treeView.selectionModel.select(treeView.selectionModel.model.index(row, 0), ItemSelectionModel.Rows | ItemSelectionModel.Select | ItemSelectionModel.Clear | ItemSelectionModel.Current);
                                     treeView.model.activate(index);
                                     if (isTreeNode && hasChildren) {
                                         treeView.toggleExpanded(row);
@@ -182,45 +116,40 @@ Rectangle {
                                 color: current ? Theme.midGray : 'transparent'
                                 width: 25
 
-                                // The features give the name of their icon
-                                Image {
+                                Repeater {
                                     id: lineIcon
 
                                     anchors.left: parent.left
                                     anchors.verticalCenter: parent.verticalCenter
-                                    height: 22
-                                    source: depth == 0 && icon ? "qrc:/images/library/ic_library_" + icon + ".svg" : ""
-                                    sourceSize.height: 22
-                                    sourceSize.width: 22
-                                    visible: depth == 0 && !!icon
-                                    width: 22
+                                    model: !!icon ? 1 : 0
+
+                                    Image {
+                                        height: 25
+                                        source: icon
+                                        visible: depth == 0 && icon
+                                        width: 25
+                                    }
                                 }
                                 Label {
                                     id: indicator
 
+                                    Layout.preferredWidth: indicator.implicitWidth
                                     color: Theme.textColor
-                                    // "▶" is drawn as an emoji on Android
-                                    font.bold: true
-                                    font.pixelSize: 22
-                                    text: "›"
+                                    text: "▶"
                                     visible: isTreeNode && hasChildren
 
                                     anchors {
-                                        right: parent.right
-                                        rightMargin: 12
-                                        verticalCenter: parent.verticalCenter
+                                        left: parent.left
+                                        verticalCenter: lineIcon.bottom
                                     }
                                 }
                                 Label {
                                     id: labelItem
 
                                     anchors.left: parent.left
-                                    anchors.leftMargin: lineIcon.visible ? 32 : 8
-                                    anchors.right: parent.right
-                                    anchors.rightMargin: 30
+                                    anchors.leftMargin: depth == 0 && row == 0 ? 10 : 34
                                     anchors.verticalCenter: parent.verticalCenter
                                     clip: true
-                                    elide: Text.ElideRight
                                     color: Theme.textColor
                                     font.pixelSize: 14
                                     font.weight: depth == 0 ? Font.Bold : Font.Medium

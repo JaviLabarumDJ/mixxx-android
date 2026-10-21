@@ -275,6 +275,10 @@ Are you sure you want to load a new track?</source>
         <source>Select mapping...</source>
         <translation>Seleccionar mapeo...</translation>
     </message>
+    <message>
+        <source>Show all mappings...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ControllerScreens</name>
@@ -807,6 +811,160 @@ Are you sure you want to load a new track?</source>
         <source>Saved</source>
         <translation>Guardado</translation>
     </message>
+    <message>
+        <source>This or a parent directory is already in your library.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This or a listed directory does not exist or is inaccessible.
+Aborting the operation to avoid library inconsistencies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This directory can not be read.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An unknown error occurred.
+Aborting the operation to avoid library inconsistencies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This directory can not be found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Music Directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose a music directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Icon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Relink music directory to new location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save to proceed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Relink</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>keep already imported tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>hide imported tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>purge imported tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save to import new folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File scanning...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Metadata</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Synchronise metadata with file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Synchronise metadata with Serato library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Prefer relative path on playlist export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track duplicate distance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete history playlist with less than</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search completion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search history keyboard shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search-as-you-type timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>sec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pitch slider for fuzz BPM search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation type="unfinished">Restablecer</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>OnlineStreamView</name>
@@ -1230,6 +1388,18 @@ Are you sure you want to load a new track?</source>
     <message>
         <source>Apply and save outputs</source>
         <translation>Aplicar y Guardar Salidas</translation>
+    </message>
+    <message>
+        <source>Faster</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Better</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Near-hi-fi quality</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1679,6 +1849,13 @@ Are you sure you want to load a new track?</source>
     </message>
     <message>
         <source>&amp;Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>WSearchLineEdit</name>
+    <message>
+        <source>Search...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
