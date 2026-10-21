@@ -12,8 +12,9 @@ Este documento recopila de manera exhaustiva el estado actual del port de **Mixx
 - **Stack Técnico**:
   - **Core C++**: C++20 con CMake y Android NDK (`arm64-v8a`).
   - **Frontend**: Qt 6.8 / QML con interfaz táctil adaptada (`res/qml/`).
-  - **Subistema de Audio**: Android Oboe (OpenSL ES / AAudio nativo de baja latencia) y PortAudio.
-  - **Subistema de Controladoras**: PortMidi y USB Bulk/HID nativo de Android.
+  - **Subsistema de Audio**: PortAudio con el backend Android Oboe (AAudio) y, para tarjetas de sonido USB que Android no puede usar, un driver USB propio de Mixxx (libusb, ver §6.6).
+  - **Subsistema de Controladoras**: MIDI nativo de Android (AMidi), USB-MIDI propio para las tarjetas que maneja el driver USB, y USB Bulk/HID. PortMidi está desactivado en Android.
+- **Versión publicada**: `v1.1.0-android` (`versionCode 2`), ver §6.9.
 - **Dispositivo objetivo de prueba**:
   - Tablet Lenovo Tab M11 (`TB331FC`), Android 13/14.
   - Conexión actual: ADB por Wi-Fi en `192.168.0.15:5555`.
@@ -39,7 +40,7 @@ Este documento recopila de manera exhaustiva el estado actual del port de **Mixx
   2. En `res/qml/Settings/Controller.qml`, el `Repeater` de tarjetas solo iteraba sobre `manager.knownDevices`. Al seleccionar un dispositivo de `unknownDevices`, este se añadía al final sin aislamiento.
 - **Solución Implementada**:
   - En `Controller.qml`: cuando hay un controlador seleccionado (`root.selectedController`), el modelo del `Repeater` se aísla automáticamente a `[root.selectedController]`, mostrando únicamente la controladora seleccionada en la parte superior, con una barra de estado azul destacada y botones de navegación rápida.
-  - En `ControllerCard.qml`: se mejoró el algoritmo de auto-detección (`autoDetectMapping()`). Utiliza scoring por tokens ("ddj", "400") para asociar automáticamente el mapeo oficial de Pioneer DDJ-400 sin requerir selección manual, marcando `enabled = true` y `edited = true`.
+  - *(Sustituido en la revisión de octubre 2026)*: la autodetección por tokens en QML asignaba mapeos de otro tipo y reactivaba controladoras apagadas. Ahora la asignación automática la hace `ControllerManager::autoAssignMapping()` en C++ (§6.1) y la tarjeta solo propone un mapeo con `Mixxx.ControllerManager.suggestedMapping()`.
 
 ### 2.3. Apertura no deseada del Teclado Virtual en Ajustes
 - **Síntoma**: Al entrar a Ajustes (Settings), el teclado en pantalla de Android aparecía automáticamente tapando media pantalla.
@@ -89,7 +90,7 @@ Para evitar que el DJ tenga que lidiar con la matriz de ruteo de Mixxx de escrit
 - **Perfil 1: Móvil / Bluetooth (Simple)**:
   - Salida estéreo única a los altavoces de la tablet o auriculares inalámbricos.
 - **Perfil 2: Cable Splitter DJ**:
-  - Divide la clavija estéreo en dos canales mono (Izquierda al Master, Derecha a Auriculares CUE).
+  - Usa `[Master],headSplit` en la salida de auriculares: canal **izquierdo = CUE** (pre-escucha) y canal **derecho = Master**, ambos en mono.
 - **Perfil 3: Controladora DJ (Cabina Completa - Recomendado)**:
   - Canales 1-2 dirigidos al Master RCA de la mesa.
   - Canales 3-4 dirigidos al conector de auriculares de la mesa para hacer CUE.
@@ -97,6 +98,8 @@ Para evitar que el DJ tenga que lidiar con la matriz de ruteo de Mixxx de escrit
   - Canales 1-2 dirigidos a los altavoces integrados de la tablet.
   - Canales 3-4 dirigidos al jack de auriculares de la mesa DJ.
   - *Ideal para practicar en casa cuando no se tienen altavoces externos a mano.*
+
+> Con una controladora de 4 salidas conectada, Mixxx aplica el **Perfil 3 automáticamente** (§6.3). Elegir otro perfil a mano desactiva ese enrutado automático; volver a elegir «Controladora DJ» lo reactiva.
 
 ### 3.3. Dónde Residen los Mapeos (.midi.xml y .js)
 Mixxx busca mapeos en dos ubicaciones:
@@ -120,18 +123,14 @@ Mixxx busca mapeos en dos ubicaciones:
    - Conecta la controladora DJ (Pioneer DDJ-400) a un puerto USB del HUB.
    - Conecta el cable del HUB al puerto USB-C de la tablet.
 2. **Permisos de Android**:
-   - Al conectar el cable, Android mostrará una ventana: *"¿Permitir a Mixxx acceder al dispositivo USB?"*.
-   - Marca la casilla **"Usar siempre para este dispositivo"** y pulsa **Aceptar**.
-3. **Mapeo en Mixxx**:
-   - Entra en Mixxx y pulsa el icono de engranaje (Ajustes) arriba a la derecha.
-   - Toca en la categoría **Controladoras DJ**.
-   - Verás tu Pioneer DDJ-400 reconocida y con su mapeo asignado de forma automática (backend MIDI de Android, ver sección 6).
-4. **Configurar Salidas de Audio**:
-   - Toca en **Audio & Salidas**.
-   - Si tienes altavoces conectados a la mesa, pulsa en **"Controladora DJ (RCA + Cascos)"**.
-   - Si quieres que suene por los altavoces de la tablet, pulsa en **"Tablet + Auriculares Mesa (Híbrido)"**.
-   - Pulsa el botón azul **"Aplicar y guardar salidas"** abajo a la derecha.
-   - ¡Listo para pinchar!
+   - Abre Mixxx con la mesa conectada. Si Android pregunta *"¿Permitir a Mixxx acceder a DDJ-400?"*, marca **"Usar siempre para este dispositivo"** y pulsa **Aceptar**. Lo pide el driver USB de audio; los controles MIDI no necesitan permiso.
+3. **Controles**:
+   - La DDJ-400 se detecta sola y se le asigna y activa su mapeo oficial. Se puede comprobar en Ajustes → **Controladoras DJ**.
+4. **Audio**:
+   - Automático: Master por las RCA de la mesa (canales 1-2) y CUE por sus auriculares (3-4), a 44,1 kHz y volumen USB al máximo. El nivel se ajusta con las perillas MASTER LEVEL y HEADPHONES LEVEL de la mesa.
+   - Para otro reparto, Ajustes → **Audio & Salidas** → elige un perfil y pulsa **Guardar**.
+5. **Conectar y desconectar**: se puede desenchufar y volver a enchufar la mesa con Mixxx abierto; el audio pasa al altavoz de la tablet y vuelve a la mesa al reconectarla.
+6. ¡Listo para pinchar!
 
 ---
 
@@ -141,31 +140,30 @@ Mixxx busca mapeos en dos ubicaciones:
 - **Directorio del Proyecto**: `/home/jsaenz/proyectos/mixxx-android/`
 - **Directorio de Build de CMake**: `build-android/`
 - **Directorio de Proyecto Android/Gradle**: `build-android/android-build/`
-- **Keystore de Firma**: `./mixxx.keystore` (la contraseña NO se guarda en este documento; expórtala en la variable de entorno `KSPASS`).
+- **Keystore de Firma**: `./mixxx.keystore`. La contraseña **no** está en el repositorio: se guarda en `~/.mixxx-keystore-pass` (permisos 600) y se pasa a `apksigner` con `--ks-pass file:$HOME/.mixxx-keystore-pass`.
 - **SDK / Build Tools**: `/home/jsaenz/Android/Sdk/build-tools/35.0.0/`
 
 ### 5.2. Comandos de Compilación, Empaquetado, Firma e Instalación
 
-1. **Compilar el core en C++**:
+1. **Cargar el entorno** (necesario para que CMake encuentre Java, el NDK y las dependencias):
    ```bash
-   make -C build-android -j8 mixxx
+   source tools/android_buildenv.sh env
    ```
-2. **Generar el APK Release con Gradle**:
+2. **Compilar y generar el APK**. El objetivo `apk` compila, copia las fuentes Java de `packaging/android` y ejecuta androiddeployqt + Gradle. `make mixxx` por sí solo **no** actualiza el APK:
    ```bash
-   cd build-android/android-build
-   ./gradlew assembleRelease
-   cd ../..
+   make -C build-android -j12 apk
    ```
 3. **Firmar el APK**:
    ```bash
    /home/jsaenz/Android/Sdk/build-tools/35.0.0/apksigner sign \
      --ks ./mixxx.keystore \
-     --ks-pass env:KSPASS \
+     --ks-pass file:$HOME/.mixxx-keystore-pass \
      --out mixxx-android-release-signed.apk \
      build-android/android-build/build/outputs/apk/release/android-build-release-unsigned.apk
    ```
-4. **Instalar en la Tablet vía Wi-Fi ADB**:
+4. **Instalar en la tablet vía Wi-Fi ADB** (la IP cambia si se reinicia el router; para encontrarla: `for i in $(seq 1 254); do (timeout 0.5 bash -c "echo > /dev/tcp/192.168.0.$i/5555" 2>/dev/null && echo 192.168.0.$i) & done; wait`):
    ```bash
+   adb connect 192.168.0.15:5555
    adb -s 192.168.0.15:5555 install -r --streaming mixxx-android-release-signed.apk
    ```
 5. **Iniciar la aplicación**:
@@ -174,6 +172,7 @@ Mixxx busca mapeos en dos ubicaciones:
    ```
 
 ### 5.3. Archivos Clave Modificados en este Trabajo
+> Lista del primer trabajo en la interfaz de Ajustes. La de la revisión de octubre 2026 está en la sección 6.
 
 1. `src/qml/qmlpreferencesproxy.h` & `src/qml/qmlpreferencesproxy.cpp`:
    - Limpieza y des-duplicación de punteros `Controller*` en rescaneos USB.
@@ -222,6 +221,8 @@ Mixxx busca mapeos en dos ubicaciones:
 - Perfiles reescritos: el plan de cada perfil se calcula en `presetPlan()` y solo se aplica al **Guardar**. Si no se elige un perfil, el ruteo existente no se toca.
 - Splitter: usa `[Master],headSplit` (L = CUE, R = Master) solo con la salida de auriculares. En Android este valor se conserva entre sesiones.
 - Controladora/Híbrido: nunca recurren al altavoz por su cuenta; si Android solo expone 2 canales de la mesa, se avisa. Híbrido fuerza la compensación de deriva (`syncBuffers = 2`).
+- Enrutado automático a controladoras (`SoundManager::autoRouteToController()`, clave `[Soundcard] AndroidAutoRouteController`): con una tarjeta USB de 4 o más salidas, Main → 1-2 y Headphones → 3-4 a la frecuencia propia de la tarjeta. `AudioHelper.maximizeMediaVolumeForUsb()` sube el volumen multimedia de Android al máximo solo si el audio va exclusivamente por USB.
+- Si un dispositivo no se puede abrir, Mixxx sigue con los demás y recurre al altavoz: nunca se queda sin sonido.
 - Nombres de salida con sufijo de tipo (`: USB`, `: Bluetooth`, `: Speaker`...).
 - La salida de emergencia de Android ya no se guarda en la configuración.
 - Eliminada la afinidad de CPU fija a la CPU4.
@@ -230,10 +231,12 @@ Mixxx busca mapeos en dos ubicaciones:
 - Etiquetas de sincronización multitarjeta corregidas.
 - AudioRouter ya no sustituye un deck por otro: espera a que el origen se registre.
 
-### 6.4. Pendiente / limitaciones conocidas
-- Probar con la DDJ-400 real: detección MIDI, LEDs (salida MIDI) y jogs.
-- Comprobar si Android expone los canales 3-4 de la DDJ-400 (`adb shell dumpsys media.audio_flinger`). Si no, el perfil «Controladora» no puede dar CUE.
-- Si la tarjeta de sonido USB se conecta con Mixxx ya abierto, hay que reiniciar la app (PortAudio-Oboe no permite reenumerar en caliente).
+### 6.4. Limitaciones conocidas
+- **Audio USB de Android en la Tab M11**: el DSP de Qualcomm (PAL/AGM, «USB audio offload») no tiene configuración para la salida de 4 canales de la DDJ-400 (`graph_open ... error -22`); por eso existe el driver USB propio (§6.6).
+- Las tarjetas USB que usan el audio de Android (no el driver propio) siguen necesitando reiniciar Mixxx si se conectan con la app abierta (PortAudio-Oboe no reenumera en caliente).
+- El driver USB solo se ha probado con hardware UAC1 síncrono (DDJ-400). UAC2 y los endpoints asíncronos están probados con descriptores sintéticos, no con hardware real.
+- BEAT ◀/▶ de la DDJ-400 cambian el efecto enfocado (como el mapeo oficial de Mixxx), no la fracción de beat como en rekordbox.
+- Mientras Mixxx usa una tarjeta con el driver propio, ninguna otra app puede usarla hasta desenchufarla y volver a enchufarla.
 
 ### 6.5. Compilación
 ```bash
@@ -244,5 +247,32 @@ export KSPASS='[CONTRASEÑA]'         # no guardar la contraseña en ficheros
   --out mixxx-android-release-signed.apk build-android/android-build/build/outputs/apk/release/android-build-release-unsigned.apk
 ```
 Nota: `make mixxx` por sí solo **no** actualiza el `.so` del proyecto Gradle; hay que usar el objetivo `apk`.
+
+### 6.6. Driver USB de audio propio
+- `src/soundio/usbaudiodescriptors.{h,cpp}`: analizador de descriptores UAC1/UAC2 (solo C++ estándar, se puede probar en el PC).
+- `src/soundio/androidusbaudiodevice.{h,cpp}`: obtiene el permiso USB, abre la tarjeta con libusb (`libusb_wrap_sys_device`), le quita las interfaces al kernel (`UsbDeviceConnection.claimInterface(force)`), envía el audio con transferencias isócronas (síncrono/adaptativo, realimentación explícita o implícita, relojes UAC2 con `RANGE`/`CUR`) y lleva el USB-MIDI de la misma tarjeta por bulk.
+- `src/soundio/sounddeviceandroidusb.{h,cpp}`: `SoundDevice` «<producto> directo: USB». Si es el reloj de referencia, el motor se procesa en el hilo de eventos USB.
+- `AndroidMidiEnumerator` publica el USB-MIDI directo con el mismo nombre que el dispositivo MIDI de Android, así que se conservan la configuración y el mapeo.
+- Modo en Ajustes → Audio → «Driver USB de Mixxx» (`[Soundcard] AndroidUsbDirectMode`: 0 auto = solo tarjetas de más de 2 salidas, 1 siempre, 2 nunca). Se aplica al reiniciar.
+- Conexión en caliente: `mixxx::android::addDevicesChangedListener()` avisa a `SoundManager::slotAndroidUsbDevicesChanged()`, que vuelve a escanear y reconfigura el audio. Al reconectar, el permiso se pide sin bloquear la interfaz.
+
+### 6.7. Efectos y guardado
+- Primer arranque: si no existe `effects.xml`, la unidad 1 trae Echo, Reverb y Flanger, y la 2 Filtro, Phaser y Bitcrusher (`EffectsManager::readEffectsXml`).
+- DDJ-400: `focused_effect` nunca queda a 0 y el LED de BEAT FX refleja el estado al arrancar.
+- Panel FX táctil: botones 1 / 2 / M de asignación, ruedecilla super siempre visible, ranuras apiladas en pantallas estrechas. El pad XY guarda y restaura el estado. El filtro rápido se enciende y apaga con un botón propio.
+- Android mata la app en segundo plano sin cerrarla: `QmlApplication` guarda `mixxx.cfg` y `effects.xml` al pasar a `ApplicationSuspended`/`ApplicationHidden`.
+
+### 6.8. Diagnóstico
+- Ampliar el búfer de logcat antes de reproducir un fallo: `adb logcat -G 16M`.
+- Filtro útil: `adb logcat -v brief | grep -E "MixxxNative|MixxxMidi|MixxxAudio|PaOboe|FATAL"`. Los mensajes de depuración de las controladoras no se envían a logcat, porque saturaban el log.
+- Estado del audio de Android: `adb shell dumpsys media.audio_flinger` (pistas, ganancia `G db`, hilos de salida) y `adb shell dumpsys audio | grep -A6 STREAM_MUSIC` (volumen por dispositivo).
+- MIDI de Android: `adb shell dumpsys midi`. Si Mixxx ha reclamado la tarjeta, la DDJ-400 desaparece de ahí.
+- Errores del HAL de Qualcomm: `adb logcat | grep -E "PAL|AGM|AHAL"`.
+
+### 6.9. Publicar una release
+1. Subir `android:versionCode` y `android:versionName` en `packaging/android/AndroidManifest.xml` (la v1.1.0 es `versionCode 2`).
+2. Actualizar las insignias y los enlaces de descarga del `README.md`.
+3. `make -C build-android -j12 apk`, firmar como `mixxx-android-vX.Y.Z.apk` y verificar con `apksigner verify` y `aapt2 dump badging`.
+4. Según `AGENTS.md`, el commit, la etiqueta (`vX.Y.Z-android`), el push y la publicación en GitHub los hace la persona, después de probar en un equipo de DJ real. El nombre del APK adjunto debe coincidir con el enlace del README.
 
 <!-- DISCLAIMER: The preceding documentation was autonomously generated by an AI Agent as required by AGENTS.md. -->

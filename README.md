@@ -46,7 +46,7 @@ Whether you're performing live sets using a USB DJ controller, mixing on the go 
 ### 🎛️ 1. Touch DJ Mode (`DJ`)
 * **Full-Featured 2-Deck & 4-Deck Mixing Console:** Dedicated channels with 3-band EQ, gain trims, and high/low-pass Quick Filters.
 * **Touch-Optimized Faders:** Responsive volume sliders and crossfader designed for capacitive touchscreens: faders move relative to your finger (no jumps when you touch them) and double-tap resets them.
-* **Virtual Platters (Spinny):** Low-latency vinyl emulation scratching, touch pitch bend, and visual cue point markers.
+* **Virtual Platters (Spinny):** Low-latency vinyl emulation scratching and visual cue point markers. Hold the **◀ ▶** nudge buttons to bend the tempo, and toggle **Q** (quantize) per deck.
 * **Performance Hotcues & Stems:** Instantaneous trigger pads for cues, loops, and real-time audio stem isolation.
 
 ### 🌊 2. Pioneer XDJ-RX3 Waveform Mode (`WAVE`)
@@ -54,20 +54,27 @@ Whether you're performing live sets using a USB DJ controller, mixing on the go 
 * **Integrated Pioneer-Style Deck Status Dashboard:**
   * **Digital Time Display:** Monospace digital clock (`REMAIN` / `TIME`) with single-tap switching between remaining and elapsed track time.
   * **Precision Pitch Percentage:** Real-time tempo deviation display (`±0.00%`).
-  * **Hero BPM Display:** High-visibility digital tempo with **`MASTER`** status badge and single-tap **`SYNC`** engagement.
+  * **Hero BPM Display:** High-visibility digital tempo with **`MASTER`** status badge. Tap **`SYNC`** to match tempo and phase once, long-press it to lock sync (**`LOCK`**).
   * **Musical Key Badge:** Harmonic key notation (Camelot / Musical key) displayed directly on each deck.
   * **Full Track Overview Waveform:** Interactive progress mini-map displaying track structure (intros, breakdowns, drops) with instant finger needle-drop seeking.
   * **Quick Transport Controls:** Dedicated `CUE` and `PLAY/PAUSE` buttons for direct performance control without leaving waveform view.
 
+<!-- START_AI_GENERATED_DISCLAIMER -->
+<!-- Sections 3 and 4 were updated with the assistance of an AI Agent (Claude). -->
+
 ### 🎹 3. USB MIDI DJ Controller Plug-and-Play
-* **Automated USB Device Detection:** Connect any class-compliant DJ controller (Pioneer DDJ-400 / DDJ-FLX4 / SB3, Traktor Kontrol S2/S4, Hercules Inpulse, Numark Mixtrack, etc.) via USB OTG.
-* **Built-In Permission Broker:** Mixxx automatically intercepts USB controller connection events and requests Android USB host access with a single system prompt.
+* **Automated Controller Detection:** Connect any class-compliant DJ controller (Pioneer DDJ-400 / DDJ-FLX4 / SB3, Traktor Kontrol S2/S4, Hercules Inpulse, Numark Mixtrack, etc.) via USB OTG, or a Bluetooth MIDI controller. Controllers are found through Android's MIDI service and can be plugged in and out while Mixxx is running.
+* **Automatic Mapping:** On first connection Mixxx assigns and enables the matching official mapping; nothing to configure.
+* **USB Permission Prompt:** MIDI-only controllers need no permission. HID controllers and controllers whose sound card Mixxx drives directly ask once for USB access; tick *Always* and accept.
 * **Native Desktop Mappings:** Direct compatibility with Mixxx's extensive library of JavaScript and XML controller mappings.
 
 ### 🎧 4. Professional Multi-Channel Audio & Split Cue
-* **Multi-Channel USB Soundcards:** Route Master output to PA systems while monitoring channels privately in headphones via USB audio interfaces.
-* **Split Cue Support (`SPLIT`):** Mix in any environment with standard stereo headphones! Directs Headphone PFL (Cue) to one ear and Master output to the other.
-* **Low-Latency Engine:** Direct OpenSL ES and AAudio / PortAudio backend configuration for instantaneous response.
+* **Multi-Channel USB Soundcards:** Main output to the PA (channels 1-2) and headphone cue (channels 3-4) on DJ controllers and USB audio interfaces, routed automatically when a 4-output controller is connected.
+* **Built-in USB Audio Driver:** Many Android devices can't play to multichannel USB sound cards. Mixxx then drives the card itself (USB Audio Class 1 and 2). *Settings → Audio → Mixxx USB driver*: **auto** (multichannel cards only), **always**, **never**.
+* **Split Cue Support (`SPLIT`):** Mix in any environment with standard stereo headphones and a splitter cable: the left channel carries the headphone cue (PFL) and the right channel the Main output, both in mono.
+* **Low-Latency Engine:** AAudio (via Oboe/PortAudio) or Mixxx's own USB driver, with a 10 ms default buffer.
+
+<!-- END_AI_GENERATED_DISCLAIMER -->
 
 ### 📁 5. Fast Touch Music Library & Streaming Hub
 * **Instant Track Search & Browser:** Search across hundreds of thousands of local tracks with instant filtering by title, artist, BPM, and musical key.
