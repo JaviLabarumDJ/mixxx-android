@@ -26,6 +26,7 @@
 #include "qml/qmlcoreservices.h"
 #include "effects/effectsmanager.h"
 #include "qml/qmldlgpreferencesproxy.h"
+#include "qml/qmllanguageproxy.h"
 #include "qml/qmlrecordingproxy.h"
 #include "soundio/soundmanager.h"
 #include "util/versionstore.h"
@@ -513,6 +514,7 @@ bool QmlApplication::loadQml(const QString& path) {
     // QQmlApplicationEngine::load creates a new window but also leaves the old one,
     // so it is necessary to destroy the old QQmlApplicationEngine and create a new one.
     m_pAppEngine = std::make_unique<QQmlApplicationEngine>();
+    mixxx::qml::QmlLanguageProxy::installAndroidTranslations();
     m_pAppEngine->setUiLanguage(QLocale().name());
 
     m_autoReload.clear();

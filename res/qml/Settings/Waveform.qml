@@ -277,7 +277,7 @@ Category {
             RowLayout {
                 Layout.fillWidth: true
                 WaveformSettingParameter {
-                    label: qsTr("Fluidez de Ondas (FPS)")
+                    label: qsTr("Waveform smoothness (FPS)")
                 }
                 RatioChoice {
                     id: frameRateRatio
@@ -670,7 +670,7 @@ Category {
                         color: root.dirty ? "#ffb300" : "#00e676"
                     }
                     Text {
-                        text: root.dirty ? qsTr("Cambios pendientes") : qsTr("Ondas guardadas")
+                        text: root.dirty ? qsTr("Unsaved changes") : qsTr("Waveforms saved")
                         font.bold: true
                         font.pixelSize: 12
                         color: root.dirty ? "#ffe082" : "#b9f6ca"
@@ -704,7 +704,7 @@ Category {
                     spacing: 6
                     Text { text: "↺"; color: "#ff8a80"; font.pixelSize: 14 }
                     Text {
-                        text: qsTr("Restablecer")
+                        text: qsTr("Reset")
                         font.bold: true
                         font.pixelSize: 12
                         color: "#ffcdd2"
@@ -734,7 +734,7 @@ Category {
 
                 Text {
                     anchors.centerIn: parent
-                    text: qsTr("Descartar")
+                    text: qsTr("Discard")
                     font.bold: true
                     font.pixelSize: 13
                     color: "#e0e0e0"
@@ -774,7 +774,7 @@ Category {
                     }
 
                     Text {
-                        text: root.dirty ? qsTr("Guardar Formas de Onda") : qsTr("Guardado")
+                        text: root.dirty ? qsTr("Save waveforms") : qsTr("Saved")
                         font.bold: true
                         font.pixelSize: 13
                         color: "#ffffff"

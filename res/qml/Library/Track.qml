@@ -58,11 +58,11 @@ Item {
                 title: qsTr("File")
 
                 MenuItem {
-                    text: qsTr("◀ Cargar en Deck 1 / Load Deck 1")
+                    text: qsTr("◀ Load Deck 1")
                     onTriggered: root.loadToDeck("[Channel1]")
                 }
                 MenuItem {
-                    text: qsTr("Cargar en Deck 2 ▶ / Load Deck 2")
+                    text: qsTr("Load Deck 2 ▶")
                     onTriggered: root.loadToDeck("[Channel2]")
                 }
                 MenuSeparator {

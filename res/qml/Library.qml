@@ -109,7 +109,7 @@ Item {
                 normalColor: root.librarySourceMode === 0 ? "#00e5ff" : "#90a4ae"
                 font.bold: true
                 font.pixelSize: 11
-                text: "MÚSICA LOCAL"
+                text: qsTr("LOCAL MUSIC")
                 onClicked: root.librarySourceMode = 0
             }
 
@@ -161,7 +161,7 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.top: parent.top
-                placeholderText: qsTranslate("WSearchLineEdit", "Buscar en tu colección local...")
+                placeholderText: qsTr("Search your local collection...")
                 onTextChanged: root.applySearch()
             }
 
@@ -293,13 +293,13 @@ Item {
                 color: Theme.white
                 font.bold: true
                 font.pixelSize: 15
-                text: qsTr("Permiso para leer USB")
+                text: qsTr("Permission to read USB")
             }
             Text {
                 Layout.fillWidth: true
                 color: Theme.textColor
                 font.pixelSize: 13
-                text: qsTr("Para leer las playlists de Rekordbox y Engine DJ de un USB, Android tiene que permitir a Mixxx el acceso a todos los archivos. Actívalo en la pantalla que se abre y vuelve a tocar la sección.")
+                text: qsTr("To read Rekordbox and Engine DJ playlists from a USB drive, Android has to grant Mixxx access to all files. Enable it on the screen that opens, then tap the section again.")
                 wrapMode: Text.WordWrap
             }
             RowLayout {

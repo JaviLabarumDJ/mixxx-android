@@ -76,7 +76,7 @@ Popup {
                     Layout.preferredWidth: 105
                     activeColor: Theme.accentColor
                     font.bold: true
-                    text: "← Volver"
+                    text: qsTr("← Back")
                     onClicked: root.close()
                 }
 
@@ -86,7 +86,7 @@ Popup {
                     font.bold: true
                     font.pixelSize: 15
                     horizontalAlignment: Text.AlignHCenter
-                    text: "⚙️ Preferencias / Settings"
+                    text: qsTr("⚙️ Settings")
                 }
 
                 Skin.Button {
@@ -137,7 +137,7 @@ Popup {
                             anchors.verticalCenter: parent.verticalCenter
                             color: "#9e9e9e"
                             font.pixelSize: 12
-                            text: "🔍 Buscar ajuste..."
+                            text: qsTr("🔍 Search settings...")
                             visible: !parent.active && searchInput.text.length === 0
                         }
 
@@ -236,7 +236,7 @@ Popup {
                                         elide: Text.ElideRight
                                         font.bold: categoryDelegate.isSelected
                                         font.pixelSize: 13
-                                        text: label
+                                        text: qsTr(label)
                                     }
 
                                     Text {
@@ -244,7 +244,7 @@ Popup {
                                         color: categoryDelegate.isSelected ? "#d0e4ff" : "#808595"
                                         elide: Text.ElideRight
                                         font.pixelSize: 10
-                                        text: subtext
+                                        text: qsTr(subtext)
                                     }
                                 }
                             }
@@ -451,32 +451,32 @@ Popup {
         id: sectionProperties
 
         ListElement {
-            label: "Audio & Salidas"
+            label: QT_TR_NOOP("Audio & Outputs")
             iconGlyph: "🎧"
-            subtext: "Master, Auriculares, Latencia"
+            subtext: QT_TR_NOOP("Main, Headphones, Latency")
         }
         ListElement {
-            label: "Controladoras DJ"
+            label: QT_TR_NOOP("DJ Controllers")
             iconGlyph: "🎛️"
             subtext: "MIDI / HID USB"
         }
         ListElement {
-            label: "Librería Musical"
+            label: QT_TR_NOOP("Music Library")
             iconGlyph: "📁"
-            subtext: "Carpetas, Escaneo de pistas"
+            subtext: QT_TR_NOOP("Folders, Track scanning")
         }
         ListElement {
-            label: "Formas de Onda"
+            label: QT_TR_NOOP("Waveforms")
             iconGlyph: "〰️"
-            subtext: "FPS, Colores RGB/HSV, Zoom"
+            subtext: QT_TR_NOOP("FPS, RGB/HSV colors, Zoom")
         }
         ListElement {
-            label: "Interfaz"
+            label: QT_TR_NOOP("Interface")
             iconGlyph: "📱"
-            subtext: "Tema, Decks, Visualización"
+            subtext: QT_TR_NOOP("Theme, Decks, Display")
         }
         ListElement {
-            label: "Acerca de"
+            label: QT_TR_NOOP("About")
             iconGlyph: "✨"
             subtext: "JaviLabarum, RRSS & Info"
         }

@@ -469,7 +469,7 @@ Item {
             font.pixelSize: 10
             footerItems: showAllMappings ? [] : [
                 {
-                    text: qsTr("Ver todos los mapeos (MIDI/HID)..."),
+                    text: qsTr("Show all mappings (MIDI/HID)..."),
                     suffix: "+"
                 }
             ]
@@ -492,7 +492,7 @@ Item {
                     font: mappingsCombobox.font
                     text: mappingsCombobox.currentIndex >= 0 
                           ? mappingsCombobox.model[mappingsCombobox.currentIndex]?.name 
-                          : qsTr("Seleccionar mapeo...")
+                          : qsTr("Select mapping...")
                 }
                 InfoBubble {
                     id: infoBubble

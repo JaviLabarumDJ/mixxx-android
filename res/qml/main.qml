@@ -187,7 +187,7 @@ ApplicationWindow {
                     anchors.top: progressTrack.bottom
                     anchors.topMargin: 7
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: splash.progress >= 1.0 ? "¡Listo para pinchar!" : (splash.progress > 0.7 ? "Optimizando controles DJ..." : (splash.progress > 0.35 ? "Cargando librería y decks..." : "Iniciando motor de audio..."))
+                    text: splash.progress >= 1.0 ? qsTr("Ready to mix!") : (splash.progress > 0.7 ? qsTr("Optimizing DJ controls...") : (splash.progress > 0.35 ? qsTr("Loading library and decks...") : qsTr("Starting audio engine...")))
                     font.pixelSize: 11
                     font.weight: Font.DemiBold
                     color: "#8fa1b8"

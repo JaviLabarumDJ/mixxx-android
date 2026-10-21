@@ -125,7 +125,7 @@ Rectangle {
                 Layout.fillWidth: true
                 text: (root.deckPlayer?.isLoaded && root.currentTrack?.title)
                     ? root.currentTrack.title
-                    : qsTr("Sin pista - Pulsa CARGAR")
+                    : qsTr("No track - press LOAD")
                 color: root.deckPlayer?.isLoaded ? "#ffffff" : "#90a4ae"
                 font.bold: true
                 font.pixelSize: (root.width < 360 || root.minimized) ? 10 : 12

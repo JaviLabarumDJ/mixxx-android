@@ -1,0 +1,48 @@
+#pragma once
+
+#include <QObject>
+#include <QQmlEngine>
+#include <QString>
+#include <QVariantList>
+
+namespace mixxx {
+namespace qml {
+
+/// Exposes the UI language to QML as the `Mixxx.Language` singleton.
+///
+/// This lives in its own file on purpose: it only builds on top of
+/// `mixxx::Translations` and `QmlConfigProxy` without modifying them, so
+/// that merging upstream Mixxx stays conflict-free.
+class QmlLanguageProxy : public QObject {
+    Q_OBJECT
+    QML_NAMED_ELEMENT(Language)
+    QML_SINGLETON
+
+    /// The locale stored as [Config],Locale. An empty string means the
+    /// system language.
+    Q_PROPERTY(QString locale READ locale WRITE setLocale NOTIFY localeChanged)
+    /// The languages a translation is shipped for, as a list of
+    /// {locale, name, nativeName} maps sorted by name.
+    Q_PROPERTY(QVariantList availableLocales READ availableLocales CONSTANT)
+
+  public:
+    explicit QmlLanguageProxy(QObject* pParent = nullptr);
+
+    static QmlLanguageProxy* create(QQmlEngine* pQmlEngine, QJSEngine* pJsEngine);
+
+    /// Installs the catalog of the strings that only exist in the Android
+    /// UI (res/translations/mixxx-android_*.qm) for the current default
+    /// locale. It has to be called after `Translations::initializeTranslations()`.
+    static void installAndroidTranslations();
+
+    QString locale() const;
+    void setLocale(const QString& locale);
+
+    QVariantList availableLocales() const;
+
+  signals:
+    void localeChanged();
+};
+
+} // namespace qml
+} // namespace mixxx

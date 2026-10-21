@@ -74,55 +74,55 @@ Category {
             let dev = k.bluetooth || k.wired || k.speaker || k.other;
             if (!dev) {
                 plan.error = true;
-                plan.message = qsTr("No se ha encontrado ninguna salida de audio.");
+                plan.message = qsTr("No audio output was found.");
                 return plan;
             }
             plan.outputs.push({ device: dev, type: 0, channel: 0 });
-            plan.message = qsTr("Master por: %1").arg(dev.displayName);
+            plan.message = qsTr("Main output through: %1").arg(dev.displayName);
         } else if (presetType === "splitter") {
             // Mixxx's head split mode: left = CUE (mono), right = Master (mono)
             let dev = k.wired || k.speaker || k.other;
             if (!dev) {
                 plan.error = true;
-                plan.message = qsTr("No se ha encontrado la salida de auriculares de la tablet.");
+                plan.message = qsTr("The headphone output of the tablet was not found.");
                 return plan;
             }
             plan.outputs.push({ device: dev, type: 1, channel: 0 });
             plan.headSplit = 1;
-            plan.message = qsTr("Canal izquierdo = CUE (pre-escucha), canal derecho = Master, por: %1").arg(dev.displayName);
+            plan.message = qsTr("Left channel = CUE (pre-listening), right channel = Main, through: %1").arg(dev.displayName);
         } else if (presetType === "controller") {
             if (!k.usb) {
                 plan.error = true;
-                plan.message = qsTr("No se detecta la tarjeta de sonido USB de la controladora. Conéctala, espera unos segundos y vuelve a abrir Ajustes.");
+                plan.message = qsTr("The USB sound card of the controller is not detected. Connect it, wait a few seconds and open the settings again.");
                 return plan;
             }
             plan.outputs.push({ device: k.usb, type: 0, channel: 0 });
             plan.sampleRate = 44100;
             if (k.usb.channelCount >= 4) {
                 plan.outputs.push({ device: k.usb, type: 1, channel: 2 });
-                plan.message = qsTr("Master → canales 1-2 (RCA) y CUE → canales 3-4 (auriculares) de %1").arg(k.usb.displayName);
+                plan.message = qsTr("Main → channels 1-2 (RCA) and CUE → channels 3-4 (headphones) of %1").arg(k.usb.displayName);
             } else {
-                plan.message = qsTr("Android solo expone %1 canales de %2: el Master sonará por la mesa, pero sus auriculares no recibirán CUE. Usa el modo Splitter para pre-escuchar.").arg(k.usb.channelCount).arg(k.usb.displayName);
+                plan.message = qsTr("Android only exposes %1 channels of %2: the main output will play through the controller, but its headphones will not receive CUE. Use the splitter mode for pre-listening.").arg(k.usb.channelCount).arg(k.usb.displayName);
             }
         } else if (presetType === "hybrid") {
             let mainDev = k.speaker || k.wired || k.bluetooth || k.other;
             if (!k.usb || k.usb.channelCount < 4) {
                 plan.error = true;
                 plan.message = k.usb
-                    ? qsTr("Android solo expone %1 canales de %2, así que sus auriculares (canales 3-4) no están disponibles.").arg(k.usb.channelCount).arg(k.usb.displayName)
-                    : qsTr("No se detecta la tarjeta de sonido USB de la controladora.");
+                    ? qsTr("Android only exposes %1 channels of %2, so its headphones (channels 3-4) are not available.").arg(k.usb.channelCount).arg(k.usb.displayName)
+                    : qsTr("The USB sound card of the controller is not detected.");
                 return plan;
             }
             if (!mainDev) {
                 plan.error = true;
-                plan.message = qsTr("No se ha encontrado el altavoz de la tablet.");
+                plan.message = qsTr("The speaker of the tablet was not found.");
                 return plan;
             }
             plan.outputs.push({ device: mainDev, type: 0, channel: 0 });
             plan.outputs.push({ device: k.usb, type: 1, channel: 2 });
             // Two sound cards with independent clocks need drift compensation
             plan.syncBuffers = 2;
-            plan.message = qsTr("Master por %1 y CUE por los auriculares de %2. Al usar dos tarjetas puede oírse algún clic leve en el CUE.").arg(mainDev.displayName).arg(k.usb.displayName);
+            plan.message = qsTr("Main output through %1 and CUE through the headphones of %2. Using two sound cards may cause slight clicks on the CUE.").arg(mainDev.displayName).arg(k.usb.displayName);
         }
         return plan;
     }
@@ -367,8 +367,8 @@ Category {
         manager.commit();
     }
 
-    label: "Audio & Salidas"
-    tabs: ["Configuración & Salidas", "Retardos (Delays)"]
+    label: qsTr("Audio & Outputs")
+    tabs: [qsTr("Setup & Outputs"), qsTr("Delays")]
 
     Component.onCompleted: {
         load();
@@ -460,14 +460,14 @@ Category {
                             spacing: 8
 
                             Text {
-                                text: "⚡ Perfiles Rápidos de Salida de Audio"
+                                text: qsTr("⚡ Quick audio output profiles")
                                 font.pixelSize: 15
                                 font.bold: true
                                 color: "#64b5f6"
                             }
                             Item { Layout.fillWidth: true }
                             Text {
-                                text: qsTr("Pulsa para configurar automáticamente")
+                                text: qsTr("Tap to configure automatically")
                                 font.pixelSize: 11
                                 color: "#90a4ae"
                             }
@@ -497,21 +497,21 @@ Category {
                                     RowLayout {
                                         Text { text: "📱"; font.pixelSize: 16 }
                                         Text {
-                                            text: qsTr("Móvil / Bluetooth")
+                                            text: qsTr("Phone / Bluetooth")
                                             font.pixelSize: 13
                                             font.bold: true
                                             color: root.activePreset === "single" ? "#ffffff" : "#cfd8dc"
                                         }
                                         Item { Layout.fillWidth: true }
                                         Text {
-                                            text: root.activePreset === "single" ? "✓ ACTIVO" : ""
+                                            text: root.activePreset === "single" ? qsTr("✓ ACTIVE") : ""
                                             font.pixelSize: 10
                                             font.bold: true
                                             color: "#64b5f6"
                                         }
                                     }
                                     Text {
-                                        text: qsTr("Salida única estéreo. Todo el sonido va a los altavoces de la tablet o auriculares Bluetooth.")
+                                        text: qsTr("Single stereo output. All sound goes to the tablet speakers or Bluetooth headphones.")
                                         font.pixelSize: 11
                                         color: "#90a4ae"
                                         wrapMode: Text.WordWrap
@@ -545,21 +545,21 @@ Category {
                                     RowLayout {
                                         Text { text: "🎧"; font.pixelSize: 16 }
                                         Text {
-                                            text: qsTr("Cable Splitter DJ")
+                                            text: qsTr("DJ splitter cable")
                                             font.pixelSize: 13
                                             font.bold: true
                                             color: root.activePreset === "splitter" ? "#ffffff" : "#cfd8dc"
                                         }
                                         Item { Layout.fillWidth: true }
                                         Text {
-                                            text: root.activePreset === "splitter" ? "✓ ACTIVO" : ""
+                                            text: root.activePreset === "splitter" ? qsTr("✓ ACTIVE") : ""
                                             font.pixelSize: 10
                                             font.bold: true
                                             color: "#ffab91"
                                         }
                                     }
                                     Text {
-                                        text: qsTr("Cable divisor en el jack: canal izquierdo = CUE (tus cascos) y canal derecho = Master (altavoz), ambos en mono.")
+                                        text: qsTr("Splitter cable on the jack: left channel = CUE (your headphones) and right channel = Main (speaker), both in mono.")
                                         font.pixelSize: 11
                                         color: "#b0bec5"
                                         wrapMode: Text.WordWrap
@@ -593,21 +593,21 @@ Category {
                                     RowLayout {
                                         Text { text: "🎛️"; font.pixelSize: 16 }
                                         Text {
-                                            text: qsTr("Controladora DJ (RCA + Cascos)")
+                                            text: qsTr("DJ controller (RCA + headphones)")
                                             font.pixelSize: 13
                                             font.bold: true
                                             color: root.activePreset === "controller" ? "#ffffff" : "#cfd8dc"
                                         }
                                         Item { Layout.fillWidth: true }
                                         Text {
-                                            text: root.activePreset === "controller" ? "✓ ACTIVO" : ""
+                                            text: root.activePreset === "controller" ? qsTr("✓ ACTIVE") : ""
                                             font.pixelSize: 10
                                             font.bold: true
                                             color: "#81c784"
                                         }
                                     }
                                     Text {
-                                        text: qsTr("Audio Pro: Canales 1-2 al Master RCA (altavoces) y Canales 3-4 al jack de auriculares de la mesa.")
+                                        text: qsTr("Pro audio: channels 1-2 to the main RCA output (speakers) and channels 3-4 to the headphone jack of the controller.")
                                         font.pixelSize: 11
                                         color: "#a5d6a7"
                                         wrapMode: Text.WordWrap
@@ -641,21 +641,21 @@ Category {
                                     RowLayout {
                                         Text { text: "🔊"; font.pixelSize: 16 }
                                         Text {
-                                            text: qsTr("Tablet + Auriculares Mesa (Híbrido)")
+                                            text: qsTr("Tablet + controller headphones (hybrid)")
                                             font.pixelSize: 13
                                             font.bold: true
                                             color: root.activePreset === "hybrid" ? "#ffffff" : "#cfd8dc"
                                         }
                                         Item { Layout.fillWidth: true }
                                         Text {
-                                            text: root.activePreset === "hybrid" ? "✓ ACTIVO" : ""
+                                            text: root.activePreset === "hybrid" ? qsTr("✓ ACTIVE") : ""
                                             font.pixelSize: 10
                                             font.bold: true
                                             color: "#b388ff"
                                         }
                                     }
                                     Text {
-                                        text: qsTr("Master por altavoces de la tablet y Preescucha CUE por los auriculares (canales 3-4) de la mesa.")
+                                        text: qsTr("Main output through the tablet speakers and CUE pre-listening through the headphones (channels 3-4) of the controller.")
                                         font.pixelSize: 11
                                         color: "#d1c4e9"
                                         wrapMode: Text.WordWrap
@@ -688,7 +688,7 @@ Category {
                                 anchors.fill: parent
                                 anchors.margins: 8
                                 text: (root.presetError ? "⚠️ " : (root.presetChosen ? "💾 " : "")) + root.presetMessage
-                                      + (root.presetChosen && !root.presetError ? qsTr(" — pulsa Guardar para aplicarlo.") : "")
+                                      + (root.presetChosen && !root.presetError ? qsTr(" — press Save to apply it.") : "")
                                 wrapMode: Text.WordWrap
                                 font.pixelSize: 12
                                 color: root.presetError ? "#ffcdd2" : "#c8e6c9"
@@ -712,14 +712,14 @@ Category {
 
                                 Text { text: "🎛️"; font.pixelSize: 14 }
                                 Text {
-                                    text: qsTr("Ruteo Personalizado Activo (Cables Virtuales en Matriz)")
+                                    text: qsTr("Custom routing active (virtual cables in the matrix)")
                                     font.pixelSize: 12
                                     font.bold: true
                                     color: "#38bdf8"
                                 }
                                 Item { Layout.fillWidth: true }
                                 Text {
-                                    text: qsTr("Configuración manual en uso")
+                                    text: qsTr("Manual configuration in use")
                                     font.pixelSize: 11
                                     color: "#94a3b8"
                                 }
@@ -742,14 +742,14 @@ Category {
                                 spacing: 4
 
                                 Text {
-                                    text: qsTr("💡 ¿Cómo conectar tus altavoces y auriculares?")
+                                    text: qsTr("💡 How do I connect my speakers and headphones?")
                                     font.pixelSize: 12
                                     font.bold: true
                                     color: "#90caf9"
                                 }
 
                                 Text {
-                                    text: qsTr("• <b>Salida Master (1-2)</b>: Sonido para el público. Conecta tus altavoces a las clavijas RCA traseras de tu mesa.<br>• <b>Preescucha CUE (3-4)</b>: Sonido privado. Conecta tus cascos a la clavija de auriculares de la mesa.<br>• <b>Modo Híbrido</b>: ¿No tienes altavoces externos? Elige <i>'Tablet + Auriculares Mesa'</i> para que la música salga por la tablet y la preescucha por los cascos.<br>• <b>Importante</b>: Tras elegir tu perfil, pulsa el botón azul <b>'Aplicar y guardar salidas'</b> abajo del todo.")
+                                    text: qsTr("• <b>Main output (1-2)</b>: sound for the audience. Connect your speakers to the rear RCA outputs of your controller.<br>• <b>CUE pre-listening (3-4)</b>: private sound. Connect your headphones to the headphone jack of the controller.<br>• <b>Hybrid mode</b>: no external speakers? Choose <i>'Tablet + controller headphones'</i> so the music plays through the tablet and the pre-listening through your headphones.<br>• <b>Important</b>: after choosing your profile, press the blue <b>'Apply and save outputs'</b> button at the bottom.")
                                     font.pixelSize: 11
                                     color: "#b0bec5"
                                     wrapMode: Text.WordWrap
@@ -776,7 +776,7 @@ Category {
                         spacing: 12
 
                         Text {
-                            text: qsTr("⚙️ Motor de Audio, Latencia & Calidad")
+                            text: qsTr("⚙️ Audio engine, latency & quality")
                             font.pixelSize: 15
                             font.bold: true
                             color: "#ffffff"
@@ -796,7 +796,7 @@ Category {
                                     Layout.fillWidth: true
                                     color: Theme.white
                                     font.pixelSize: 13
-                                    text: qsTr("API de Audio")
+                                    text: qsTr("Audio API")
                                 }
                                 RatioChoice {
                                     id: soundApi
@@ -817,7 +817,7 @@ Category {
                                     Layout.fillWidth: true
                                     color: Theme.white
                                     font.pixelSize: 13
-                                    text: qsTr("Frecuencia de Muestreo")
+                                    text: qsTr("Sample rate")
                                 }
                                 RatioChoice {
                                     id: sampleRate
@@ -854,7 +854,7 @@ Category {
                                         Layout.fillWidth: true
                                         color: Theme.white
                                         font.pixelSize: 13
-                                        text: qsTr("Latencia / Buffer de Audio")
+                                        text: qsTr("Latency / audio buffer")
                                     }
                                     Skin.ComboBox {
                                         id: audioBuffer
@@ -884,9 +884,9 @@ Category {
                                 Text {
                                     text: {
                                         const idx = audioBuffer.currentIndex;
-                                        if (idx <= 1) return qsTr("⚡ Latencia Ultra-Baja: Respuesta instantánea para scratch y mezclas rápidas.");
-                                        if (idx <= 3) return qsTr("⚖️ Latencia Equilibrada: Recomendada para la mayoría de teléfonos Android (estable y sin cortes).");
-                                        return qsTr("🛡️ Modo Seguro: Máxima estabilidad si notas chasquidos o si el móvil va lento.");
+                                        if (idx <= 1) return qsTr("⚡ Ultra-low latency: instant response for scratching and fast mixing.");
+                                        if (idx <= 3) return qsTr("⚖️ Balanced latency: recommended for most Android phones (stable, no dropouts).");
+                                        return qsTr("🛡️ Safe mode: maximum stability if you hear crackles or the phone is slow.");
                                     }
                                     font.pixelSize: 11
                                     color: audioBuffer.currentIndex <= 1 ? "#64b5f6" : (audioBuffer.currentIndex <= 3 ? "#81c784" : "#ffb74d")
@@ -900,7 +900,7 @@ Category {
                                     Layout.fillWidth: true
                                     color: Theme.white
                                     font.pixelSize: 13
-                                    text: qsTr("Modo de Mezcla Principal")
+                                    text: qsTr("Main mix mode")
                                 }
                                 RatioChoice {
                                     id: mainOutputMode
@@ -920,7 +920,7 @@ Category {
                                     Layout.fillWidth: true
                                     color: Theme.white
                                     font.pixelSize: 13
-                                    text: qsTr("Calidad Keylock (Bloqueo de Tono)")
+                                    text: qsTr("Keylock quality")
                                 }
                                 RatioChoice {
                                     id: keylock
@@ -931,15 +931,15 @@ Category {
                                             switch (eng) {
                                             case 0:
                                                 opts.push(qsTr("Soundtouch"));
-                                                tips.push(qsTr("Rápido"));
+                                                tips.push(qsTr("Fast"));
                                                 break;
                                             case 1:
                                                 opts.push(qsTr("Rubberband"));
-                                                tips.push(qsTr("Alta Calidad"));
+                                                tips.push(qsTr("High quality"));
                                                 break;
                                             case 2:
                                                 opts.push(qsTr("Rubberband R3"));
-                                                tips.push(qsTr("Máxima Calidad Hi-Fi"));
+                                                tips.push(qsTr("Highest quality"));
                                                 break;
                                             }
                                         }
@@ -963,7 +963,7 @@ Category {
                                     Layout.fillWidth: true
                                     color: Theme.white
                                     font.pixelSize: 13
-                                    text: qsTr("Mezcla Principal (Main Mix)")
+                                    text: qsTr("Main mix")
                                 }
                                 RatioChoice {
                                     id: mainMixEnabled
@@ -986,13 +986,13 @@ Category {
                                         Layout.fillWidth: true
                                         color: Theme.white
                                         font.pixelSize: 13
-                                        text: qsTr("Driver USB de Mixxx")
+                                        text: qsTr("Mixxx USB driver")
                                     }
                                     RatioChoice {
                                         id: usbDirectMode
                                         // Indexed by the config value: 0 = auto, 1 = always, 2 = never
-                                        options: ["auto", "siempre", "nunca"]
-                                        tooltips: [qsTr("Solo tarjetas multicanal (controladoras DJ)"), qsTr("Todas las tarjetas USB compatibles"), qsTr("Usar siempre el audio de Android")]
+                                        options: ["auto", "always", "never"]
+                                        tooltips: [qsTr("Multichannel sound cards only (DJ controllers)"), qsTr("All compatible USB sound cards"), qsTr("Always use Android audio")]
                                         onSelectedChanged: {
                                             root.hasChanges = true;
                                         }
@@ -1003,7 +1003,7 @@ Category {
                                     wrapMode: Text.WordWrap
                                     color: "#90a4ae"
                                     font.pixelSize: 11
-                                    text: qsTr("Mixxx controla directamente la tarjeta de sonido USB cuando Android no puede usar todos sus canales (p. ej. los auriculares de una controladora DJ). Los cambios se aplican al reiniciar Mixxx.")
+                                    text: qsTr("Mixxx drives the USB sound card directly when Android cannot use all of its channels (e.g. the headphones of a DJ controller). Changes take effect after restarting Mixxx.")
                                 }
                             }
                         }
@@ -1045,7 +1045,7 @@ Category {
                             spacing: 8
 
                             Text {
-                                text: "🔧 Matriz de Ruteo Avanzada (Cables Virtuales)"
+                                text: qsTr("🔧 Advanced routing matrix (virtual cables)")
                                 font.pixelSize: 14
                                 font.bold: true
                                 color: "#b0bec5"
@@ -1062,7 +1062,7 @@ Category {
 
                                 Text {
                                     anchors.centerIn: parent
-                                    text: root.showAdvancedRouter ? qsTr("Ocultar Matriz") : qsTr("Mostrar Matriz Completa")
+                                    text: root.showAdvancedRouter ? qsTr("Hide matrix") : qsTr("Show full matrix")
                                     font.pixelSize: 11
                                     font.bold: true
                                     color: "#90caf9"
@@ -1136,7 +1136,7 @@ Category {
                         spacing: 14
 
                         Text {
-                            text: qsTr("Ajuste de Retardos de Salida (Compensación de Latencia Acústica)")
+                            text: qsTr("Output delays (acoustic latency compensation)")
                             font.pixelSize: 15
                             font.bold: true
                             color: "#ffffff"
@@ -1153,7 +1153,7 @@ Category {
                                 color: Theme.white
                                 font.pixelSize: 14
                                 opacity: enabled ? 1 : 0.5
-                                text: qsTr("Retardo Salida Principal (Master)")
+                                text: qsTr("Main output delay")
                             }
                             Skin.Slider {
                                 id: mainDelaySlider
@@ -1171,7 +1171,7 @@ Category {
                                 enabled: boothEnabled.value
                                 font.pixelSize: 14
                                 opacity: enabled ? 1 : 0.5
-                                text: qsTr("Retardo Salida Cabina (Booth)")
+                                text: qsTr("Booth output delay")
                             }
                             Skin.Slider {
                                 id: boothDelaySlider
@@ -1191,7 +1191,7 @@ Category {
                                 enabled: headEnabled.value
                                 font.pixelSize: 14
                                 opacity: enabled ? 1 : 0.5
-                                text: qsTr("Retardo Salida Auriculares (CUE)")
+                                text: qsTr("Headphone output delay (CUE)")
                             }
                             Skin.Slider {
                                 id: headphoneDelaySlider
@@ -1241,7 +1241,7 @@ Category {
                 Text {
                     id: statusText
                     anchors.centerIn: parent
-                    text: root.hasChanges ? "● Cambios pendientes" : "✓ Audio configurado"
+                    text: root.hasChanges ? qsTr("● Unsaved changes") : qsTr("✓ Audio configured")
                     font.bold: true
                     font.pixelSize: 11
                     color: root.hasChanges ? "#ffb74d" : "#81c784"
@@ -1266,7 +1266,7 @@ Category {
                 normalColor: "#ff8a80"
                 font.bold: true
                 font.pixelSize: 12
-                text: qsTr("Descartar")
+                text: qsTr("Discard")
                 onClicked: {
                     errorMessage.text = "";
                     root.load();
@@ -1293,7 +1293,7 @@ Category {
                     }
 
                     Text {
-                        text: root.committing ? qsTr("Aplicando...") : qsTr("Aplicar y Guardar Salidas")
+                        text: root.committing ? qsTr("Applying...") : qsTr("Apply and save outputs")
                         font.bold: true
                         font.pixelSize: 13
                         color: "#ffffff"

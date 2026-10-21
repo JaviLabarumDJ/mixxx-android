@@ -4177,6 +4177,7 @@ if(QML)
       src/qml/qmlsoundmanagerproxy.cpp
       src/qml/qmlpreferencesproxy.cpp
       src/qml/qmlstreamingproxy.cpp
+      src/qml/qmllanguageproxy.cpp
       src/waveform/renderers/allshader/digitsrenderer.cpp
       src/waveform/renderers/allshader/waveformrenderbeat.cpp
       src/waveform/renderers/allshader/waveformrenderer.cpp

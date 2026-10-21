@@ -381,7 +381,7 @@ Rectangle {
                         font.pixelSize: 13
                         text: {
                             if (!quickLoadBar.hasTrack)
-                                return qsTr("Selecciona una pista para cargar");
+                                return qsTr("Select a track to load");
                             const urlStr = quickLoadBar.selectedUrls[0].toString();
                             const filename = decodeURIComponent(urlStr.substring(urlStr.lastIndexOf('/') + 1));
                             return filename;
@@ -461,7 +461,7 @@ Rectangle {
             if (Mixxx.Library.addTrackToPlaylist(playlistId, trackUrl)) {
                 close();
             } else {
-                message = qsTr("No se ha podido añadir a %1").arg(name);
+                message = qsTr("Could not add to %1").arg(name);
             }
         }
 
@@ -486,7 +486,7 @@ Rectangle {
                 color: Theme.white
                 font.bold: true
                 font.pixelSize: 15
-                text: qsTr("Añadir a playlist")
+                text: qsTr("Add to playlist")
             }
             ListView {
                 Layout.fillHeight: true
@@ -514,7 +514,7 @@ Rectangle {
                     visible: playlistPopup.playlists.length === 0
                     color: Theme.lightGray2
                     font.pixelSize: 13
-                    text: qsTr("Aún no tienes playlists")
+                    text: qsTr("You have no playlists yet")
                 }
             }
             Text {
@@ -535,7 +535,7 @@ Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 44
                     font.pixelSize: 14
-                    placeholderText: qsTr("Nueva playlist")
+                    placeholderText: qsTr("New playlist")
                     onAccepted: createPlaylistBtn.clicked()
                 }
                 Skin.Button {
@@ -554,7 +554,7 @@ Rectangle {
                         const name = newPlaylistName.text.trim();
                         const playlistId = Mixxx.Library.createNamedPlaylist(name);
                         if (playlistId < 0) {
-                            playlistPopup.message = qsTr("Ya existe una playlist llamada %1").arg(name);
+                            playlistPopup.message = qsTr("A playlist named %1 already exists").arg(name);
                             return;
                         }
                         playlistPopup.addTo(playlistId, name);
