@@ -232,6 +232,69 @@ Use the advanced mode to view them</source>
     </message>
 </context>
 <context>
+    <name>BeatgridPopup</name>
+    <message>
+        <source>Beatgrid – Deck %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 BPM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load a track first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If quantized play or cues start between the beats, the grid is off: try ½ BEAT first. To place it exactly, stop on a downbeat (e.g. the first kick) and tap SET DOWNBEAT HERE. Changes are saved with the track.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>🔒 Grid locked – tap to unlock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>½ BEAT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SET DOWNBEAT HERE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>◀ EARLIER</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LATER ▶</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BPM ÷2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BPM ×2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MATCH OTHER DECK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UNDO</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>🔒 LOCK GRID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CLOSE</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Broadcast</name>
     <message>
         <source>Broadcast</source>
@@ -2201,6 +2264,17 @@ Aborting the operation to avoid library inconsistencies</source>
     <name>SyncButton</name>
     <message>
         <source>Leader</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Toolbar</name>
+    <message>
+        <source>GRID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Beatgrid</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
