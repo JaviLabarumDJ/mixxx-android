@@ -10,8 +10,9 @@ namespace mixxx {
 namespace android {
 
 /// Copies the Rekordbox export of a USB stick (its PIONEER and Contents
-/// folders) to /storage/emulated/0/Music/Mixxx/Rekordbox/<name>, where it is
-/// read like the stick itself (see util/removablestorage.cpp).
+/// folders, and the audio files anywhere else on the stick, which Rekordbox
+/// may play from there) to /storage/emulated/0/Music/Mixxx/Rekordbox/<name>,
+/// where it is read like the stick itself (see util/removablestorage.cpp).
 ///
 /// Backing up a stick again mirrors it: files that are new or changed (by
 /// size or date) are copied, and files that were removed from the stick

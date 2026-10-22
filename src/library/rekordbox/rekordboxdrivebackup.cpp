@@ -15,6 +15,7 @@
 
 #include "library/rekordbox/rekordboxandroid.h"
 #include "moc_rekordboxdrivebackup.cpp"
+#include "sources/soundsourceproxy.h"
 #include "util/removablestorage.h"
 #ifdef __ANDROID_USB_DRIVE__
 #include "library/usbdrive/androidusbdrive.h"
@@ -29,11 +30,18 @@ const QStringList kPdbPaths = {
         QStringLiteral(".PIONEER/rekordbox/export.pdb"),
 };
 /// The folders of a Rekordbox export: the database and the analysis, and
-/// the audio files
+/// the tracks. They are backed up completely.
 const QStringList kExportFolders = {
         QStringLiteral("PIONEER"),
         QStringLiteral(".PIONEER"),
         QStringLiteral("Contents"),
+};
+/// Folders of the systems that are never backed up
+const QStringList kSystemFolders = {
+        QStringLiteral("System Volume Information"),
+        QStringLiteral("$RECYCLE.BIN"),
+        QStringLiteral("LOST.DIR"),
+        QStringLiteral("Android"),
 };
 /// Kept free on the device
 constexpr qint64 kReservedBytes = 200LL * 1024 * 1024;
@@ -50,61 +58,71 @@ bool sameTime(const QDateTime& a, const QDateTime& b) {
     return a.isValid() && b.isValid() && std::abs(a.secsTo(b)) <= 2;
 }
 
+/// Whether a file of the stick (path relative to its root) is backed up:
+/// everything in the export folders, and the audio files anywhere else,
+/// e.g. tracks in the root folder that Rekordbox plays from there
+bool isBackedUp(const QString& relativePath) {
+    const QString topLevel = relativePath.section(QChar('/'), 0, 0);
+    if (relativePath.contains(QChar('/'))) {
+        if (kExportFolders.contains(topLevel, Qt::CaseInsensitive)) {
+            return true;
+        }
+        // Hidden folders (.Trashes, .Spotlight-V100...) and system folders
+        if (topLevel.startsWith(QChar('.')) ||
+                kSystemFolders.contains(topLevel, Qt::CaseInsensitive)) {
+            return false;
+        }
+    }
+    const QString fileName = relativePath.section(QChar('/'), -1);
+    return !fileName.startsWith(QChar('.')) &&
+            SoundSourceProxy::getSupportedFileNamesRegex().match(fileName).hasMatch();
+}
+
 QList<File> listMountedFiles(const QString& root) {
     QList<File> files;
-    const QStringList topLevel = QDir(root).entryList(
-            QDir::Dirs | QDir::Hidden | QDir::NoDotAndDotDot);
-    for (const QString& folder : topLevel) {
-        if (!kExportFolders.contains(folder, Qt::CaseInsensitive)) {
-            continue;
-        }
-        QDirIterator it(root + QChar('/') + folder,
-                QDir::Files | QDir::Hidden,
-                QDirIterator::Subdirectories);
-        while (it.hasNext()) {
-            const QFileInfo info(it.next());
-            files.append({QDir(root).relativeFilePath(info.filePath()),
-                    info.size(),
-                    info.lastModified()});
+    const QDir rootDir(root);
+    QDirIterator it(root, QDir::Files | QDir::Hidden, QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        const QFileInfo info(it.next());
+        const QString relativePath = rootDir.relativeFilePath(info.filePath());
+        if (isBackedUp(relativePath)) {
+            files.append({relativePath, info.size(), info.lastModified()});
         }
     }
     return files;
 }
 
-/// Deletes the files in the export folders of the backup `target` that are
-/// not in `stickFiles` (relative paths in lower case), and the folders that
-/// become empty. Returns the number of deleted files.
+/// Deletes the backed up files (see isBackedUp()) of the backup `target`
+/// that are not in `stickFiles` (relative paths in lower case), left over
+/// partial files, and the folders that become empty. Returns the number of
+/// deleted files.
 int removeDeletedFiles(const QString& target, const QSet<QString>& stickFiles) {
     int deleted = 0;
     const QDir targetDir(target);
-    const QStringList topLevel =
-            targetDir.entryList(QDir::Dirs | QDir::Hidden | QDir::NoDotAndDotDot);
-    for (const QString& folder : topLevel) {
-        if (!kExportFolders.contains(folder, Qt::CaseInsensitive)) {
+    QStringList folders;
+    QDirIterator it(target,
+            QDir::Files | QDir::Dirs | QDir::Hidden | QDir::NoDotAndDotDot,
+            QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        const QFileInfo info(it.next());
+        if (info.isDir()) {
+            folders.append(info.filePath());
             continue;
         }
-        QStringList folders;
-        QDirIterator it(target + QChar('/') + folder,
-                QDir::Files | QDir::Dirs | QDir::Hidden | QDir::NoDotAndDotDot,
-                QDirIterator::Subdirectories);
-        while (it.hasNext()) {
-            const QFileInfo info(it.next());
-            if (info.isDir()) {
-                folders.append(info.filePath());
-                continue;
-            }
-            const QString relativePath = targetDir.relativeFilePath(info.filePath());
-            if (!stickFiles.contains(relativePath.toLower()) && QFile::remove(info.filePath())) {
-                ++deleted;
-            }
+        const QString relativePath = targetDir.relativeFilePath(info.filePath());
+        const bool removed = (isBackedUp(relativePath) &&
+                                     !stickFiles.contains(relativePath.toLower())) ||
+                relativePath.endsWith(QLatin1String(".part"));
+        if (removed && QFile::remove(info.filePath())) {
+            ++deleted;
         }
-        // Deepest first; rmdir() only removes empty folders
-        std::sort(folders.begin(), folders.end(), [](const QString& a, const QString& b) {
-            return a.size() > b.size();
-        });
-        for (const QString& path : std::as_const(folders)) {
-            QDir().rmdir(path);
-        }
+    }
+    // Deepest first; rmdir() only removes empty folders
+    std::sort(folders.begin(), folders.end(), [](const QString& a, const QString& b) {
+        return a.size() > b.size();
+    });
+    for (const QString& path : std::as_const(folders)) {
+        QDir().rmdir(path);
     }
     return deleted;
 }
@@ -232,10 +250,12 @@ void RekordboxDriveBackup::run(const QString& drivePath, const QString& target) 
     bool complete = true;
 #ifdef __ANDROID_USB_DRIVE__
     if (const auto driveFiles =
-                    mixxx::usbdrive::listFiles(drivePath, kExportFolders, &complete)) {
+                    mixxx::usbdrive::listFiles(drivePath, &complete)) {
         isDrive = true;
         for (const auto& file : *driveFiles) {
-            files.append({file.relativePath, file.size, file.modified});
+            if (isBackedUp(file.relativePath)) {
+                files.append({file.relativePath, file.size, file.modified});
+            }
         }
     }
 #endif

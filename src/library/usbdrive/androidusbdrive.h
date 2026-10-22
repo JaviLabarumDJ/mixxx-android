@@ -42,13 +42,11 @@ struct DriveFile {
     QDateTime modified;
 };
 
-/// All files in the top level folders `folders` (compared ignoring case)
-/// of the drive whose local folder is `root`, recursively. Returns nothing
-/// if `root` is not a drive that Mixxx reads itself. Blocks while reading
-/// the drive. Sets *pComplete to false if a part of the drive could not be
-/// read, in which case files may be missing from the list.
-std::optional<QList<DriveFile>> listFiles(
-        const QString& root, const QStringList& folders, bool* pComplete);
+/// All files of the drive whose local folder is `root`, recursively.
+/// Returns nothing if `root` is not a drive that Mixxx reads itself. Blocks
+/// while reading the drive. Sets *pComplete to false if a part of the drive
+/// could not be read, in which case files may be missing from the list.
+std::optional<QList<DriveFile>> listFiles(const QString& root, bool* pComplete);
 
 /// Copies a file of the drive whose local folder is `root` to `destination`,
 /// directly, without the local cache. Blocks while copying.

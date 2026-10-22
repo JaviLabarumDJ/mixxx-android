@@ -87,7 +87,9 @@ A copy of a whole USB stick can be used instead of the stick: each folder in
 folder (see `src/util/removablestorage.cpp`). The library scanner skips that
 folder, so the tracks of the copies are not added to the library.
 *Settings → Music Library → Rekordbox stick backup* makes such a copy: it
-copies the `PIONEER` and `Contents` folders of a connected stick there. Later
+copies the `PIONEER` and `Contents` folders of a connected stick there, and
+the audio files anywhere else on the stick (Rekordbox can play tracks from
+any folder, e.g. the root). Later
 backups mirror the stick: they copy what is new or changed and delete what
 was removed from it, but only if the stick could be read completely
 (`src/library/rekordbox/rekordboxdrivebackup.cpp`).

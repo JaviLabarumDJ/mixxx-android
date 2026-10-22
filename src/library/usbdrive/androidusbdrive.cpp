@@ -438,8 +438,7 @@ bool fetchFile(const QString& localPath) {
     return ensureLocal(pDrive, localPath.mid(pDrive->root.size() + 1));
 }
 
-std::optional<QList<DriveFile>> listFiles(
-        const QString& root, const QStringList& folders, bool* pComplete) {
+std::optional<QList<DriveFile>> listFiles(const QString& root, bool* pComplete) {
     const auto pDrive = driveFor(root + QStringLiteral("/"));
     if (!pDrive) {
         return std::nullopt;
@@ -447,18 +446,13 @@ std::optional<QList<DriveFile>> listFiles(
     const int readErrors = pDrive->volume.readErrors();
     // Reads only the directories, the file system guards itself
     QList<DriveFile> files;
-    QStringList pending;
-    const QList<FatVolume::Entry> topLevel = pDrive->volume.list(QString());
-    for (const auto& entry : topLevel) {
-        if (entry.isDirectory && folders.contains(entry.name, Qt::CaseInsensitive)) {
-            pending.append(entry.name);
-        }
-    }
+    // The root first
+    QStringList pending{QString()};
     while (!pending.isEmpty()) {
         const QString folder = pending.takeFirst();
         const QList<FatVolume::Entry> entries = pDrive->volume.list(folder);
         for (const auto& entry : entries) {
-            const QString path = folder + QChar('/') + entry.name;
+            const QString path = folder.isEmpty() ? entry.name : folder + QChar('/') + entry.name;
             if (entry.isDirectory) {
                 pending.append(path);
             } else {
