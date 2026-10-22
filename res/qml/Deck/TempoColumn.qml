@@ -8,11 +8,8 @@ import QtQuick.Shapes
 import "../Theme"
 
 ColumnLayout {
-    id: root
-
     required property var currentTrack
     required property string group
-    property bool minimized: false
 
     Mixxx.ControlProxy {
         id: keylockCO
@@ -187,6 +184,7 @@ ColumnLayout {
         group: root.group
         key: "rate"
         visible: !root.minimized
+        width: pitchKey.implicitWidth
 
         Skin.FadeBehavior on visible {
             fadeTarget: rateSlider
@@ -199,39 +197,6 @@ ColumnLayout {
         Layout.fillWidth: true
         group: root.group
         height: 22
-    }
-    // Manual beatmatching: hold to bend the tempo (also works while sync is
-    // locked, the offset is kept), and quantize, which snaps play/cue/hotcues
-    // to the beat grid when enabled.
-    RowLayout {
-        Layout.fillWidth: true
-        spacing: 2
-
-        Skin.ControlButton {
-            Layout.fillWidth: true
-            activeColor: Theme.deckActiveColor
-            group: root.group
-            implicitHeight: 22
-            key: "rate_temp_down"
-            text: "◀"
-        }
-        Skin.ControlButton {
-            Layout.fillWidth: true
-            activeColor: Theme.deckActiveColor
-            group: root.group
-            implicitHeight: 22
-            key: "quantize"
-            text: "Q"
-            toggleable: true
-        }
-        Skin.ControlButton {
-            Layout.fillWidth: true
-            activeColor: Theme.deckActiveColor
-            group: root.group
-            implicitHeight: 22
-            key: "rate_temp_up"
-            text: "▶"
-        }
     }
     Skin.RangeButton {
         id: rangeButton

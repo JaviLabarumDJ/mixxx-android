@@ -72,8 +72,6 @@ Rectangle {
     property var newConnection: null
     property var outputDevices: new Object()
     property var outputs: new Object()
-    // Existing connections whose mixer/deck gateway wasn't registered yet
-    property var pendingConnections: []
     property var selectedTab: ""
     property var system: new Object()
 
@@ -82,23 +80,9 @@ Rectangle {
             return;
         for (let connection of connections) {
             let typeDef = audioTypeMap[connection.type];
-            if (!typeDef) {
-                console.error("Unable to find typeDef for connection type", connection.type);
-                continue;
-            }
-            let sourceList = root.system[typeDef.entity]?.gateways[typeDef.channel];
-            let source = sourceList?.[connection.index]?.edgeItem;
-            if (!source) {
-                // Never substitute another index (e.g. deck 1 for deck 3):
-                // wait for the gateway to register instead.
-                root.pendingConnections.push({
-                    "node": node,
-                    "connection": connection
-                });
-                continue;
-            }
+            let source = root.system[typeDef.entity].gateways[typeDef.channel][connection.index].edgeItem;
             let availableEdge = node.availableEdge();
-            if (!source || availableEdge === null || availableEdge === undefined) {
+            if (!source || availableEdge === null) {
                 console.error("Unable to get the source and sink of the existing connection!", source, availableEdge);
                 continue;
             }
@@ -112,13 +96,6 @@ Rectangle {
             node.channelAssignation[availableEdge] = connection.channelGroup / 2;
         }
         root.updateHiddenConnectionCount();
-    }
-    function retryPendingConnections() {
-        let pending = root.pendingConnections;
-        root.pendingConnections = [];
-        for (let item of pending) {
-            addExistingConnection(item.node, [item.connection]);
-        }
     }
     function entityOnConnect(edge) {
         if (root.newConnection != null) {
@@ -248,7 +225,6 @@ Rectangle {
                     gateways: {
                         [deviceName]: {
                             name: deviceName,
-                            address: deviceName,
                             node: existing[cardName]?.gateways?.[deviceName]?.node ?? null,
                             device: device,
                             channels: device.channelCount
@@ -274,7 +250,6 @@ Rectangle {
 
             cards[cardName].gateways[deviceName] = {
                 name: deviceName,
-                address: deviceName,
                 node: existing[cardName]?.gateways?.[deviceName]?.node ?? null,
                 device: device,
                 channels: device.channelCount
@@ -325,46 +300,21 @@ Rectangle {
         root.hasChanges = false;
     }
     function registerInputEdge(device, address, node) {
-        if (!root.inputs[device] || !root.inputs[device].gateways) return;
-        let gw = root.inputs[device].gateways[address];
-        if (!gw) {
-            for (let k of Object.keys(root.inputs[device].gateways)) {
-                if (root.inputs[device].gateways[k].name === address || k === address) {
-                    gw = root.inputs[device].gateways[k];
-                    break;
-                }
-            }
-        }
-        if (gw) {
-            gw.node = node;
-            if (gw.delayedConnections) {
-                addExistingConnection(node, gw.delayedConnections);
-                gw.delayedConnections = undefined;
-            }
+        root.inputs[device].gateways[address].node = node;
+        if (root.inputs[device].gateways[address].delayedConnections) {
+            addExistingConnection(node, root.inputs[device].gateways[address].delayedConnections);
+            root.inputs[device].gateways[address].delayedConnections = undefined;
         }
     }
     function registerOutputEdge(device, address, node) {
-        if (!root.outputs[device] || !root.outputs[device].gateways) return;
-        let gw = root.outputs[device].gateways[address];
-        if (!gw) {
-            for (let k of Object.keys(root.outputs[device].gateways)) {
-                if (root.outputs[device].gateways[k].name === address || k === address) {
-                    gw = root.outputs[device].gateways[k];
-                    break;
-                }
-            }
-        }
-        if (gw) {
-            gw.node = node;
-            if (gw.delayedConnections) {
-                addExistingConnection(node, gw.delayedConnections);
-                gw.delayedConnections = undefined;
-            }
+        root.outputs[device].gateways[address].node = node;
+        if (root.outputs[device].gateways[address].delayedConnections) {
+            addExistingConnection(node, root.outputs[device].gateways[address].delayedConnections);
+            root.outputs[device].gateways[address].delayedConnections = undefined;
         }
     }
     function update(api) {
         console.log(`Using sound api: ${api} ${typeof api}`);
-        root.pendingConnections = [];
         root.inputs = generateDeviceList(api, manager.availableInputDevices(api), root.inputs);
         root.outputs = generateDeviceList(api, manager.availableOutputDevices(api), root.outputs);
         root.loadConnections();
@@ -428,7 +378,7 @@ Rectangle {
                 Layout.margins: 15
                 color: '#626262'
                 font.pixelSize: 14
-                text: qsTr("Inputs")
+                text: "Inputs"
             }
             ListView {
                 id: inputList
@@ -525,7 +475,7 @@ Rectangle {
                     id: modeChoice
 
                     options: ["simple", !root.hiddenConnections ? "advanced" : "advanced (!)", "legacy"]
-                    tooltips: !root.hiddenConnections ? [] : [null, (root.hiddenConnections > 1 ? qsTr("%1 connections hidden\nUse the advanced mode to view them") : qsTr("%1 connection hidden\nUse the advanced mode to view them")).arg(root.hiddenConnections), null]
+                    tooltips: !root.hiddenConnections ? [] : [null, `${root.hiddenConnections} connection${root.hiddenConnections > 1 ? 's' : ''} hidden\nUse the advanced mode to view them`, null]
 
                     onOptionsChanged: {
                         if (modeChoice.selected?.startsWith("advanced")) {
@@ -545,23 +495,21 @@ Rectangle {
 
                     maxWidth: mainCanvas.width < 560 ? 200 : 400
                     normalizedWidth: false
-                    // Indexed by the sync buffers value: 0 = experimental,
-                    // 1 = disabled (short delay), 2 = default (long delay)
-                    options: ["experimental", "disabled", "default"]
-                    tooltips: [qsTr("No delay"), qsTr("Short delay"), qsTr("Long delay")]
+                    options: ["experimental", "default", "disabled"]
+                    tooltips: ["No delay", "Long delay", "Short delay"]
 
                     onSelectedChanged: {
                         root.hasChanges = true;
                     }
 
                     Mixxx.SettingParameter {
-                        label: qsTr("Multi-Soundcard Synchronization")
+                        label: "Multi-Soundcard Synchronization"
                     }
                 }
                 Text {
                     color: Theme.white
                     font.pixelSize: 14
-                    text: qsTr("Multi-Soundcard Synchronization")
+                    text: "Multi-Soundcard Synchronization"
                 }
                 Item {
                     Layout.fillWidth: true
@@ -585,7 +533,7 @@ Rectangle {
                 Layout.margins: 15
                 color: '#626262'
                 font.pixelSize: 14
-                text: qsTr("Outputs")
+                text: "Outputs"
             }
             ListView {
                 id: outputList
@@ -685,14 +633,12 @@ Rectangle {
             advanced: root.mode == AudioRouter.Mode.Advanced
             gateways: [
                 {
-                    address: "Output",
-                    name: qsTr("Output"),
+                    name: "Output",
                     type: "source",
                     advanced: true
                 },
                 {
-                    address: "Vinyl Control",
-                    name: qsTr("Vinyl Control"),
+                    name: "Vinyl Control",
                     type: "sink",
                     advanced: true
                 }
@@ -715,7 +661,6 @@ Rectangle {
                     root.system["Deck"].gateways[address] = [];
                 }
                 root.system["Deck"].gateways[address][deck.index] = node.itemAt(0);
-                root.retryPendingConnections();
             }
         }
     }
@@ -729,44 +674,37 @@ Rectangle {
                 type: "source"
             },
             {
-                address: "Main",
-                name: qsTr("Main"),
+                name: "Main",
                 type: "source",
                 required: true
             },
             {
-                address: "Booth",
-                name: qsTr("Booth"),
+                name: "Booth",
                 type: "source"
             },
             {
-                address: "Left Bus",
-                name: qsTr("Left Bus"),
+                name: "Left Bus",
                 type: "source",
                 advanced: true
             },
             {
-                address: "Center Bus",
-                name: qsTr("Center Bus"),
+                name: "Center Bus",
                 type: "source",
                 advanced: true
             },
             {
-                address: "Right Bus",
-                name: qsTr("Right Bus"),
+                name: "Right Bus",
                 type: "source",
                 advanced: true
             },
             {
-                address: "Auxiliary",
-                name: qsTr("Auxiliary"),
+                name: "Auxiliary",
                 type: "sink",
                 instances: 4,
                 advanced: true
             },
             {
-                address: "Microphone",
-                name: qsTr("Microphone"),
+                name: "Microphone",
                 type: "sink",
                 instances: 4,
                 advanced: true
@@ -799,32 +737,31 @@ Rectangle {
             for (let nodeIdx = 0; nodeIdx < node.count; nodeIdx++) {
                 root.system["Mixer"].gateways[address][nodeIdxOffset + nodeIdx] = node.itemAt(nodeIdx);
             }
-            root.retryPendingConnections();
         }
 
         Mixxx.SettingParameter {
             label: "PFL"
         }
         Mixxx.SettingParameter {
-            label: qsTr("Main")
+            label: "Main"
         }
         Mixxx.SettingParameter {
-            label: qsTr("Booth")
+            label: "Booth"
         }
         Mixxx.SettingParameter {
-            label: qsTr("Mixer")
+            label: "Mixer"
         }
         Mixxx.SettingParameter {
-            label: qsTr("Decks")
+            label: "Decks"
         }
         Mixxx.SettingParameter {
-            label: qsTr("Input")
+            label: "Input"
         }
         Mixxx.SettingParameter {
-            label: qsTr("Output")
+            label: "Output"
         }
         Mixxx.SettingParameter {
-            label: qsTr("Broadcast")
+            label: "Broadcast"
         }
     }
     Repeater {
@@ -852,8 +789,7 @@ Rectangle {
 
         gateways: [
             {
-                address: "Alternative input",
-                name: qsTr("Alternative input"),
+                name: "Alternative input",
                 type: "sink"
             }
         ]
@@ -888,12 +824,7 @@ Rectangle {
                 root.system["Record"].gateways[address] = [];
             }
             node = node.itemAt(0);
-            if (!node) {
-                // The gateway's items are not created yet
-                return;
-            }
             root.system["Record"].gateways[address][node.index] = node;
-            root.retryPendingConnections();
         }
     }
     AudioConnection {

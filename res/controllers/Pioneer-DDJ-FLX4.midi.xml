@@ -77,6 +77,28 @@
                     <Normal/>
                 </options>
             </control>
+            <!-- Mixxx Android: SHIFT+LOAD shows the LIB view or returns to the
+                 previous view, see res/qml/+android/MainWindow.qml -->
+            <control>
+                <description>LOAD +SHIFT (DECK1) - press - Show or hide the full library (Android)</description>
+                <group>[Skin]</group>
+                <key>mobile_library_toggle</key>
+                <status>0x96</status>
+                <midino>0x68</midino>
+                <options>
+                    <Normal/>
+                </options>
+            </control>
+            <control>
+                <description>LOAD +SHIFT (DECK2) - press - Show or hide the full library (Android)</description>
+                <group>[Skin]</group>
+                <key>mobile_library_toggle</key>
+                <status>0x96</status>
+                <midino>0x7A</midino>
+                <options>
+                    <Normal/>
+                </options>
+            </control>
             <!-- BROWSER Section END -->
 
             <!--

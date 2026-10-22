@@ -1,9 +1,8 @@
-import ".." as Skin
 import Mixxx 1.0 as Mixxx
 import QtQuick
 import QtQuick.Controls
 
-Skin.ComboBox {
+ComboBox {
     id: root
 
     required property Mixxx.EffectSlotProxy slot
@@ -21,7 +20,6 @@ Skin.ComboBox {
     readonly property string observedEffectId: root.slot?.effectId ?? ""
 
     model: Mixxx.EffectsManager.visibleEffectsModel
-    popupMaxItem: 8
     textRole: "display"
 
     Component.onCompleted: syncCurrentEffect()

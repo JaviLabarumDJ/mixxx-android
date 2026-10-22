@@ -25,25 +25,11 @@ Rectangle {
         key: "super1"
         width: 36
     }
-    // On/off button in the corner. A double tap on the whole knob toggled the
-    // effect by accident while turning it on a touch screen.
-    Rectangle {
-        anchors.right: root.right
-        anchors.top: root.top
-        anchors.margins: 1
-        border.color: Theme.white
-        border.width: 1
-        color: statusControl.value ? Theme.white : "transparent"
-        height: 10
-        radius: 5
-        width: 10
+    TapHandler {
+        acceptedButtons: Qt.LeftButton
 
-        TapHandler {
-            margin: 8
-
-            onTapped: {
-                statusControl.value = !statusControl.value;
-            }
+        onDoubleTapped: {
+            statusControl.value = !statusControl.value;
         }
     }
     Mixxx.ControlProxy {

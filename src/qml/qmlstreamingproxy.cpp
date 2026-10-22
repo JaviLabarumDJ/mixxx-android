@@ -178,7 +178,7 @@ QString QmlStreamingProxy::getSubsonicCoverArtUrl(const QString& coverArtId, int
 void QmlStreamingProxy::testSubsonicConnection() {
     const QString urlStr = buildSubsonicUrl(QStringLiteral("ping"));
     if (urlStr.isEmpty()) {
-        emit subsonicConnectionTested(false, tr("Server URL is empty"), QString());
+        emit subsonicConnectionTested(false, tr("The server URL is empty"), QString());
         return;
     }
 

@@ -11,7 +11,7 @@ Category {
     id: root
 
     property bool dirty: false
-    label: qsTr("Waveforms")
+    label: "Waveforms"
     readonly property string graphicsApiName: {
         switch (GraphicsInfo.api) {
         case GraphicsInfo.OpenGL:
@@ -29,7 +29,7 @@ Category {
         case GraphicsInfo.Null:
             return "Null";
         default:
-            return qsTr("Unknown");
+            return "Unknown";
         }
     }
     readonly property list<int> waveformTypes: [Mixxx.WaveformDisplay.Type.Simple, Mixxx.WaveformDisplay.Type.Filtered, Mixxx.WaveformDisplay.Type.HSV, Mixxx.WaveformDisplay.Type.RGB, Mixxx.WaveformDisplay.Type.Stacked]
@@ -37,12 +37,10 @@ Category {
     function load() {
         overviewTypeInput.currentIndex = Math.max(0, Math.min(2, Mixxx.Config.waveformOverviewType));
         overviewStereoInput.selected = Mixxx.Config.waveformOverviewStereo ? "on" : "off";
+        overviewMinuteMarkersInput.selected = Mixxx.Config.waveformOverviewMinuteMarkers ? "on" : "off";
         overviewScalingInput.selected = Mixxx.Config.waveformOverviewNormalized ? "normalize" : "global gain";
         waveformEnabledInput.selected = Mixxx.Config.waveformEnabled ? "on" : "off";
         frameRateInput.value = Mixxx.Config.waveformFrameRate;
-        if (frameRateInput.value <= 60) frameRateRatio.selected = "60 fps";
-        else if (frameRateInput.value <= 90) frameRateRatio.selected = "90 fps";
-        else frameRateRatio.selected = "120 fps ★";
         waveformTypeInput.currentIndex = root.waveformTypes.indexOf(Mixxx.Config.waveformType);
         if (waveformTypeInput.currentIndex < 0)
             waveformTypeInput.currentIndex = 3;
@@ -147,20 +145,20 @@ Category {
     }
 
     ScrollView {
-        id: scrollView
-
         anchors.bottom: buttonActions.top
-        anchors.bottomMargin: 8
+        anchors.bottomMargin: 18
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
         clip: true
-        contentWidth: availableWidth
 
         ColumnLayout {
             id: content
 
-            width: scrollView.availableWidth
+            anchors.left: parent.left
+            anchors.margins: 14
+            anchors.right: parent.right
+            anchors.top: parent.top
             spacing: 10
 
             Text {
@@ -168,19 +166,19 @@ Category {
                 color: Theme.white
                 font.pixelSize: 14
                 font.weight: Font.DemiBold
-                text: qsTr("Overview Waveforms")
+                text: "Overview Waveforms"
             }
             RowLayout {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: qsTr("Type")
+                    label: "Type"
                 }
                 Skin.ComboBox {
                     id: overviewTypeInput
 
                     Layout.preferredWidth: 180
-                    model: [qsTr("Filtered"), "HSV", "RGB"]
+                    model: ["Filtered", "HSV", "RGB"]
 
                     onCurrentIndexChanged: root.markDirty()
                 }
@@ -189,7 +187,7 @@ Category {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: qsTr("Stereo channels")
+                    label: "Stereo channels"
                 }
                 RatioChoice {
                     id: overviewStereoInput
@@ -203,7 +201,7 @@ Category {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: qsTr("Minute markers")
+                    label: "Minute markers"
                 }
                 RatioChoice {
                     id: overviewMinuteMarkersInput
@@ -217,7 +215,7 @@ Category {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: qsTr("Gain scaling")
+                    label: "Gain scaling"
                 }
                 RatioChoice {
                     id: overviewScalingInput
@@ -237,19 +235,19 @@ Category {
                 color: Theme.white
                 font.pixelSize: 14
                 font.weight: Font.DemiBold
-                text: qsTr("Scrolling Waveforms")
+                text: "Scrolling Waveforms"
             }
             RowLayout {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: qsTr("Type")
+                    label: "Type"
                 }
                 Skin.ComboBox {
                     id: waveformTypeInput
 
                     Layout.preferredWidth: 180
-                    model: [qsTr("Simple"), qsTr("Filtered"), "HSV", "RGB", qsTr("Stacked")]
+                    model: ["Simple", "Filtered", "HSV", "RGB", "Stacked"]
 
                     onCurrentIndexChanged: root.markDirty()
                 }
@@ -257,14 +255,14 @@ Category {
             Text {
                 Layout.fillWidth: true
                 color: Theme.midGray
-                text: qsTr("Simple, Filtered, HSV, RGB and Stacked are supported by the QML renderer.")
+                text: "Simple, Filtered, HSV, RGB and Stacked are supported by the QML renderer."
                 wrapMode: Text.WordWrap
             }
             RowLayout {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: qsTr("Enabled")
+                    label: "Enabled"
                 }
                 RatioChoice {
                     id: waveformEnabledInput
@@ -274,27 +272,11 @@ Category {
                     onSelectedChanged: root.markDirty()
                 }
             }
-            RowLayout {
-                Layout.fillWidth: true
-                WaveformSettingParameter {
-                    label: qsTr("Waveform Smoothness (FPS)")
-                }
-                RatioChoice {
-                    id: frameRateRatio
-                    options: ["60 fps", "90 fps", "120 fps ★"]
-                    onSelectedChanged: {
-                        if (selected === "60 fps") frameRateInput.value = 60;
-                        else if (selected === "90 fps") frameRateInput.value = 90;
-                        else frameRateInput.value = 120;
-                        root.markDirty();
-                    }
-                }
-            }
             WaveformSliderRow {
                 id: frameRateInput
 
                 decimals: 0
-                label: qsTr("Frame rate")
+                label: "Frame rate"
                 max: 240
                 min: 10
                 suffix: " fps"
@@ -306,7 +288,7 @@ Category {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: qsTr("Sync deck zoom")
+                    label: "Sync deck zoom"
                 }
                 RatioChoice {
                     id: zoomSynchronizationInput
@@ -320,7 +302,7 @@ Category {
                 id: defaultZoomInput
 
                 decimals: 0
-                label: qsTr("Default zoom")
+                label: "Default zoom"
                 max: 10
                 min: 1
                 suffix: "x"
@@ -331,7 +313,7 @@ Category {
                 id: endOfTrackWarningInput
 
                 decimals: 0
-                label: qsTr("End-of-track warning")
+                label: "End-of-track warning"
                 max: 120
                 min: 0
                 suffix: "s"
@@ -342,7 +324,7 @@ Category {
                 id: beatGridAlphaInput
 
                 decimals: 0
-                label: qsTr("Beat-grid opacity")
+                label: "Beat-grid opacity"
                 max: 100
                 min: 0
                 suffix: "%"
@@ -353,7 +335,7 @@ Category {
                 id: playMarkerPositionInput
 
                 decimals: 0
-                label: qsTr("Play-marker position")
+                label: "Play-marker position"
                 max: 100
                 min: 0
                 suffix: "%"
@@ -364,7 +346,7 @@ Category {
                 id: visualGainAllInput
 
                 decimals: 2
-                label: qsTr("Visual gain (all)")
+                label: "Visual gain (all)"
                 max: 3
                 min: 0
                 suffix: "x"
@@ -375,7 +357,7 @@ Category {
                 id: visualGainLowInput
 
                 decimals: 2
-                label: qsTr("Visual gain (low)")
+                label: "Visual gain (low)"
                 max: 3
                 min: 0
                 suffix: "x"
@@ -386,7 +368,7 @@ Category {
                 id: visualGainMidInput
 
                 decimals: 2
-                label: qsTr("Visual gain (mid)")
+                label: "Visual gain (mid)"
                 max: 3
                 min: 0
                 suffix: "x"
@@ -397,7 +379,7 @@ Category {
                 id: visualGainHighInput
 
                 decimals: 2
-                label: qsTr("Visual gain (high)")
+                label: "Visual gain (high)"
                 max: 3
                 min: 0
                 suffix: "x"
@@ -408,7 +390,7 @@ Category {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: qsTr("Split stereo signal")
+                    label: "Split stereo signal"
                 }
                 RatioChoice {
                     id: splitStereoSignalInput
@@ -422,14 +404,14 @@ Category {
             Text {
                 Layout.fillWidth: true
                 color: Theme.midGray
-                text: qsTr("Split stereo signal is used by the RGB renderer.")
+                text: "Split stereo signal is used by the RGB renderer."
                 wrapMode: Text.WordWrap
             }
             RowLayout {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: qsTr("High detail (legacy)")
+                    label: "High detail (legacy)"
                 }
                 RatioChoice {
                     id: highDetailInput
@@ -443,14 +425,14 @@ Category {
             Text {
                 Layout.fillWidth: true
                 color: Theme.midGray
-                text: qsTr("High detail is retained for compatibility but is unavailable in the QML scene-graph renderer.")
+                text: "High detail is retained for compatibility but is unavailable in the QML scene-graph renderer."
                 wrapMode: Text.WordWrap
             }
             RowLayout {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: qsTr("Show beats until marker")
+                    label: "Show beats until marker"
                 }
                 RatioChoice {
                     id: untilMarkShowBeatsInput
@@ -464,7 +446,7 @@ Category {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: qsTr("Show time until marker")
+                    label: "Show time until marker"
                 }
                 RatioChoice {
                     id: untilMarkShowTimeInput
@@ -478,13 +460,13 @@ Category {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: qsTr("Marker alignment")
+                    label: "Marker alignment"
                 }
                 Skin.ComboBox {
                     id: untilMarkAlignInput
 
                     Layout.preferredWidth: 180
-                    model: [qsTr("Top"), qsTr("Center"), qsTr("Bottom")]
+                    model: ["Top", "Center", "Bottom"]
 
                     onCurrentIndexChanged: root.markDirty()
                 }
@@ -493,7 +475,7 @@ Category {
                 id: untilMarkTextSizeInput
 
                 decimals: 0
-                label: qsTr("Marker text size")
+                label: "Marker text size"
                 max: 48
                 min: 6
                 suffix: "px"
@@ -504,7 +486,7 @@ Category {
                 id: stemOpacityInput
 
                 decimals: 2
-                label: qsTr("Stem channel opacity")
+                label: "Stem channel opacity"
                 max: 1
                 min: 0
 
@@ -514,7 +496,7 @@ Category {
                 id: stemOutlineOpacityInput
 
                 decimals: 2
-                label: qsTr("Stem outline opacity")
+                label: "Stem outline opacity"
                 max: 1
                 min: 0
 
@@ -524,7 +506,7 @@ Category {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: qsTr("Reorder stems when volume changes")
+                    label: "Reorder stems when volume changes"
                 }
                 RatioChoice {
                     id: stemReorderInput
@@ -538,7 +520,7 @@ Category {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: qsTr("Stem display mode")
+                    label: "Stem display mode"
                 }
                 RatioChoice {
                     id: stemDisplayModeInput
@@ -558,13 +540,13 @@ Category {
                 color: Theme.white
                 font.pixelSize: 14
                 font.weight: Font.DemiBold
-                text: qsTr("Caching")
+                text: "Caching"
             }
             RowLayout {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: qsTr("Enable waveform caching")
+                    label: "Enable waveform caching"
                 }
                 RatioChoice {
                     id: cachingInput
@@ -578,7 +560,7 @@ Category {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: qsTr("Generate while analyzing")
+                    label: "Generate while analyzing"
                 }
                 RatioChoice {
                     id: generateWithAnalysisInput
@@ -594,10 +576,10 @@ Category {
                 Text {
                     Layout.fillWidth: true
                     color: Theme.white
-                    text: qsTr("Cached waveforms occupy %1 on disk.").arg(Mixxx.Library.waveformCacheDiskUsage || qsTr("unknown"))
+                    text: "Cached waveforms occupy " + (Mixxx.Library.waveformCacheDiskUsage || "unknown") + " on disk."
                 }
                 Skin.Button {
-                    text: qsTr("Clear cached waveforms")
+                    text: "Clear cached waveforms"
 
                     onPressed: Mixxx.Library.clearCachedWaveforms()
                 }
@@ -612,184 +594,79 @@ Category {
                 color: Theme.white
                 font.pixelSize: 14
                 font.weight: Font.DemiBold
-                text: qsTr("Graphics API Status")
+                text: "Graphics API Status"
             }
             Text {
                 Layout.fillWidth: true
                 color: Theme.white
-                text: qsTr("Qt Quick renderer: %1").arg(root.graphicsApiName)
+                text: "Qt Quick renderer: " + root.graphicsApiName
             }
             Text {
                 Layout.fillWidth: true
                 color: Theme.white
                 text: Mixxx.Config.waveformAverageFrameRate > 0
-                        ? qsTr("Average frame rate: %1 fps").arg(Number(Mixxx.Config.waveformAverageFrameRate).toFixed(2))
-                        : qsTr("Average frame rate: Measuring…")
+                        ? "Average frame rate: " + Number(Mixxx.Config.waveformAverageFrameRate).toFixed(2) + " fps"
+                        : "Average frame rate: Measuring…"
             }
             Text {
                 Layout.fillWidth: true
                 color: Theme.midGray
-                text: GraphicsInfo.api === GraphicsInfo.OpenGL ? "OpenGL " + GraphicsInfo.majorVersion + "." + GraphicsInfo.minorVersion : qsTr("Runtime API reported by Qt Quick")
+                text: GraphicsInfo.api === GraphicsInfo.OpenGL ? "OpenGL " + GraphicsInfo.majorVersion + "." + GraphicsInfo.minorVersion : "Runtime API reported by Qt Quick"
             }
         }
     }
-    // ================= BARRA INFERIOR FIJA: ACCIONES Y ESTADO =================
-    Rectangle {
+    Item {
         id: buttonActions
+
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        height: 58
-        color: "#181b24"
-        border.color: "#282d3c"
-        border.width: 1
-        radius: 8
+        height: 20
 
-        RowLayout {
-            anchors.fill: parent
-            anchors.margins: 10
-            spacing: 12
+        Setting.FormButton {
+            activeColor: "#999999"
+            anchors.left: parent.left
+            backgroundColor: "#7D3B3B"
+            opacity: enabled ? 1.0 : 0.5
+            text: "Reset"
 
-            // Status indicator pill
-            Rectangle {
-                Layout.preferredHeight: 34
-                Layout.preferredWidth: statusRow.implicitWidth + 24
-                radius: 17
-                color: root.dirty ? "#332200" : "#0d2b1a"
-                border.color: root.dirty ? "#ffb300" : "#00c853"
-                border.width: 1
-
-                RowLayout {
-                    id: statusRow
-                    anchors.centerIn: parent
-                    spacing: 8
-                    Text {
-                        text: root.dirty ? "●" : "✓"
-                        font.bold: true
-                        font.pixelSize: 13
-                        color: root.dirty ? "#ffb300" : "#00e676"
-                    }
-                    Text {
-                        text: root.dirty ? qsTr("Pending changes") : qsTr("Waveforms saved")
-                        font.bold: true
-                        font.pixelSize: 12
-                        color: root.dirty ? "#ffe082" : "#b9f6ca"
-                    }
-                }
+            onPressed: {
+                root.reset();
             }
+        }
+        Row {
+            anchors.right: parent.right
+            spacing: 10
 
-            // Error message if any
             Text {
                 id: errorMessage
+
                 Layout.alignment: Qt.AlignVCenter
-                visible: text.length > 0
-                color: "#ff5252"
-                font.pixelSize: 12
+                Layout.rightMargin: 16
+                color: "#7D3B3B"
                 text: ""
             }
-
-            Item { Layout.fillWidth: true }
-
-            // Botón Restablecer valores
-            Rectangle {
-                Layout.preferredHeight: 38
-                Layout.preferredWidth: 140
-                radius: 6
-                color: resetMouse.pressed ? "#5c2b2b" : (resetMouse.containsMouse ? "#4a2222" : "#371e1e")
-                border.color: "#772b2b"
-                border.width: 1
-
-                RowLayout {
-                    anchors.centerIn: parent
-                    spacing: 6
-                    Text { text: "↺"; color: "#ff8a80"; font.pixelSize: 14 }
-                    Text {
-                        text: qsTr("Reset")
-                        font.bold: true
-                        font.pixelSize: 12
-                        color: "#ffcdd2"
-                    }
-                }
-
-                MouseArea {
-                    id: resetMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        root.reset();
-                    }
-                }
-            }
-
-            // Botón Descartar
-            Rectangle {
-                Layout.preferredHeight: 38
-                Layout.preferredWidth: 110
-                radius: 6
+            Setting.FormButton {
+                activeColor: "#999999"
+                backgroundColor: "#3F3F3F"
+                opacity: enabled ? 1.0 : 0.5
+                text: "Cancel"
                 visible: root.dirty
-                color: discardMouse.pressed ? "#424242" : (discardMouse.containsMouse ? "#333333" : "#262626")
-                border.color: "#555555"
-                border.width: 1
 
-                Text {
-                    anchors.centerIn: parent
-                    text: qsTr("Discard")
-                    font.bold: true
-                    font.pixelSize: 13
-                    color: "#e0e0e0"
-                }
-
-                MouseArea {
-                    id: discardMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        root.load();
-                        errorMessage.text = "";
-                    }
+                onPressed: {
+                    root.load();
                 }
             }
+            Setting.FormButton {
+                activeColor: "#999999"
+                backgroundColor: root.dirty ? "#3a60be" : "#3F3F3F"
+                enabled: root.dirty
+                opacity: enabled ? 1.0 : 0.5
+                text: "Save"
 
-            // Botón Guardar Formas de Onda
-            Rectangle {
-                Layout.preferredHeight: 40
-                Layout.preferredWidth: 230
-                radius: 6
-                color: root.dirty
-                       ? (saveMouse.pressed ? "#009624" : (saveMouse.containsMouse ? "#00e676" : "#00c853"))
-                       : (saveMouse.pressed ? "#0d47a1" : (saveMouse.containsMouse ? "#1e88e5" : "#1976d2"))
-                border.color: root.dirty ? "#69f0ae" : "#64b5f6"
-                border.width: 1.5
-
-                RowLayout {
-                    anchors.centerIn: parent
-                    spacing: 8
-
-                    Text {
-                        text: root.dirty ? "💾" : "✓"
-                        font.pixelSize: 14
-                        color: "#ffffff"
-                    }
-
-                    Text {
-                        text: root.dirty ? qsTr("Save Waveforms") : qsTr("Saved")
-                        font.bold: true
-                        font.pixelSize: 13
-                        color: "#ffffff"
-                    }
-                }
-
-                MouseArea {
-                    id: saveMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        errorMessage.text = "";
-                        root.save();
-                    }
+                onPressed: {
+                    errorMessage.text = "";
+                    root.save();
                 }
             }
         }

@@ -9,6 +9,7 @@
 #include <QElapsedTimer>
 #include <QFile>
 #include <QFutureWatcher>
+#include <QGuiApplication>
 #include <QJniEnvironment>
 #include <QJniObject>
 #include <QPointer>
@@ -16,6 +17,7 @@
 #include <QtConcurrentRun>
 #include <QtCore/private/qandroidextras_p.h>
 #include <algorithm>
+#include <atomic>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -37,6 +39,9 @@ constexpr jint kProtocolBulkOnly = 0x50;
 constexpr jint kEndpointBulk = 2;
 constexpr jint kDirectionIn = 0x80;
 
+/// mixxx::android::waitForPermission() gives up after 30 s
+constexpr qint64 kPermissionTimeoutMs = 29000;
+
 /// The copied tracks are deleted, oldest first, beyond this size
 constexpr qint64 kMaxTrackCacheBytes = 4LL * 1024 * 1024 * 1024;
 
@@ -50,6 +55,8 @@ struct Drive {
     std::unique_ptr<UsbMassStorage> pStorage;
     FatVolume volume;
     QString root;
+    /// The drive reads one file at a time
+    std::mutex mutex;
 
     ~Drive() {
         if (pHandle) {
@@ -70,8 +77,10 @@ std::mutex s_scanMutex;
 // Guards s_drives, only held briefly
 std::mutex s_drivesMutex;
 std::vector<std::shared_ptr<Drive>> s_drives;
-// The permission is only requested once per plug-in
+// The permission is only requested once per plug-in, guarded by s_scanMutex
 QStringList s_permissionRequested;
+// Set by allowPermissionRequests(), which doesn't wait for s_scanMutex
+std::atomic<bool> s_permissionRequestsAllowed = false;
 
 QString cacheRoot() {
     return QStandardPaths::writableLocation(QStandardPaths::CacheLocation) +
@@ -147,16 +156,34 @@ std::shared_ptr<Drive> openDrive(const QJniObject& manager, const QJniObject& us
         if (s_permissionRequested.contains(pDrive->usbDeviceName)) {
             return nullptr;
         }
+        // Android may not show the dialog while another app or the system
+        // settings are in front, e.g. on the first start. Asked again on the
+        // next search for drives.
+        if (QGuiApplication::applicationState() != Qt::ApplicationActive) {
+            qInfo() << "Not asking for the USB permission for the drive" << productName
+                    << "while Mixxx is in the background";
+            return nullptr;
+        }
         s_permissionRequested.append(pDrive->usbDeviceName);
         qInfo() << "Requesting USB permission for the drive" << productName;
         manager.callMethod<void>("requestPermission",
                 "(Landroid/hardware/usb/UsbDevice;Landroid/app/PendingIntent;)V",
                 usbDevice.object(),
                 mixxx::android::getIntent().object());
+        QElapsedTimer waitTimer;
+        waitTimer.start();
         if (!mixxx::android::waitForPermission(usbDevice)) {
-            qWarning() << "USB permission denied for the drive" << productName;
+            if (waitTimer.elapsed() >= kPermissionTimeoutMs) {
+                // Unanswered, not denied: asked again on the next search
+                qWarning() << "No answer to the USB permission request for the drive"
+                           << productName;
+                s_permissionRequested.removeAll(pDrive->usbDeviceName);
+            } else {
+                qWarning() << "USB permission denied for the drive" << productName;
+            }
             return nullptr;
         }
+        qInfo() << "USB permission granted for the drive" << productName;
     }
 
     const QJniObject usbInterface = massStorageInterface(usbDevice);
@@ -181,6 +208,8 @@ std::shared_ptr<Drive> openDrive(const QJniObject& manager, const QJniObject& us
         return nullptr;
     }
 
+    qInfo() << "Opening the USB drive" << productName << "interface"
+            << pDrive->interfaceNumber;
     pDrive->connection = manager.callObjectMethod("openDevice",
             "(Landroid/hardware/usb/UsbDevice;)Landroid/hardware/usb/UsbDeviceConnection;",
             usbDevice.object());
@@ -196,6 +225,7 @@ std::shared_ptr<Drive> openDrive(const QJniObject& manager, const QJniObject& us
         qWarning() << "Unable to claim the USB drive" << productName;
         return nullptr;
     }
+    qInfo() << "Claimed the USB drive" << productName;
     libusb_set_option(nullptr, LIBUSB_OPTION_NO_DEVICE_DISCOVERY);
     if (libusb_init(&pDrive->pContext) < 0) {
         pDrive->pContext = nullptr;
@@ -207,6 +237,7 @@ std::shared_ptr<Drive> openDrive(const QJniObject& manager, const QJniObject& us
         return nullptr;
     }
     libusb_claim_interface(pDrive->pHandle, pDrive->interfaceNumber);
+    qInfo() << "Reading the file system of the USB drive" << productName;
 
     pDrive->pStorage = std::make_unique<UsbMassStorage>(
             pDrive->pHandle, pDrive->interfaceNumber, endpointIn, endpointOut);
@@ -280,6 +311,7 @@ void trimTrackCache(const QString& keep) {
 
 /// Copies a file of the drive unless the local copy is current
 bool ensureLocal(const std::shared_ptr<Drive>& pDrive, const QString& relativePath) {
+    const std::lock_guard lock(pDrive->mutex);
     const std::optional<FatVolume::Entry> entry = pDrive->volume.find(relativePath);
     if (!entry || entry->isDirectory) {
         return false;
@@ -337,6 +369,17 @@ QFileInfoList driveRoots() {
             connected.append(usbDevice.callMethod<jstring>("getDeviceName").toString());
         }
     }
+    // A drive that stopped answering was reset or plugged again (e.g. by a
+    // hub), and Android dropped its permission: ask again
+    for (const auto& pDrive : drives) {
+        if (pDrive->pStorage->isDisconnected()) {
+            qInfo() << "The USB drive" << pDrive->usbDeviceName << "was disconnected";
+            s_permissionRequested.erase(std::remove(s_permissionRequested.begin(),
+                                                s_permissionRequested.end(),
+                                                pDrive->usbDeviceName),
+                    s_permissionRequested.end());
+        }
+    }
     // Forget the drives that are gone
     drives.erase(std::remove_if(drives.begin(),
                            drives.end(),
@@ -351,6 +394,9 @@ QFileInfoList driveRoots() {
                                             return !connected.contains(name);
                                         }),
             s_permissionRequested.end());
+    if (s_permissionRequestsAllowed.exchange(false)) {
+        s_permissionRequested.clear();
+    }
 
     if (!androidMountedRemovableStorage()) {
         for (const QJniObject& usbDevice : usbDevices) {
@@ -399,6 +445,60 @@ void prepareFiles(const QString& root, const QStringList& relativePaths) {
             ensureLocal(pDrive, relativePath);
         }
     }
+}
+
+void allowPermissionRequests() {
+    s_permissionRequestsAllowed = true;
+}
+
+bool fetchFile(const QString& localPath) {
+    const auto pDrive = driveFor(localPath);
+    if (!pDrive) {
+        return QFileInfo::exists(localPath);
+    }
+    return ensureLocal(pDrive, localPath.mid(pDrive->root.size() + 1));
+}
+
+QString driveSerial(const QString& root) {
+    const auto pDrive = driveFor(root + QStringLiteral("/"));
+    return pDrive ? pDrive->volume.serial() : QString();
+}
+
+std::optional<QList<DriveFile>> listFiles(const QString& root, bool* pComplete) {
+    const auto pDrive = driveFor(root + QStringLiteral("/"));
+    if (!pDrive) {
+        return std::nullopt;
+    }
+    const int readErrors = pDrive->volume.readErrors();
+    // Reads only the directories, the file system guards itself
+    QList<DriveFile> files;
+    // The root first
+    QStringList pending{QString()};
+    while (!pending.isEmpty()) {
+        const QString folder = pending.takeFirst();
+        const QList<FatVolume::Entry> entries = pDrive->volume.list(folder);
+        for (const auto& entry : entries) {
+            const QString path = folder.isEmpty() ? entry.name : folder + QChar('/') + entry.name;
+            if (entry.isDirectory) {
+                pending.append(path);
+            } else {
+                files.append({path, static_cast<qint64>(entry.size), entry.modified});
+            }
+        }
+    }
+    *pComplete = pDrive->volume.readErrors() == readErrors &&
+            !pDrive->pStorage->isDisconnected();
+    return files;
+}
+
+bool copyFileTo(const QString& root, const QString& relativePath, const QString& destination) {
+    const auto pDrive = driveFor(root + QStringLiteral("/"));
+    if (!pDrive) {
+        return false;
+    }
+    const std::lock_guard lock(pDrive->mutex);
+    const std::optional<FatVolume::Entry> entry = pDrive->volume.find(relativePath);
+    return entry && pDrive->volume.copyFile(*entry, destination);
 }
 
 bool isOnDrive(const QString& localPath) {

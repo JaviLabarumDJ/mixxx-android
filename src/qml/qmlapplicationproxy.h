@@ -28,8 +28,6 @@ class QmlApplicationProxy : public QObject {
     Q_PROPERTY(QString applicationName READ applicationName CONSTANT)
     Q_PROPERTY(QString version READ version CONSTANT)
     Q_PROPERTY(QString platform READ platform CONSTANT)
-    // Version of the installed package (versionName on Android)
-    Q_PROPERTY(QString packageVersion READ packageVersion CONSTANT)
     Q_PROPERTY(bool vinylControlAvailable READ vinylControlAvailable CONSTANT)
     Q_PROPERTY(bool liveBroadcastingAvailable READ liveBroadcastingAvailable CONSTANT)
     Q_PROPERTY(QUrl userManualUrl READ userManualUrl CONSTANT)
@@ -54,7 +52,6 @@ class QmlApplicationProxy : public QObject {
     QString applicationName() const;
     QString version() const;
     QString platform() const;
-    QString packageVersion() const;
     bool vinylControlAvailable() const;
     bool liveBroadcastingAvailable() const;
     QUrl userManualUrl() const;

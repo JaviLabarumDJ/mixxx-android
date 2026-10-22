@@ -35,7 +35,7 @@ Item {
             if (success) {
                 root.tracksModel = songs;
                 root.activeMode = "search";
-                root.statusMessage = qsTr("%1 songs found").arg(songs.length);
+                root.statusMessage = qsTr("%1 tracks found").arg(songs.length);
             } else {
                 root.statusMessage = qsTr("❌ Error: %1").arg(errorString);
             }
@@ -85,7 +85,7 @@ Item {
                 }
             }
             root.tracksModel = currentTracks;
-            root.statusMessage = qsTr("✔ Track ready and loaded into %1").arg(targetDeck === "[Channel1]" ? "Deck 1" : (targetDeck === "[Channel2]" ? "Deck 2" : qsTr("cache")));
+            root.statusMessage = qsTr("✔ Track ready and loaded into %1").arg(targetDeck === "[Channel1]" ? qsTr("Deck 1") : (targetDeck === "[Channel2]" ? qsTr("Deck 2") : qsTr("cache")));
         }
 
         function onDownloadFailed(trackId, errorMessage) {
@@ -255,7 +255,7 @@ Item {
                             Mixxx.StreamingManager.subsonicUsername = userField.text;
                             Mixxx.StreamingManager.subsonicPassword = passField.text;
                             root.isBusy = true;
-                            root.statusMessage = qsTr("Connecting to server...");
+                            root.statusMessage = qsTr("Connecting to the server...");
                             Mixxx.StreamingManager.testSubsonicConnection();
                         }
                     }
@@ -278,7 +278,7 @@ Item {
                         backgroundColor: "#262b36"
                         normalColor: "#90a4ae"
                         font.pixelSize: 10
-                        text: qsTr("🧹 Clear Cache")
+                        text: qsTr("🧹 Clear cache")
                         onClicked: {
                             Mixxx.StreamingManager.clearCache();
                             root.statusMessage = qsTr("Streaming cache cleared");
@@ -606,7 +606,7 @@ Item {
                         Text {
                             text: Mixxx.StreamingManager.isSubsonicConnected
                                 ? qsTr("🔍 Type an artist, title or album to search your server")
-                                : qsTr("☁️ Connect your Navidrome / Subsonic server in Settings above")
+                                : qsTr("☁️ Connect your Navidrome / Subsonic server in the settings above")
                             font.pixelSize: 13
                             color: "#78909c"
                             horizontalAlignment: Text.AlignHCenter
@@ -676,7 +676,7 @@ Item {
                             normalColor: "#ffffff"
                             font.bold: true
                             font.pixelSize: 11
-                            text: qsTr("View Tracks ▶")
+                            text: qsTr("Show tracks ▶")
                             onClicked: {
                                 root.currentPlaylistName = modelData.name;
                                 root.isBusy = true;

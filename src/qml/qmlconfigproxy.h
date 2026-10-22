@@ -46,10 +46,6 @@ class QmlConfigProxy : public QmlConfigProxyBase {
                             multiSamplingLevelChanged);
     Q_PROPERTY(bool useAcceleration READ useAcceleration WRITE
                     set_useAcceleration NOTIFY useAccelerationChanged);
-    // User interface language: empty for the system language, otherwise a
-    // locale name like "en_US" or "es_ES".
-    Q_PROPERTY(QString uiLanguage READ uiLanguage WRITE setUiLanguage NOTIFY
-                    uiLanguageChanged);
 
     // Waveform group
     Q_PROPERTY(bool waveformZoomSynchronization READ waveformZoomSynchronization
@@ -355,14 +351,7 @@ class QmlConfigProxy : public QmlConfigProxyBase {
     Q_INVOKABLE QVariantList colorPalette(const QString& paletteName) const;
 
     Q_INVOKABLE QStringList paletteNames() const;
-
-    QString uiLanguage() const;
-    void setUiLanguage(const QString& language);
   signals:
-    // Emitted before the texts are translated again, so that views can
-    // keep their state while their models are rebuilt.
-    void uiLanguageAboutToChange();
-    void uiLanguageChanged();
     void hotcueColorPaletteChanged();
     void trackColorPaletteChanged();
     void keyColorPaletteChanged();

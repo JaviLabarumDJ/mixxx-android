@@ -130,7 +130,7 @@ Item {
                         normalColor: "#ffffff"
                         font.bold: true
                         font.pixelSize: 11
-                        text: qsTr("◀ Load to DECK 1")
+                        text: qsTr("◀ Load into DECK 1")
 
                         onClicked: {
                             if (!customUrlInput.text.trim()) return;
@@ -156,7 +156,7 @@ Item {
                         normalColor: "#ffffff"
                         font.bold: true
                         font.pixelSize: 11
-                        text: qsTr("Load to DECK 2 ▶")
+                        text: qsTr("Load into DECK 2 ▶")
 
                         onClicked: {
                             if (!customUrlInput.text.trim()) return;

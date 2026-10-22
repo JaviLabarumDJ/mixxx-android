@@ -2,13 +2,10 @@
 
 #include <QCoreApplication>
 #include <QLibraryInfo>
-#include <QList>
 #include <QLocale>
-#include <QPointer>
 #include <QString>
 #include <QTranslator>
 #include <QtDebug>
-#include <utility>
 
 #include "preferences/usersettings.h"
 
@@ -21,11 +18,6 @@ class Translations {
             const QString& cmdlineLocaleString) {
         const QString translationsPath =
                 pConfig->getResourcePath() + QStringLiteral("translations/");
-        translationsDirectory() = translationsPath;
-
-        // Allow switching the language at runtime: drop the translators
-        // installed by a previous call.
-        removeTranslations(pApp);
 
         // Set the default locale, if specified via command line or config
         // file. If neither is the case, the default locale will be the
@@ -110,41 +102,10 @@ class Translations {
         // Load Mixxx specific translations for this locale from the Mixxx
         // translations folder.
         installTranslations(pApp, locale, QStringLiteral("mixxx"), translationsPath, true);
-
-#ifdef __ANDROID__
-        // Strings of the Android user interface, installed last so they
-        // take precedence.
-        installTranslations(pApp,
-                locale,
-                QStringLiteral("mixxx_android"),
-                translationsPath,
-                false);
-#endif
     }
     Translations() = delete;
 
-    /// Folder of the Mixxx .qm files, known after initializeTranslations()
-    static QString& translationsDirectory() {
-        static QString s_path;
-        return s_path;
-    }
-
   private:
-    static QList<QPointer<QTranslator>>& installedTranslators() {
-        static QList<QPointer<QTranslator>> s_translators;
-        return s_translators;
-    }
-
-    static void removeTranslations(QCoreApplication* pApp) {
-        for (const QPointer<QTranslator>& pTranslator : std::as_const(installedTranslators())) {
-            if (pTranslator) {
-                pApp->removeTranslator(pTranslator);
-                delete pTranslator;
-            }
-        }
-        installedTranslators().clear();
-    }
-
     static bool installTranslations(QCoreApplication* pApp,
             const QLocale& locale,
             const QString& translation,
@@ -168,7 +129,6 @@ class Translations {
                  << locale.name()
                  << "from" << pTranslator->filePath();
         pApp->installTranslator(pTranslator);
-        installedTranslators().append(pTranslator);
         return true;
     }
 };

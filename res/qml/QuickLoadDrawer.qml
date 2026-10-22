@@ -83,7 +83,7 @@ Popup {
                 }
 
                 Text {
-                    text: qsTr("Load track to %1").arg(root.deckName)
+                    text: qsTr("Load track into %1").arg(root.deckName)
                     color: "#ffffff"
                     font.bold: true
                     font.pixelSize: 14
@@ -182,7 +182,7 @@ Popup {
                             normalColor: "#80d8ff"
                             font.bold: true
                             font.pixelSize: 11
-                            text: qsTr("📂 Open Full Library View")
+                            text: qsTr("📂 Open full library view")
                             onClicked: {
                                 root.close();
                                 if (typeof root.parent?.viewMode !== "undefined") {

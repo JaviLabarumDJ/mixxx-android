@@ -27,8 +27,6 @@ Item {
     property bool editMode: false
     required property string group
     property bool minimized: false
-    property int mobilePadView: 0 // 0: Hotcue & Stem, 1: Loop
-    clip: true
 
     signal toggleFocus
 
@@ -101,7 +99,8 @@ Item {
                                                     "type": "row",
                                                     "items": [
                                                         {
-                                                            "type": "hotcueAndStem"
+                                                            "type": "hotcueAndStem",
+                                                            "minWidth": 520
                                                         },
                                                         {
                                                             "type": "beatjump",
@@ -132,7 +131,7 @@ Item {
                         },
                         {
                             "type": "tempo",
-                            "minWidth": 220
+                            "minWidth": 270
                         }
                     ]
                 }
@@ -222,9 +221,7 @@ Item {
                     rightColumnWidth: 105
 
                     TapHandler {
-                        onTapped: {
-                            // Tapping deck info bar can signal deck focus
-                        }
+                        onDoubleTapped: root.toggleFocus()
                     }
                 }
             }
@@ -241,7 +238,6 @@ Item {
                 editLabel.text: "Loop"
                 editOverlay.color: Theme.midGray
                 height: 92
-                visible: root.width >= 520 || root.mobilePadView === 1
 
                 DeckComponent.Loop {
                     anchors.fill: parent
@@ -275,7 +271,7 @@ Item {
                 blurRadius: 4
                 editLabel.color: Theme.white
                 editLabel.font.pixelSize: 14
-                editLabel.text: qsTr("Waveform overview")
+                editLabel.text: "Waveform overview"
                 editOverlay.color: Qt.alpha('black', 0.5)
 
                 DeckComponent.WaveformOverview {
@@ -297,7 +293,7 @@ Item {
                 Layout.fillHeight: true
                 editLabel.color: Theme.midGray
                 editLabel.font.capitalization: Font.AllUppercase
-                editLabel.text: qsTr("FX Assign")
+                editLabel.text: "FX Assign"
                 editOverlay.color: Theme.darkGray2
                 width: 135
 
@@ -311,7 +307,7 @@ Item {
 
             LayoutItem {
                 Layout.fillHeight: true
-                Layout.preferredWidth: root.width < 320 ? 65 : 75
+                Layout.preferredWidth: 75
                 blurRadius: 4
                 editLabel.color: Theme.white
                 editLabel.text: "Tempo"
@@ -332,7 +328,7 @@ Item {
                 Layout.preferredWidth: 60
                 editLabel.color: Theme.white
                 editLabel.horizontalAlignment: Text.AlignHCenter
-                editLabel.text: qsTr("Play\nButton")
+                editLabel.text: "Play\nButton"
                 editOverlay.border.color: '#000000'
                 editOverlay.border.width: 2
                 editOverlay.color: Theme.darkGray2
@@ -352,7 +348,7 @@ Item {
                 Layout.preferredWidth: 60
                 editLabel.color: Theme.white
                 editLabel.horizontalAlignment: Text.AlignHCenter
-                editLabel.text: qsTr("Cue\nButton")
+                editLabel.text: "Cue\nButton"
                 editOverlay.border.color: '#000000'
                 editOverlay.border.width: 2
                 editOverlay.color: Theme.darkGray2
@@ -408,12 +404,11 @@ Item {
                 blurRadius: 4
                 editLabel.color: Theme.white
                 editLabel.font.pixelSize: 14
-                editLabel.text: qsTr("Toolbar")
+                editLabel.text: "Toolbar"
                 editOverlay.color: Qt.alpha('black', 0.5)
 
                 DeckComponent.Toolbar {
                     anchors.fill: parent
-                    deck: root
                     group: root.group
                 }
             }
@@ -423,14 +418,13 @@ Item {
 
             LayoutItem {
                 Layout.fillWidth: true
-                Layout.minimumWidth: 120
+                Layout.minimumWidth: 250
                 blurRadius: 4
                 editLabel.color: Theme.white
                 editLabel.font.pixelSize: 14
                 editLabel.text: "Hotcue & Stem"
                 editOverlay.color: Qt.alpha('black', 0.5)
                 height: 92
-                visible: root.width >= 520 || root.mobilePadView === 0
 
                 DeckComponent.HotcueAndStem {
                     anchors.fill: parent
@@ -705,7 +699,7 @@ Item {
         Drag.active: mouseArea.drag.active
         Drag.hotSpot: Qt.point(width / 2, height / 2)
         columns: disposition == GridLayout.TopToBottom ? 1 : items.count
-        visible: typeof minWidth !== 'number' || (root.width > 0 && root.width >= minWidth)
+        visible: typeof minWidth !== 'number' || root.width <= 0 || minWidth < root.width
 
         Behavior on x {
             SpringAnimation {
@@ -791,7 +785,7 @@ Item {
 
         Drag.active: mouseArea.drag.active
         Drag.hotSpot: Qt.point(width / 2, height / 2)
-        visible: typeof minWidth !== 'number' || (root.width > 0 && root.width >= minWidth)
+        visible: typeof minWidth !== 'number' || root.width <= 0 || minWidth < root.width
 
         Behavior on x {
             SpringAnimation {

@@ -22,7 +22,7 @@ Item {
             root.isBusy = false;
             if (success) {
                 root.tracksModel = tracks;
-                root.statusMessage = qsTr("%1 tracks found on Streaming").arg(tracks.length);
+                root.statusMessage = qsTr("%1 tracks found on streaming").arg(tracks.length);
             } else {
                 root.statusMessage = qsTr("❌ Error: %1").arg(errorString);
             }
@@ -57,7 +57,7 @@ Item {
                 }
             }
             root.tracksModel = currentTracks;
-            root.statusMessage = qsTr("✔ Track ready and loaded into %1").arg(targetDeck === "[Channel1]" ? "Deck 1" : (targetDeck === "[Channel2]" ? "Deck 2" : qsTr("cache")));
+            root.statusMessage = qsTr("✔ Track ready and loaded into %1").arg(targetDeck === "[Channel1]" ? qsTr("Deck 1") : (targetDeck === "[Channel2]" ? qsTr("Deck 2") : qsTr("cache")));
         }
 
         function onDownloadFailed(trackId, errorMessage) {
@@ -113,7 +113,7 @@ Item {
                         font.pixelSize: 10
                         font.bold: true
                         color: "#00e676"
-                        text: qsTr("● Free Online")
+                        text: qsTr("● Free online")
                     }
                 }
 
@@ -236,7 +236,7 @@ Item {
                                         searchInput.text = "";
                                         root.currentGenre = modelData.genre;
                                         root.isBusy = true;
-                                        root.statusMessage = qsTr("Loading trending...");
+                                        root.statusMessage = qsTr("Loading trending tracks...");
                                         Mixxx.StreamingManager.getAudiusTrending(modelData.genre);
                                     }
                                 }
@@ -451,7 +451,7 @@ Item {
                         spacing: 8
 
                         Text {
-                            text: qsTr("🔥 Browse music by genre or search for any song or artist")
+                            text: qsTr("🔥 Explore music by genre or search for any track or artist")
                             font.pixelSize: 13
                             color: "#78909c"
                             horizontalAlignment: Text.AlignHCenter

@@ -5,8 +5,8 @@
 ![Android Version](https://img.shields.io/badge/Android-10.0%2B%20(API%2029--35)-brightgreen?logo=android&logoColor=white)
 ![Architecture](https://img.shields.io/badge/Arch-ARM64%20(arm64--v8a)-blue?logo=arm)
 ![Framework](https://img.shields.io/badge/Qt-6.8%20%7C%20QML-41cd52?logo=qt)
-[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.3.0-android)
-[![Download APK](https://img.shields.io/badge/Download-APK%20(248%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.3.0-android/mixxx-android-v1.3.0.apk)
+[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.4.0-android)
+[![Download APK](https://img.shields.io/badge/Download-APK%20(249%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.4.0-android/mixxx-android-v1.4.0.apk)
 ![License](https://img.shields.io/badge/License-GPL%20v2-orange.svg)
 
 **The world's premier open-source DJ software, fully ported, modernized, and touch-optimized for Android smartphones, tablets, and standalone hardware setups.**
@@ -28,7 +28,19 @@ Whether you're performing live sets using a USB DJ controller, mixing on the go 
 <!-- START_AI_GENERATED_DISCLAIMER -->
 <!-- This section was written with the assistance of an AI Agent (Claude). -->
 
-## 🆕 What's New in v1.3.0
+## 🆕 What's New in v1.4.0
+
+This release merges the work of **[morpheasgr (Angelos Exarchos)](https://github.com/morpheasgr)** from [the morpheasgr/mixxx-android fork (android-stable)](https://github.com/morpheasgr/mixxx-android/tree/android-stable). Special thanks to Angelos for the massive advances in Rekordbox playlist copies, library backups, and controller navigation!
+
+* **Copy Rekordbox playlists to the device:** a playlist of a USB drive can be copied to the tablet with **⬇ COPY**, keeping its order, beatgrids, cues, keys and colors, so you can play it without the drive. An existing playlist or folder with the same name is never replaced, and the free space is checked first.
+* **Library backup and restore:** *Settings → Music Library* saves the library (tracks, BPM, keys, cues, playlists, crates, history) and the settings to `/storage/emulated/0/Mixxx/backup`, which survives uninstalling Mixxx. Passwords and the streaming cache are not included.
+* **Rekordbox stick backup:** copies a whole Rekordbox USB stick to the tablet; the copy then appears in the library like the stick.
+* **Browse with the controller:** BROWSE opens folders and playlists and goes on into their tracks, LOAD opens the deck loader when no library is shown, SHIFT + LOAD shows or hides the library (DDJ-400 and DDJ-FLX4), and only the library on screen follows the controller.
+* **Library:** new *Added* column, scans ordered by file date, **+ ALL** adds a whole list to a playlist, the sidebar remembers whether it was shown, USB sticks are followed when plugged in and out.
+* **Under the hood:** the Android screens live next to the upstream Mixxx files (`+android` folders), so new Mixxx versions can be merged more easily; crash reports in `/storage/emulated/0/Mixxx/logs`.
+* **Fixes:** the language is now applied from the first screen and kept when Android closes the app, USB sticks are read again after a hub resets them, and the DDJ-FLX4 BEAT FX works without pressing LEFT/RIGHT first.
+
+## 🗂️ What was new in v1.3.0
 
 * **English and Spanish:** the whole Android interface is now available in English and Spanish. By default Mixxx follows the language of the device; change it in *Settings → Interface → Language*. Effect presets created on the first launch are shown in the selected language too.
 * **Smoother selectors:** drop-down lists (quick effects, effect units, settings) scroll smoothly, no longer jump to the item under your finger while you drag, and open at the selected item.
@@ -118,7 +130,7 @@ Whether you're performing live sets using a USB DJ controller, mixing on the go 
 ## 🚀 Installation & Quick Start
 
 ### Option A: Install Pre-Built Signed APK
-1. Download [**mixxx-android-v1.3.0.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.3.0-android/mixxx-android-v1.3.0.apk) from the [Official GitHub Release v1.3.0](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.3.0-android).
+1. Download [**mixxx-android-v1.4.0.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.4.0-android/mixxx-android-v1.4.0.apk) from the [Official GitHub Release v1.4.0](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.4.0-android).
 2. Enable *"Install unknown apps"* in your Android device settings.
 3. Install and launch **MIXXX**.
 4. Grant storage and audio permissions when prompted.
@@ -182,6 +194,7 @@ $ANDROID_SDK/build-tools/35.0.0/apksigner sign \
 ## 👥 Authors & Acknowledgments
 
 * **Android Port & Touch UI Enhancements:** [Javier Sáenz (JaviLabarumDJ)](https://github.com/JaviLabarumDJ)
+* **Contributions (v1.4.0):** [morpheasgr (Angelos Exarchos)](https://github.com/morpheasgr) — *merged from [morpheasgr/mixxx-android (android-stable)](https://github.com/morpheasgr/mixxx-android/tree/android-stable): Rekordbox playlist copies, library and stick backups, controller library navigation, and upstream-friendly architecture.*
 * **Upstream Project:** [Mixxx DJ Development Team](https://github.com/mixxxdj/mixxx) - *Free & Open Source DJ Software*
 
 ## 📄 License

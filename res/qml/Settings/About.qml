@@ -155,12 +155,12 @@ Category {
                         font.pixelSize: 11
                         lineHeight: 1.3
                         color: "#cfd8dc"
-                        text: qsTr("For a long time, mobile DJ software has been held back by expensive subscriptions, unacceptable latency or unprofessional interfaces.") + "\n\n" +
-                              qsTr("This Android edition of Mixxx was born from a personal need as a DJ: a complete, free, powerful and ultra-stable booth in your pocket.") + "\n\n" +
-                              qsTr("• Professional real-time C++ audio engine with no dropouts.") + "\n" +
-                              qsTr("• Support for external USB DJ controllers (plug & play via OTG).") + "\n" +
-                              qsTr("• Dual touch decks with independent pitch faders, beatloops, hotcues and full EQ.") + "\n" +
-                              qsTr("• Independently made with a passion for music, for the DJ community.")
+                        text: qsTr("For a long time, DJ software on phones has been held back by expensive subscriptions, unacceptable latency or unprofessional interfaces.\n\n" +
+                                   "This edition of Mixxx for Android was born from a personal need as a DJ: to have a complete, free, powerful and ultra-stable DJ booth in your pocket.\n\n" +
+                                   "• Professional real-time C++ audio engine without dropouts.\n" +
+                                   "• Support for external USB DJ controllers (plug & play via OTG).\n" +
+                                   "• Dual touch decks with independent pitch faders, beatloops, hotcues and full EQ.\n" +
+                                   "• Built independently with a passion for music, for the DJ community.")
                     }
                 }
             }
@@ -196,7 +196,7 @@ Category {
                     }
 
                     Text {
-                        text: qsTr("Tap any network to open the profile and see sets, tips, news and updates:")
+                        text: qsTr("Tap any network to open the profile and see sessions, tips, news and updates:")
                         font.pixelSize: 10
                         color: "#90a4ae"
                     }
@@ -260,7 +260,7 @@ Category {
                         }
                         Item { Layout.fillWidth: true }
                         Text {
-                            text: `v${Mixxx.Application.packageVersion} (Mixxx ${Mixxx.Application.version})`
+                            text: `v${Mixxx.MobileApp.packageVersion} (Mixxx ${Mixxx.Application.version})`
                             font.pixelSize: 10
                             color: "#78909c"
                         }

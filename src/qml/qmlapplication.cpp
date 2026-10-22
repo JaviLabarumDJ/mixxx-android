@@ -26,6 +26,7 @@
 #include "qml/qmlcoreservices.h"
 #include "effects/effectsmanager.h"
 #include "qml/qmldlgpreferencesproxy.h"
+#include "qml/qmllanguageproxy.h"
 #include "qml/qmlrecordingproxy.h"
 #include "soundio/soundmanager.h"
 #include "util/versionstore.h"
@@ -142,6 +143,9 @@ QmlApplication::QmlApplication(
 #if defined(Q_OS_ANDROID)
     if (canWriteToExternalStorage()) {
         const QString externalQmlDir = QStringLiteral("/storage/emulated/0/Mixxx/qml");
+        // Files of other versions would still be loaded (e.g. +android file
+        // selector folders), so start from an empty folder
+        QDir(externalQmlDir).removeRecursively();
         copyAssetDir(QStringLiteral("assets:/qml"), externalQmlDir);
         m_mainFilePath = externalQmlDir + QStringLiteral("/main.qml");
     }
@@ -513,6 +517,7 @@ bool QmlApplication::loadQml(const QString& path) {
     // QQmlApplicationEngine::load creates a new window but also leaves the old one,
     // so it is necessary to destroy the old QQmlApplicationEngine and create a new one.
     m_pAppEngine = std::make_unique<QQmlApplicationEngine>();
+    mixxx::qml::QmlLanguageProxy::installAndroidTranslations(m_pCoreServices->getSettings());
     m_pAppEngine->setUiLanguage(QLocale().name());
 
     m_autoReload.clear();

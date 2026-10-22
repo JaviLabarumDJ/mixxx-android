@@ -10,152 +10,9 @@ Category {
 
     property bool committing: false
     property bool hasChanges: router.hasChanges
-    property string activePreset: ""
-    // True once the user tapped a preset in this session. Only then are the
-    // outputs rebuilt on save; otherwise the configured routing is kept.
-    property bool presetChosen: false
-    // Warning or error about the selected preset, shown below the presets
-    property string presetMessage: ""
-    property bool presetError: false
-    property bool loading: false
-    property bool showAdvancedRouter: false
-
-    // The Android enumerator suffixes device names with their type, e.g.
-    // "TB331FC: Speaker", "DDJ-400: USB" or "Buds: Bluetooth".
-    function outputDeviceKinds() {
-        let kinds = {
-            speaker: null,
-            wired: null,
-            bluetooth: null,
-            usb: null,
-            other: null
-        };
-        let devices = Mixxx.SoundManager.availableOutputDevices(soundApi.selected) || [];
-        for (let d of devices) {
-            let n = d.displayName || "";
-            if (n.endsWith(": USB")) {
-                // Prefer the device exposing the most channels (a DJ
-                // controller rather than e.g. a USB headset)
-                if (!kinds.usb || d.channelCount > kinds.usb.channelCount)
-                    kinds.usb = d;
-            } else if (n.endsWith(": Speaker") || n.endsWith(": Altavoz")) {
-                kinds.speaker = kinds.speaker || d;
-            } else if (n.endsWith(": Wired headphones") || n.endsWith(": Wired headset")) {
-                kinds.wired = kinds.wired || d;
-            } else if (n.endsWith(": Bluetooth")) {
-                kinds.bluetooth = kinds.bluetooth || d;
-            } else if (d.channelCount >= 4) {
-                kinds.usb = kinds.usb || d;
-            } else {
-                kinds.other = kinds.other || d;
-            }
-        }
-        return kinds;
-    }
-
-    function isUsbDevice(device) {
-        return !!device && ((device.displayName || "").endsWith(": USB") || device.channelCount >= 4);
-    }
-
-    // Returns the outputs a preset needs, without touching anything:
-    // {outputs: [{device, type, channel}], headSplit, syncBuffers, sampleRate, message, error}
-    // Output types: 0 = Main, 1 = Headphones
-    function presetPlan(presetType) {
-        let k = outputDeviceKinds();
-        let plan = {
-            outputs: [],
-            headSplit: 0,
-            syncBuffers: -1,
-            sampleRate: 0,
-            message: "",
-            error: false
-        };
-        if (presetType === "single") {
-            let dev = k.bluetooth || k.wired || k.speaker || k.other;
-            if (!dev) {
-                plan.error = true;
-                plan.message = qsTr("No audio output was found.");
-                return plan;
-            }
-            plan.outputs.push({ device: dev, type: 0, channel: 0 });
-            plan.message = qsTr("Master via: %1").arg(dev.displayName);
-        } else if (presetType === "splitter") {
-            // Mixxx's head split mode: left = CUE (mono), right = Master (mono)
-            let dev = k.wired || k.speaker || k.other;
-            if (!dev) {
-                plan.error = true;
-                plan.message = qsTr("The tablet's headphone output was not found.");
-                return plan;
-            }
-            plan.outputs.push({ device: dev, type: 1, channel: 0 });
-            plan.headSplit = 1;
-            plan.message = qsTr("Left channel = CUE (pre-listen), right channel = Master, via: %1").arg(dev.displayName);
-        } else if (presetType === "controller") {
-            if (!k.usb) {
-                plan.error = true;
-                plan.message = qsTr("The controller's USB sound card is not detected. Connect it, wait a few seconds and reopen Settings.");
-                return plan;
-            }
-            plan.outputs.push({ device: k.usb, type: 0, channel: 0 });
-            plan.sampleRate = 44100;
-            if (k.usb.channelCount >= 4) {
-                plan.outputs.push({ device: k.usb, type: 1, channel: 2 });
-                plan.message = qsTr("Master → channels 1-2 (RCA) and CUE → channels 3-4 (headphones) of %1").arg(k.usb.displayName);
-            } else {
-                plan.message = qsTr("Android only exposes %1 channels of %2: the Master will play through the controller, but its headphones won't receive CUE. Use Splitter mode to pre-listen.").arg(k.usb.channelCount).arg(k.usb.displayName);
-            }
-        } else if (presetType === "hybrid") {
-            let mainDev = k.speaker || k.wired || k.bluetooth || k.other;
-            if (!k.usb || k.usb.channelCount < 4) {
-                plan.error = true;
-                plan.message = k.usb
-                    ? qsTr("Android only exposes %1 channels of %2, so its headphones (channels 3-4) are not available.").arg(k.usb.channelCount).arg(k.usb.displayName)
-                    : qsTr("The controller's USB sound card is not detected.");
-                return plan;
-            }
-            if (!mainDev) {
-                plan.error = true;
-                plan.message = qsTr("The tablet speaker was not found.");
-                return plan;
-            }
-            plan.outputs.push({ device: mainDev, type: 0, channel: 0 });
-            plan.outputs.push({ device: k.usb, type: 1, channel: 2 });
-            // Two sound cards with independent clocks need drift compensation
-            plan.syncBuffers = 2;
-            plan.message = qsTr("Master via %1 and CUE via the headphones of %2. Using two sound cards may cause slight clicks in the CUE.").arg(mainDev.displayName).arg(k.usb.displayName);
-        }
-        return plan;
-    }
-
-    function applyPreset(presetType) {
-        let plan = presetPlan(presetType);
-        root.activePreset = presetType;
-        root.presetChosen = true;
-        root.presetMessage = plan.message;
-        root.presetError = plan.error;
-        // Only the form is updated here; the engine changes on save
-        mainMixEnabled.selected = "on";
-        mainOutputMode.selected = "stereo";
-        if (plan.sampleRate > 0) {
-            let rate = qsTr("%1 Hz").arg(plan.sampleRate);
-            if (sampleRate.options.indexOf(rate) !== -1) {
-                sampleRate.selected = rate;
-            }
-        }
-        if (plan.syncBuffers >= 0) {
-            router.multiSoundcard.selected = router.multiSoundcard.options[plan.syncBuffers];
-        }
-        root.hasChanges = true;
-    }
 
     function load() {
         const manager = Mixxx.SoundManager;
-        // The engine may have rerouted the outputs (DJ controller plugged in)
-        manager.reload();
-        root.loading = true;
-        root.presetChosen = false;
-        root.presetMessage = "";
-        root.presetError = false;
         mainMixEnabled.selected = mainMixEnabled.options[mainEnabled.value ? 0 : 1];
         mainOutputMode.selected = mainOutputMode.options[monoMix.value ? 0 : 1];
         soundClock.selected = soundClock.options[manager.getForceNetworkClock() ? 1 : 0];
@@ -165,62 +22,15 @@ Category {
         microphoneMonitorMode.enabled = manager.hasMicInputs();
         microphoneMonitorMode.currentIndex = micMonitorMode.value;
         soundApi.options = manager.getHostAPIList();
-        let curApi = manager.getAPI();
-        if ((!curApi || curApi === "ALSA") && soundApi.options.indexOf("Android Oboe") !== -1) {
-            curApi = "Android Oboe";
-            manager.setAPI(curApi);
-        }
-        soundApi.selected = curApi;
+        soundApi.selected = manager.getAPI();
         keylock.update();
         keylock.selected = keylock.options[manager.getKeylockEngine()];
-        usbDirectMode.selected = usbDirectMode.options[Math.max(0, Math.min(2, manager.getAndroidUsbDirectMode()))];
-
-        // Detect current preset by analyzing real SoundManager output connections
-        let detected = "custom";
-        try {
-            let devices = manager.availableOutputDevices(soundApi.selected);
-            let mainDevs = [];
-            let headDev = null;
-            let headChannel = 0;
-            let otherOutputs = false;
-
-            for (let d of devices) {
-                let conns = d.connections(manager);
-                if (!conns) continue;
-                for (let c of conns) {
-                    if (c.type === 0) { // Main
-                        mainDevs.push(d);
-                    } else if (c.type === 1) { // Headphones (PFL / Preescucha)
-                        headDev = d;
-                        headChannel = c.channelGroup;
-                    } else {
-                        otherOutputs = true;
-                    }
-                }
-            }
-
-            let mainDev = mainDevs.length === 1 ? mainDevs[0] : null;
-            if (otherOutputs || mainDevs.length > 1) {
-                detected = "custom";
-            } else if (!mainDev && headDev && headSplit.value > 0) {
-                detected = "splitter";
-            } else if (mainDev && !headDev) {
-                detected = isUsbDevice(mainDev) ? "controller" : "single";
-            } else if (mainDev && headDev && isUsbDevice(headDev) && headChannel >= 2) {
-                detected = mainDev === headDev ? "controller" : "hybrid";
-            } else if (!mainDev && !headDev) {
-                detected = "";
-            }
-        } catch (e) {
-            console.error("Error detecting active audio preset:", e);
-        }
-        root.activePreset = detected;
 
         // Router
         router.multiSoundcard.selected = router.multiSoundcard.options[manager.getSyncBuffers()];
         router.update(manager.getAPI());
 
-        // Delays
+        //Delays
         mainDelayLabel.enabled = mainEnabled.value;
         mainDelaySlider.enabled = mainEnabled.value;
         mainDelaySlider.value = mainDelay.value;
@@ -234,12 +44,10 @@ Category {
         root.hasChanges = Qt.binding(function () {
             return router.hasChanges;
         });
-        root.loading = false;
     }
-
     function save() {
         const manager = Mixxx.SoundManager;
-        mainEnabled.value = mainMixEnabled.selected === "on" ? 1 : 0;
+        mainEnabled.value = mainMixEnabled.options.indexOf(mainMixEnabled.selected);
         monoMix.value = !mainOutputMode.options.indexOf(mainOutputMode.selected);
         manager.setForceNetworkClock(soundClock.options[1] == soundClock.selected);
         manager.setSampleRate(parseInt(sampleRate.selected));
@@ -247,7 +55,6 @@ Category {
         micMonitorMode.value = microphoneMonitorMode.currentIndex;
         manager.setAPI(soundApi.selected);
         manager.setKeylockEngine(keylock.options.indexOf(keylock.selected));
-        manager.setAndroidUsbDirectMode(Math.max(0, usbDirectMode.options.indexOf(usbDirectMode.selected)));
 
         // Router
         manager.setSyncBuffers(router.multiSoundcard.options.indexOf(router.multiSoundcard.selected));
@@ -314,48 +121,20 @@ Category {
                 }
             }
         };
-
-        let rebuildFromRouter = () => {
-            for (let device of Object.keys(router.outputs)) {
-                for (let address of Object.keys(router.outputs[device].gateways)) {
-                    let gateway = router.outputs[device].gateways[address];
-                    let connections = gateway.node && gateway.node.assignedEdges ? gateway.node.assignedEdges() : {};
-                    connectionsHandler(connections, gateway.device);
-                }
-            }
-        };
-
-        // Outputs are only rebuilt when the user picked a preset or edited the
-        // matrix; any other change (buffer size, sample rate...) keeps the
-        // configured routing untouched.
-        const routerEdited = root.showAdvancedRouter && router.hasChanges;
-        if (routerEdited) {
-            manager.clearOutputs();
-            rebuildFromRouter();
-            // Respect the manual routing even when a controller is plugged in
-            manager.setAutoRouteController(false);
-        } else if (root.presetChosen) {
-            // Only the controller preset follows the controller automatically
-            manager.setAutoRouteController(root.activePreset === "controller");
-            let plan = presetPlan(root.activePreset);
-            if (!plan.error) {
-                manager.clearOutputs();
-                for (let output of plan.outputs) {
-                    manager.addOutput(output.device, output.type, output.channel, 0);
-                }
-                headSplit.value = plan.headSplit;
-                monoMix.value = 0;
+        manager.clearOutputs();
+        for (let device of Object.keys(router.outputs)) {
+            for (let address of Object.keys(router.outputs[device].gateways)) {
+                let gateway = router.outputs[device].gateways[address];
+                let connections = gateway.node && gateway.node.assignedEdges ? gateway.node.assignedEdges() : {};
+                connectionsHandler(connections, gateway.device);
             }
         }
-
-        if (routerEdited) {
-            manager.clearInputs();
-            for (let device of Object.keys(router.inputs)) {
-                for (let address of Object.keys(router.inputs[device].gateways)) {
-                    let gateway = router.inputs[device].gateways[address];
-                    let connections = gateway.node && gateway.node.assignedEdges ? gateway.node.assignedEdges() : {};
-                    connectionsHandler(connections, gateway.device);
-                }
+        manager.clearInputs();
+        for (let device of Object.keys(router.inputs)) {
+            for (let address of Object.keys(router.inputs[device].gateways)) {
+                let gateway = router.inputs[device].gateways[address];
+                let connections = gateway.node && gateway.node.assignedEdges ? gateway.node.assignedEdges() : {};
+                connectionsHandler(connections, gateway.device);
             }
         }
 
@@ -367,8 +146,8 @@ Category {
         manager.commit();
     }
 
-    label: qsTr("Audio & Outputs")
-    tabs: [qsTr("Setup & Outputs"), qsTr("Delays")]
+    label: "Sound hardware"
+    tabs: ["engine", "delays", "stats"]
 
     Component.onCompleted: {
         load();
@@ -376,937 +155,517 @@ Category {
 
     Mixxx.ControlProxy {
         id: mainEnabled
+
         group: "[Master]"
         key: "enabled"
     }
     Mixxx.ControlProxy {
         id: headEnabled
+
         group: "[Master]"
         key: "headEnabled"
     }
     Mixxx.ControlProxy {
         id: boothEnabled
+
         group: "[Master]"
         key: "booth_enabled"
     }
     Mixxx.ControlProxy {
         id: mainDelay
+
         group: "[Master]"
         key: "delay"
     }
     Mixxx.ControlProxy {
         id: headDelay
+
         group: "[Master]"
         key: "headDelay"
     }
     Mixxx.ControlProxy {
         id: boothDelay
+
         group: "[Master]"
         key: "boothDelay"
     }
     Mixxx.ControlProxy {
-        id: headSplit
-        group: "[Master]"
-        key: "headSplit"
-    }
-    Mixxx.ControlProxy {
         id: monoMix
+
         group: "[Master]"
         key: "mono_mixdown"
     }
     Mixxx.ControlProxy {
         id: micMonitorMode
+
         group: "[Master]"
         key: "talkover_mix"
     }
-
     ScrollView {
         id: scrollView
-        anchors.bottom: soundAction.top
-        anchors.bottomMargin: 8
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        clip: true
-        contentWidth: availableWidth
+
+        anchors.fill: parent
 
         ColumnLayout {
-            spacing: 16
-            width: scrollView.availableWidth
+            Item {
+                id: tabSection
 
-            // ================= PESTAÑA 1: CONFIGURACIÓN & SALIDAS =================
-            ColumnLayout {
                 Layout.fillWidth: true
-                spacing: 16
-                visible: root.selectedIndex === 0
+                Layout.preferredHeight: root.selectedIndex == 0 ? engine.height : delays.height
 
-                // CARD 1: PERFILES DE SALIDA RÁPIDOS (1-TOUCH PRESETS)
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: presetsCol.implicitHeight + 28
-                    color: "#181f2a"
-                    radius: 12
-                    border.color: "#283b54"
-                    border.width: 1
+                Mixxx.SettingGroup {
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    label: "Engine"
+                    visible: root.selectedIndex == 0
 
-                    ColumnLayout {
-                        id: presetsCol
-                        anchors.fill: parent
-                        anchors.margins: 14
-                        spacing: 12
-
-                        RowLayout {
-                            Layout.fillWidth: true
-                            spacing: 8
-
-                            Text {
-                                text: qsTr("⚡ Quick Audio Output Profiles")
-                                font.pixelSize: 15
-                                font.bold: true
-                                color: "#64b5f6"
-                            }
-                            Item { Layout.fillWidth: true }
-                            Text {
-                                text: qsTr("Tap to configure automatically")
-                                font.pixelSize: 11
-                                color: "#90a4ae"
-                            }
-                        }
-
-                        // 4 Interactive Preset Cards (2x2 Grid)
-                        GridLayout {
-                            Layout.fillWidth: true
-                            columns: 2
-                            columnSpacing: 10
-                            rowSpacing: 10
-
-                            // Preset 1: Móvil / Bluetooth (Salida simple)
-                            Rectangle {
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 96
-                                radius: 10
-                                color: root.activePreset === "single" ? "#1e3a5f" : (p1Mouse.containsMouse ? "#212b38" : "#1a222c")
-                                border.color: root.activePreset === "single" ? "#42a5f5" : "#324050"
-                                border.width: root.activePreset === "single" ? 2 : 1
-
-                                ColumnLayout {
-                                    anchors.fill: parent
-                                    anchors.margins: 10
-                                    spacing: 4
-
-                                    RowLayout {
-                                        Text { text: "📱"; font.pixelSize: 16 }
-                                        Text {
-                                            text: qsTr("Phone / Bluetooth")
-                                            font.pixelSize: 13
-                                            font.bold: true
-                                            color: root.activePreset === "single" ? "#ffffff" : "#cfd8dc"
-                                        }
-                                        Item { Layout.fillWidth: true }
-                                        Text {
-                                            text: root.activePreset === "single" ? qsTr("✓ ACTIVE") : ""
-                                            font.pixelSize: 10
-                                            font.bold: true
-                                            color: "#64b5f6"
-                                        }
-                                    }
-                                    Text {
-                                        text: qsTr("Single stereo output. All sound goes to the tablet speakers or Bluetooth headphones.")
-                                        font.pixelSize: 11
-                                        color: "#90a4ae"
-                                        wrapMode: Text.WordWrap
-                                        Layout.fillWidth: true
-                                    }
-                                }
-
-                                MouseArea {
-                                    id: p1Mouse
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: root.applyPreset("single")
-                                }
-                            }
-
-                            // Preset 2: Cable Splitter DJ
-                            Rectangle {
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 96
-                                radius: 10
-                                color: root.activePreset === "splitter" ? "#3e2723" : (p2Mouse.containsMouse ? "#2d221f" : "#1e1a19")
-                                border.color: root.activePreset === "splitter" ? "#ff7043" : "#4e342e"
-                                border.width: root.activePreset === "splitter" ? 2 : 1
-
-                                ColumnLayout {
-                                    anchors.fill: parent
-                                    anchors.margins: 10
-                                    spacing: 4
-
-                                    RowLayout {
-                                        Text { text: "🎧"; font.pixelSize: 16 }
-                                        Text {
-                                            text: qsTr("DJ Splitter Cable")
-                                            font.pixelSize: 13
-                                            font.bold: true
-                                            color: root.activePreset === "splitter" ? "#ffffff" : "#cfd8dc"
-                                        }
-                                        Item { Layout.fillWidth: true }
-                                        Text {
-                                            text: root.activePreset === "splitter" ? qsTr("✓ ACTIVE") : ""
-                                            font.pixelSize: 10
-                                            font.bold: true
-                                            color: "#ffab91"
-                                        }
-                                    }
-                                    Text {
-                                        text: qsTr("Splitter cable on the jack: left channel = CUE (your headphones) and right channel = Master (speaker), both in mono.")
-                                        font.pixelSize: 11
-                                        color: "#b0bec5"
-                                        wrapMode: Text.WordWrap
-                                        Layout.fillWidth: true
-                                    }
-                                }
-
-                                MouseArea {
-                                    id: p2Mouse
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: root.applyPreset("splitter")
-                                }
-                            }
-
-                            // Preset 3: Controladora DJ / 4 Canales
-                            Rectangle {
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 96
-                                radius: 10
-                                color: root.activePreset === "controller" ? "#1b3a24" : (p3Mouse.containsMouse ? "#1c2b1e" : "#172218")
-                                border.color: root.activePreset === "controller" ? "#66bb6a" : "#2e4c34"
-                                border.width: root.activePreset === "controller" ? 2 : 1
-
-                                ColumnLayout {
-                                    anchors.fill: parent
-                                    anchors.margins: 10
-                                    spacing: 4
-
-                                    RowLayout {
-                                        Text { text: "🎛️"; font.pixelSize: 16 }
-                                        Text {
-                                            text: qsTr("DJ Controller (RCA + Headphones)")
-                                            font.pixelSize: 13
-                                            font.bold: true
-                                            color: root.activePreset === "controller" ? "#ffffff" : "#cfd8dc"
-                                        }
-                                        Item { Layout.fillWidth: true }
-                                        Text {
-                                            text: root.activePreset === "controller" ? qsTr("✓ ACTIVE") : ""
-                                            font.pixelSize: 10
-                                            font.bold: true
-                                            color: "#81c784"
-                                        }
-                                    }
-                                    Text {
-                                        text: qsTr("Pro Audio: Channels 1-2 to the RCA Master (speakers) and Channels 3-4 to the controller's headphone jack.")
-                                        font.pixelSize: 11
-                                        color: "#a5d6a7"
-                                        wrapMode: Text.WordWrap
-                                        Layout.fillWidth: true
-                                    }
-                                }
-
-                                MouseArea {
-                                    id: p3Mouse
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: root.applyPreset("controller")
-                                }
-                            }
-
-                            // Preset 4: Híbrido (Tablet Master + Auriculares Mesa)
-                            Rectangle {
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 96
-                                radius: 10
-                                color: root.activePreset === "hybrid" ? "#311b92" : (p4Mouse.containsMouse ? "#211a36" : "#191624")
-                                border.color: root.activePreset === "hybrid" ? "#b388ff" : "#4527a0"
-                                border.width: root.activePreset === "hybrid" ? 2 : 1
-
-                                ColumnLayout {
-                                    anchors.fill: parent
-                                    anchors.margins: 10
-                                    spacing: 4
-
-                                    RowLayout {
-                                        Text { text: "🔊"; font.pixelSize: 16 }
-                                        Text {
-                                            text: qsTr("Tablet + Controller Headphones (Hybrid)")
-                                            font.pixelSize: 13
-                                            font.bold: true
-                                            color: root.activePreset === "hybrid" ? "#ffffff" : "#cfd8dc"
-                                        }
-                                        Item { Layout.fillWidth: true }
-                                        Text {
-                                            text: root.activePreset === "hybrid" ? qsTr("✓ ACTIVE") : ""
-                                            font.pixelSize: 10
-                                            font.bold: true
-                                            color: "#b388ff"
-                                        }
-                                    }
-                                    Text {
-                                        text: qsTr("Master through the tablet speakers and CUE pre-listen through the controller's headphones (channels 3-4).")
-                                        font.pixelSize: 11
-                                        color: "#d1c4e9"
-                                        wrapMode: Text.WordWrap
-                                        Layout.fillWidth: true
-                                    }
-                                }
-
-                                MouseArea {
-                                    id: p4Mouse
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: root.applyPreset("hybrid")
-                                }
-                            }
-                        }
-
-                        // Result of the selected preset (target devices or problem)
-                        Rectangle {
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: presetMessageText.implicitHeight + 16
-                            radius: 8
-                            visible: root.presetMessage.length > 0
-                            color: root.presetError ? "#3b1d1d" : "#16261c"
-                            border.color: root.presetError ? "#ef5350" : "#66bb6a"
-                            border.width: 1
-
-                            Text {
-                                id: presetMessageText
-                                anchors.fill: parent
-                                anchors.margins: 8
-                                text: (root.presetError ? "⚠️ " : (root.presetChosen ? "💾 " : "")) + root.presetMessage
-                                      + (root.presetChosen && !root.presetError ? qsTr(" — tap Save to apply it.") : "")
-                                wrapMode: Text.WordWrap
-                                font.pixelSize: 12
-                                color: root.presetError ? "#ffcdd2" : "#c8e6c9"
-                            }
-                        }
-
-                        // Banner informativo cuando el ruteo es Personalizado (Matriz)
-                        Rectangle {
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 38
-                            radius: 8
-                            visible: root.activePreset === "custom"
-                            color: "#1e293b"
-                            border.color: "#38bdf8"
-                            border.width: 1
-
-                            RowLayout {
-                                anchors.fill: parent
-                                anchors.margins: 10
-                                spacing: 8
-
-                                Text { text: "🎛️"; font.pixelSize: 14 }
-                                Text {
-                                    text: qsTr("Custom Routing Active (Virtual Cables in Matrix)")
-                                    font.pixelSize: 12
-                                    font.bold: true
-                                    color: "#38bdf8"
-                                }
-                                Item { Layout.fillWidth: true }
-                                Text {
-                                    text: qsTr("Manual configuration in use")
-                                    font.pixelSize: 11
-                                    color: "#94a3b8"
-                                }
-                            }
-                        }
-
-                        // Card explicativa de conexiones de audio físicas
-                        Rectangle {
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: audioExplCol.implicitHeight + 16
-                            radius: 8
-                            color: "#141c24"
-                            border.color: "#213144"
-                            border.width: 1
-
-                            ColumnLayout {
-                                id: audioExplCol
-                                anchors.fill: parent
-                                anchors.margins: 10
-                                spacing: 4
-
-                                Text {
-                                    text: qsTr("💡 How do I connect my speakers and headphones?")
-                                    font.pixelSize: 12
-                                    font.bold: true
-                                    color: "#90caf9"
-                                }
-
-                                Text {
-                                    text: qsTr("• <b>Master Output (1-2)</b>: Sound for the audience. Connect your speakers to the rear RCA jacks of your controller.<br>• <b>CUE Pre-listen (3-4)</b>: Private sound. Connect your headphones to the controller's headphone jack.<br>• <b>Hybrid Mode</b>: No external speakers? Choose <i>'Tablet + Controller Headphones'</i> so the music plays through the tablet and the pre-listen through the headphones.<br>• <b>Important</b>: After choosing your profile, tap the blue <b>'Apply & Save Outputs'</b> button at the very bottom.")
-                                    font.pixelSize: 11
-                                    color: "#b0bec5"
-                                    wrapMode: Text.WordWrap
-                                    Layout.fillWidth: true
-                                }
-                            }
-                        }
+                    onActivated: {
+                        root.selectedIndex = 0;
                     }
-                }
 
-                // CARD 2: MOTOR DE AUDIO & LATENCIA
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: engineSettingsCol.implicitHeight + 28
-                    color: "#181818"
-                    radius: 12
-                    border.color: "#2c2c2c"
-                    border.width: 1
+                    RowLayout {
+                        id: engine
 
-                    ColumnLayout {
-                        id: engineSettingsCol
-                        anchors.fill: parent
-                        anchors.margins: 14
-                        spacing: 12
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        spacing: tabSection.width * 0.04
 
-                        Text {
-                            text: qsTr("⚙️ Audio Engine, Latency & Quality")
-                            font.pixelSize: 15
-                            font.bold: true
-                            color: "#ffffff"
-                        }
-
-                        // Grid with settings
-                        GridLayout {
+                        ColumnLayout {
+                            Layout.alignment: Qt.AlignTop
                             Layout.fillWidth: true
-                            columns: root.width > 750 ? 2 : 1
-                            columnSpacing: 24
-                            rowSpacing: 12
 
-                            // Sound API
                             RowLayout {
-                                Layout.fillWidth: true
                                 Text {
                                     Layout.fillWidth: true
                                     color: Theme.white
-                                    font.pixelSize: 13
-                                    text: qsTr("Audio API")
+                                    font.pixelSize: 14
+                                    text: "Main Mix"
+
+                                    Mixxx.SettingParameter {
+                                        label: "Main Mix"
+                                    }
+                                }
+                                RatioChoice {
+                                    id: mainMixEnabled
+
+                                    options: ["on", "off"]
+                                    selected: options[mainEnabled.value ? 0 : 1]
+
+                                    onSelectedChanged: {
+                                        root.hasChanges = true;
+                                    }
+                                }
+                            }
+                            RowLayout {
+                                Text {
+                                    Layout.fillWidth: true
+                                    color: Theme.white
+                                    font.pixelSize: 14
+                                    text: "Main Output Mode"
+
+                                    Mixxx.SettingParameter {
+                                        label: "Main Output Mode"
+                                    }
+                                }
+                                RatioChoice {
+                                    id: mainOutputMode
+
+                                    maxWidth: tabSection.width * 0.18
+                                    options: ["mono", "stereo"]
+                                    selected: options[monoMix.value ? 0 : 1]
+
+                                    onSelectedChanged: {
+                                        root.hasChanges = true;
+                                    }
+                                }
+                            }
+                            RowLayout {
+                                Text {
+                                    Layout.fillWidth: true
+                                    color: Theme.white
+                                    font.pixelSize: 14
+                                    text: "Sound Clock"
+
+                                    Mixxx.SettingParameter {
+                                        label: "Sound Clock"
+                                    }
+                                }
+                                RatioChoice {
+                                    id: soundClock
+
+                                    maxWidth: tabSection.width * 0.28
+                                    options: ["soundcard", "network"]
+
+                                    onSelectedChanged: {
+                                        root.hasChanges = true;
+                                    }
+                                }
+                            }
+                            RowLayout {
+                                Text {
+                                    Layout.fillWidth: true
+                                    color: Theme.white
+                                    font.pixelSize: 14
+                                    text: "Keylock engine"
+                                }
+                                RatioChoice {
+                                    id: keylock
+
+                                    function update() {
+                                        let options = [];
+                                        let tooltips = [];
+                                        for (let engine of Mixxx.SoundManager.getKeylockEngines()) {
+                                            switch (engine) {
+                                            case 0:
+                                                options.push(qsTr("Soundtouch"));
+                                                tooltips.push(qsTr("Faster"));
+                                                break;
+                                            case 1:
+                                                options.push(qsTr("Rubberband"));
+                                                tooltips.push(qsTr("Better"));
+                                                break;
+                                            case 2:
+                                                options.push(qsTr("Rubberband R3"));
+                                                tooltips.push(qsTr("Near-hi-fi quality"));
+                                                break;
+                                            }
+                                        }
+                                        keylock.options = options;
+                                        keylock.tooltips = tooltips;
+                                    }
+
+                                    maxWidth: tabSection.width * 0.4
+                                    normalizedWidth: false
+                                    options: []
+                                    tooltips: []
+
+                                    onSelectedChanged: {
+                                        root.hasChanges = true;
+                                    }
+
+                                    Mixxx.SettingParameter {
+                                        label: "Keylock engine"
+                                    }
+                                }
+                            }
+                        }
+                        ColumnLayout {
+                            Layout.alignment: Qt.AlignTop
+
+                            RowLayout {
+                                Text {
+                                    Layout.fillWidth: true
+                                    color: Theme.white
+                                    font.pixelSize: 14
+                                    text: "Sound API"
                                 }
                                 RatioChoice {
                                     id: soundApi
-                                    maxWidth: 240
+
+                                    maxWidth: tabSection.width * 0.4
                                     options: []
+
                                     onSelectedChanged: {
                                         root.hasChanges = true;
                                         router.update(soundApi.selected);
                                         sampleRate.update(soundApi.selected);
                                     }
+
+                                    Mixxx.SettingParameter {
+                                        label: "Sound API"
+                                    }
                                 }
                             }
-
-                            // Sample Rate
                             RowLayout {
-                                Layout.fillWidth: true
                                 Text {
                                     Layout.fillWidth: true
                                     color: Theme.white
-                                    font.pixelSize: 13
-                                    text: qsTr("Sample Rate")
+                                    font.pixelSize: 14
+                                    text: "Sample Rate"
+
+                                    Mixxx.SettingParameter {
+                                        label: "Sample Rate"
+                                    }
                                 }
                                 RatioChoice {
                                     id: sampleRate
+
                                     function update(api) {
                                         let data = [];
-                                        for (let sr of Mixxx.SoundManager.getSampleRates(api)) {
-                                            data.push(qsTr("%1 Hz").arg(sr));
+                                        for (let sampleRate of Mixxx.SoundManager.getSampleRates(api)) {
+                                            data.push(qsTr("%1 Hz").arg(sampleRate));
                                         }
                                         sampleRate.options = data;
                                     }
-                                    maxWidth: 240
+
+                                    Layout.minimumWidth: sampleRate.implicitWidth
+                                    maxWidth: tabSection.width * 0.34
                                     options: []
+
                                     onSelectedChanged: {
                                         root.hasChanges = true;
                                     }
                                 }
-                                Connections {
-                                    target: sampleRate
-                                    function onSelectedChanged() {
-                                        let sampleRateValue = parseInt(sampleRate.selected);
-                                        audioBuffer.update(sampleRateValue);
-                                    }
-                                }
                             }
-
-                            // Audio Buffer (Latency)
-                            ColumnLayout {
-                                Layout.fillWidth: true
-                                spacing: 4
-
-                                RowLayout {
-                                    Layout.fillWidth: true
-                                    Text {
-                                        Layout.fillWidth: true
-                                        color: Theme.white
-                                        font.pixelSize: 13
-                                        text: qsTr("Latency / Audio Buffer")
-                                    }
-                                    Skin.ComboBox {
-                                        id: audioBuffer
-                                        function update(sr) {
-                                            let data = [];
-                                            let framesPerBuffer = 1;
-                                            for (; framesPerBuffer / sr * 1000 < 1.0; framesPerBuffer *= 2) {}
-                                            for (let i = 0; i < 7; i++) {
-                                                const latency = framesPerBuffer / sr * 1000;
-                                                data.push(qsTr("%1 ms").arg(latency.toFixed(1)));
-                                                framesPerBuffer *= 2;
-                                            }
-                                            let cur = audioBuffer.currentIndex;
-                                            audioBuffer.model = data;
-                                            audioBuffer.currentIndex = cur;
-                                        }
-                                        clip: true
-                                        font.pixelSize: 12
-                                        spacing: 2
-                                        onCurrentIndexChanged: {
-                                            root.hasChanges = true;
-                                        }
-                                    }
+                            Connections {
+                                function onSelectedChanged() {
+                                    let sampleRateValue = parseInt(sampleRate.selected);
+                                    audioBuffer.update(sampleRateValue);
                                 }
 
-                                // Latency explanation text
-                                Text {
-                                    text: {
-                                        const idx = audioBuffer.currentIndex;
-                                        if (idx <= 1) return qsTr("⚡ Ultra-Low Latency: Instant response for scratching and fast mixing.");
-                                        if (idx <= 3) return qsTr("⚖️ Balanced Latency: Recommended for most Android phones (stable, no dropouts).");
-                                        return qsTr("🛡️ Safe Mode: Maximum stability if you hear crackles or the phone is slow.");
-                                    }
-                                    font.pixelSize: 11
-                                    color: audioBuffer.currentIndex <= 1 ? "#64b5f6" : (audioBuffer.currentIndex <= 3 ? "#81c784" : "#ffb74d")
-                                }
+                                target: sampleRate
                             }
-
-                            // Main Output Mode (Mono / Stereo)
                             RowLayout {
-                                Layout.fillWidth: true
                                 Text {
                                     Layout.fillWidth: true
                                     color: Theme.white
-                                    font.pixelSize: 13
-                                    text: qsTr("Main Mix Mode")
+                                    font.pixelSize: 14
+                                    text: "Audio Buffer"
+
+                                    Mixxx.SettingParameter {
+                                        label: "Audio Buffer"
+                                    }
                                 }
-                                RatioChoice {
-                                    id: mainOutputMode
-                                    maxWidth: 200
-                                    options: ["mono", "stereo"]
-                                    selected: options[monoMix.value ? 0 : 1]
-                                    onSelectedChanged: {
+                                Skin.ComboBox {
+                                    id: audioBuffer
+
+                                    function update(sampleRate) {
+                                        let data = [];
+                                        let framesPerBuffer = 1;
+                                        for (; framesPerBuffer / sampleRate * 1000 < 1.0; framesPerBuffer *= 2) {}
+                                        for (let i = 0; i < 7; i++) {
+                                            const latency = framesPerBuffer / sampleRate * 1000;
+                                            // i + 1 in the next line is a latency index as described in SSConfig
+                                            data.push(qsTr("%1 ms").arg(latency.toFixed(1)));
+                                            framesPerBuffer *= 2;
+                                        }
+                                        let currentIndex = audioBuffer.currentIndex;
+                                        audioBuffer.model = data;
+                                        audioBuffer.currentIndex = currentIndex;
+                                    }
+
+                                    clip: true
+                                    font.pixelSize: 12
+                                    spacing: 2
+
+                                    onCurrentIndexChanged: {
                                         root.hasChanges = true;
                                     }
                                 }
                             }
-
-                            // Keylock engine
                             RowLayout {
-                                Layout.fillWidth: true
                                 Text {
                                     Layout.fillWidth: true
                                     color: Theme.white
-                                    font.pixelSize: 13
-                                    text: qsTr("Keylock Quality (Pitch Lock)")
-                                }
-                                RatioChoice {
-                                    id: keylock
-                                    function update() {
-                                        let opts = [];
-                                        let tips = [];
-                                        for (let eng of Mixxx.SoundManager.getKeylockEngines()) {
-                                            switch (eng) {
-                                            case 0:
-                                                opts.push(qsTr("Soundtouch"));
-                                                tips.push(qsTr("Fast"));
-                                                break;
-                                            case 1:
-                                                opts.push(qsTr("Rubberband"));
-                                                tips.push(qsTr("High Quality"));
-                                                break;
-                                            case 2:
-                                                opts.push(qsTr("Rubberband R3"));
-                                                tips.push(qsTr("Maximum Hi-Fi Quality"));
-                                                break;
-                                            }
-                                        }
-                                        keylock.options = opts;
-                                        keylock.tooltips = tips;
+                                    font.pixelSize: 14
+                                    opacity: Mixxx.SoundManager.hasMicInputs() ? 1.0 : 0.5
+                                    text: "Microphone Monitor Mode"
+
+                                    Mixxx.SettingParameter {
+                                        label: "Microphone Monitor Mode"
                                     }
-                                    maxWidth: 240
-                                    normalizedWidth: false
-                                    options: []
-                                    tooltips: []
-                                    onSelectedChanged: {
+                                }
+                                Skin.ComboBox {
+                                    id: microphoneMonitorMode
+
+                                    clip: true
+                                    font.pixelSize: 12
+                                    model: ["Main output only", "Main and booth outputs", "Direct monitor (recording and broadcasting only)"]
+                                    opacity: enabled ? 1.0 : 0.5
+                                    spacing: 2
+
+                                    onCurrentIndexChanged: {
                                         root.hasChanges = true;
                                     }
-                                }
-                            }
-
-                            // Main Mix Enabled
-                            RowLayout {
-                                Layout.fillWidth: true
-                                Text {
-                                    Layout.fillWidth: true
-                                    color: Theme.white
-                                    font.pixelSize: 13
-                                    text: qsTr("Main Mix")
-                                }
-                                RatioChoice {
-                                    id: mainMixEnabled
-                                    options: ["on", "off"]
-                                    selected: options[mainEnabled.value ? 0 : 1]
-                                    onSelectedChanged: {
-                                        root.hasChanges = true;
-                                    }
-                                }
-                            }
-
-                            // Mixxx's own USB audio driver (Android)
-                            ColumnLayout {
-                                Layout.fillWidth: true
-                                spacing: 2
-
-                                RowLayout {
-                                    Layout.fillWidth: true
-                                    Text {
-                                        Layout.fillWidth: true
-                                        color: Theme.white
-                                        font.pixelSize: 13
-                                        text: qsTr("Mixxx USB Driver")
-                                    }
-                                    RatioChoice {
-                                        id: usbDirectMode
-                                        // Indexed by the config value: 0 = auto, 1 = always, 2 = never
-                                        options: [qsTr("auto"), qsTr("always"), qsTr("never")]
-                                        tooltips: [qsTr("Multichannel cards only (DJ controllers)"), qsTr("All compatible USB cards"), qsTr("Always use Android audio")]
-                                        onSelectedChanged: {
-                                            root.hasChanges = true;
-                                        }
-                                    }
-                                }
-                                Text {
-                                    Layout.fillWidth: true
-                                    wrapMode: Text.WordWrap
-                                    color: "#90a4ae"
-                                    font.pixelSize: 11
-                                    text: qsTr("Mixxx drives the USB sound card directly when Android can't use all of its channels (e.g. a DJ controller's headphones). Changes take effect after restarting Mixxx.")
-                                }
-                            }
-                        }
-
-                        // Network Clock (oculto / avanzado)
-                        RowLayout {
-                            Layout.fillWidth: true
-                            visible: false
-                            RatioChoice {
-                                id: soundClock
-                                options: ["soundcard", "network"]
-                            }
-                            Skin.ComboBox {
-                                id: microphoneMonitorMode
-                                model: [qsTr("Main output only"), qsTr("Main and booth outputs"), qsTr("Direct monitor")]
-                            }
-                        }
-                    }
-                }
-
-                // CARD 3: ROUTER AVANZADO (CABLES VIRTUALES)
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: root.showAdvancedRouter ? 460 : 54
-                    color: "#181818"
-                    radius: 12
-                    border.color: "#2c2c2c"
-                    border.width: 1
-                    clip: true
-
-                    ColumnLayout {
-                        anchors.fill: parent
-                        anchors.margins: 12
-                        spacing: 8
-
-                        // Header with toggle
-                        RowLayout {
-                            Layout.fillWidth: true
-                            spacing: 8
-
-                            Text {
-                                text: qsTr("🔧 Advanced Routing Matrix (Virtual Cables)")
-                                font.pixelSize: 14
-                                font.bold: true
-                                color: "#b0bec5"
-                            }
-                            Item { Layout.fillWidth: true }
-
-                            Rectangle {
-                                width: 150
-                                height: 28
-                                radius: 6
-                                color: toggleRouterMouse.containsMouse ? "#2e3b4e" : "#222c3a"
-                                border.color: "#3f51b5"
-                                border.width: 1
-
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: root.showAdvancedRouter ? qsTr("Hide Matrix") : qsTr("Show Full Matrix")
-                                    font.pixelSize: 11
-                                    font.bold: true
-                                    color: "#90caf9"
-                                }
-
-                                MouseArea {
-                                    id: toggleRouterMouse
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        root.showAdvancedRouter = !root.showAdvancedRouter;
-                                    }
-                                }
-                            }
-                        }
-
-                        // The full AudioRouter canvas
-                        Item {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            visible: root.showAdvancedRouter
-
-                            AudioRouter {
-                                id: router
-                                anchors.fill: parent
-                                onHasChangesChanged: {
-                                    if (hasChanges && !root.loading && root.showAdvancedRouter) {
-                                        root.activePreset = "custom";
-                                        root.presetChosen = false;
-                                        root.presetMessage = "";
-                                    }
-                                }
-                            }
-
-                            Rectangle {
-                                anchors.fill: parent
-                                color: Qt.alpha('grey', 0.3)
-                                visible: root.committing
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    preventStealing: true
-                                    onWheel: mouse => { mouse.accepted = true; }
                                 }
                             }
                         }
                     }
                 }
-            }
+                Mixxx.SettingGroup {
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    label: "Delays"
+                    visible: root.selectedIndex == 1
 
-            // ================= PESTAÑA 2: RETARDOS (DELAYS) =================
-            ColumnLayout {
-                Layout.fillWidth: true
-                spacing: 16
-                visible: root.selectedIndex === 1
+                    onActivated: {
+                        root.selectedIndex = 1;
+                    }
 
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: delaysCol.implicitHeight + 28
-                    color: "#181818"
-                    radius: 12
-                    border.color: "#2c2c2c"
-                    border.width: 1
+                    GridLayout {
+                        id: delays
 
-                    ColumnLayout {
-                        id: delaysCol
-                        anchors.fill: parent
-                        anchors.margins: 14
-                        spacing: 14
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        columns: 2
+                        rowSpacing: 0
 
                         Text {
-                            text: qsTr("Output Delay Adjustment (Acoustic Latency Compensation)")
-                            font.pixelSize: 15
-                            font.bold: true
-                            color: "#ffffff"
-                        }
+                            id: mainDelayLabel
 
-                        GridLayout {
                             Layout.fillWidth: true
-                            columns: 2
-                            rowSpacing: 10
+                            color: Theme.white
+                            font.pixelSize: 14
+                            opacity: enabled ? 1 : 0.5
+                            text: "Main Output"
 
-                            Text {
-                                id: mainDelayLabel
-                                Layout.fillWidth: true
-                                color: Theme.white
-                                font.pixelSize: 14
-                                opacity: enabled ? 1 : 0.5
-                                text: qsTr("Main Output Delay (Master)")
+                            Mixxx.SettingParameter {
+                                label: "Main Output"
                             }
-                            Skin.Slider {
-                                id: mainDelaySlider
-                                Layout.fillWidth: true
-                                markers: ["0ms", "100ms", "1s", "10s", null]
-                                slider.to: 1000
-                                suffix: "ms"
-                                onValueChanged: { root.hasChanges = true; }
-                            }
+                        }
+                        Skin.Slider {
+                            id: mainDelaySlider
 
-                            Text {
-                                id: boothDelayLabel
-                                Layout.fillWidth: true
-                                color: Theme.white
-                                enabled: boothEnabled.value
-                                font.pixelSize: 14
-                                opacity: enabled ? 1 : 0.5
-                                text: qsTr("Booth Output Delay")
-                            }
-                            Skin.Slider {
-                                id: boothDelaySlider
-                                Layout.fillWidth: true
-                                enabled: boothEnabled.value
-                                markers: ["0ms", "100ms", "1s", "10s", null]
-                                slider.to: 1000
-                                suffix: "ms"
-                                value: boothDelay.value
-                                onValueChanged: { root.hasChanges = true; }
-                            }
+                            Layout.fillWidth: true
+                            markers: ["0ms", "100ms", "1s", "10s", null]
+                            slider.to: 1000
+                            suffix: "ms"
 
-                            Text {
-                                id: headphoneDelayLabel
-                                Layout.fillWidth: true
-                                color: Theme.white
-                                enabled: headEnabled.value
-                                font.pixelSize: 14
-                                opacity: enabled ? 1 : 0.5
-                                text: qsTr("Headphone Output Delay (CUE)")
+                            onValueChanged: {
+                                root.hasChanges = true;
                             }
-                            Skin.Slider {
-                                id: headphoneDelaySlider
-                                Layout.fillWidth: true
-                                enabled: headEnabled.value
-                                markers: ["0ms", "100ms", "1s", "10s", null]
-                                slider.to: 1000
-                                suffix: "ms"
-                                value: headDelay.value
-                                onValueChanged: { root.hasChanges = true; }
+                        }
+                        Text {
+                            id: boothDelayLabel
+
+                            Layout.fillWidth: true
+                            color: Theme.white
+                            enabled: boothEnabled.value
+                            font.pixelSize: 14
+                            opacity: enabled ? 1 : 0.5
+                            text: "Booth Output"
+
+                            Mixxx.SettingParameter {
+                                label: "Booth Output"
+                            }
+                        }
+                        Skin.Slider {
+                            id: boothDelaySlider
+
+                            Layout.fillWidth: true
+                            enabled: boothEnabled.value
+                            markers: ["0ms", "100ms", "1s", "10s", null]
+                            slider.to: 1000
+                            suffix: "ms"
+                            value: boothDelay.value
+
+                            onValueChanged: {
+                                root.hasChanges = true;
+                            }
+                        }
+                        Text {
+                            id: headphoneDelayLabel
+
+                            Layout.fillWidth: true
+                            color: Theme.white
+                            enabled: headEnabled.value
+                            font.pixelSize: 14
+                            opacity: enabled ? 1 : 0.5
+                            text: "Headphone Output"
+
+                            Mixxx.SettingParameter {
+                                label: "Headphone Output"
+                            }
+                        }
+                        Skin.Slider {
+                            id: headphoneDelaySlider
+
+                            Layout.fillWidth: true
+                            enabled: headEnabled.value
+                            markers: ["0ms", "100ms", "1s", "10s", null]
+                            slider.to: 1000
+                            suffix: "ms"
+                            value: headDelay.value
+
+                            onValueChanged: {
+                                root.hasChanges = true;
                             }
                         }
                     }
                 }
-            }
+                Mixxx.SettingGroup {
+                    label: "Stats"
+                    visible: root.selectedIndex == 2
 
-        }
-    }
+                    onActivated: {
+                        root.selectedIndex = 2;
+                    }
 
-    // ================= PINNED BOTTOM ACTION BAR =================
-    Rectangle {
-        id: soundAction
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        height: 58
-        color: "#161b24"
-        border.color: "#283548"
-        border.width: 1
-        radius: 8
+                    Mixxx.SettingParameter {
+                        label: "A white square"
 
-        RowLayout {
-            anchors.fill: parent
-            anchors.leftMargin: 16
-            anchors.rightMargin: 16
-            spacing: 12
-
-            // Status Indicator Pill
-            Rectangle {
-                Layout.preferredHeight: 30
-                Layout.preferredWidth: statusText.implicitWidth + 20
-                radius: 15
-                color: root.hasChanges ? "#3e2723" : "#1b5e20"
-                border.color: root.hasChanges ? "#ff9800" : "#4caf50"
-                border.width: 1
-
-                Text {
-                    id: statusText
-                    anchors.centerIn: parent
-                    text: root.hasChanges ? qsTr("● Unsaved changes") : qsTr("✓ Audio configured")
-                    font.bold: true
-                    font.pixelSize: 11
-                    color: root.hasChanges ? "#ffb74d" : "#81c784"
+                        Rectangle {
+                            color: 'white'
+                            height: 20
+                            width: 20
+                        }
+                    }
                 }
             }
-
-            Text {
-                id: errorMessage
+            Mixxx.SettingGroup {
+                Layout.fillHeight: true
                 Layout.fillWidth: true
-                elide: Text.ElideRight
-                font.pixelSize: 12
-                color: "#ff5252"
-                text: ""
-            }
+                Layout.minimumHeight: Math.max(router.mode == AudioRouter.Mode.Advanced ? 450 : 250, scrollView.height - tabSection.height - buttons.height - 15)
+                Layout.minimumWidth: Math.max(600, scrollView.width)
+                label: "Router"
 
-            Skin.Button {
-                visible: root.hasChanges
-                Layout.preferredHeight: 38
-                Layout.preferredWidth: 130
-                activeColor: "#ff5252"
-                backgroundColor: "#2a1b1b"
-                normalColor: "#ff8a80"
-                font.bold: true
-                font.pixelSize: 12
-                text: qsTr("Discard")
-                onClicked: {
-                    errorMessage.text = "";
-                    root.load();
-                }
-            }
+                AudioRouter {
+                    id: router
 
-            Rectangle {
-                id: applyButtonRect
-                Layout.preferredHeight: 40
-                Layout.preferredWidth: 230
-                radius: 8
-                color: root.committing ? "#1565c0" : (root.hasChanges ? "#00c853" : (applyMouse.containsMouse ? "#2979ff" : "#1976d2"))
-                border.color: root.hasChanges ? "#b9f6ca" : "#64b5f6"
-                border.width: 1.5
-
-                RowLayout {
-                    anchors.centerIn: parent
-                    spacing: 8
-
-                    Text {
-                        text: root.committing ? "⏳" : (root.hasChanges ? "💾" : "✓")
-                        font.pixelSize: 14
-                        color: "#ffffff"
-                    }
-
-                    Text {
-                        text: root.committing ? qsTr("Applying...") : qsTr("Apply & Save Outputs")
-                        font.bold: true
-                        font.pixelSize: 13
-                        color: "#ffffff"
-                    }
-                }
-
-                MouseArea {
-                    id: applyMouse
                     anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
+                }
+                Rectangle {
+                    anchors.fill: parent
+                    color: Qt.alpha('grey', 0.3)
+                    visible: root.committing
+
+                    MouseArea {
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        preventStealing: true
+
+                        onWheel: mouse => {
+                            mouse.accepted = true;
+                        }
+                    }
+                }
+            }
+            RowLayout {
+                id: buttons
+
+                Layout.topMargin: 4
+
+                Skin.FormButton {
+                    activeColor: "#999999"
+                    backgroundColor: "#7D3B3B"
                     enabled: !root.committing
-                    onClicked: {
+                    opacity: enabled ? 1.0 : 0.5
+                    text: "Cancel"
+                    visible: root.hasChanges
+
+                    onPressed: {
+                        root.load();
+                    }
+                }
+                Item {
+                    Layout.fillWidth: true
+                }
+                Text {
+                    id: errorMessage
+
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.rightMargin: 16
+                    color: "#7D3B3B"
+                    text: ""
+                }
+                Skin.FormButton {
+                    activeColor: "#999999"
+                    backgroundColor: root.hasChanges ? "#3a60be" : Theme.darkGray3
+                    enabled: root.hasChanges && !root.committing
+                    opacity: enabled ? 1.0 : 0.5
+                    text: "Save"
+
+                    onPressed: {
                         errorMessage.text = "";
                         root.save();
                     }
@@ -1314,7 +673,6 @@ Category {
             }
         }
     }
-
     Connections {
         function onCommitted(error) {
             root.committing = false;
@@ -1323,6 +681,7 @@ Category {
             }
             root.load();
         }
+
         target: Mixxx.SoundManager
     }
 }

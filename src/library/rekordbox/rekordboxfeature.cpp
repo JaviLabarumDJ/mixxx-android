@@ -33,6 +33,9 @@
 #ifdef __ANDROID_USB_DRIVE__
 #include "library/usbdrive/androidusbdrive.h"
 #endif
+#ifdef Q_OS_ANDROID
+#include "library/rekordbox/rekordboxandroid.h"
+#endif
 #include "util/sandbox.h"
 #include "waveform/waveform.h"
 #include "widget/wlibrary.h"
@@ -232,8 +235,17 @@ QList<TreeItem*> findRekordboxDevices() {
                         QStringLiteral(".PIONEER/rekordbox/export.pdb")});
 #endif
         if (!findRekordboxPdbPath(device.filePath()).isEmpty()) {
+            // The devices are identified by their label, which must be unique
+            const QString baseLabel = mixxx::removableStorageLabel(device);
+            QString label = baseLabel;
+            for (int i = 2; std::any_of(foundDevices.cbegin(),
+                         foundDevices.cend(),
+                         [&label](const TreeItem* pItem) { return pItem->getLabel() == label; });
+                    ++i) {
+                label = QStringLiteral("%1 (%2)").arg(baseLabel).arg(i);
+            }
             auto* pFoundDevice = new TreeItem(
-                    device.fileName(),
+                    std::move(label),
                     QVariant(QList<QString>{device.filePath(), IS_RECORDBOX_DEVICE}));
             foundDevices << pFoundDevice;
         }
@@ -258,8 +270,17 @@ QList<TreeItem*> findRekordboxDevices() {
 
     foreach (QFileInfo device, devices) {
         if (!findRekordboxPdbPath(device.filePath()).isEmpty()) {
+            // The devices are identified by their label, which must be unique
+            const QString baseLabel = mixxx::removableStorageLabel(device);
+            QString label = baseLabel;
+            for (int i = 2; std::any_of(foundDevices.cbegin(),
+                         foundDevices.cend(),
+                         [&label](const TreeItem* pItem) { return pItem->getLabel() == label; });
+                    ++i) {
+                label = QStringLiteral("%1 (%2)").arg(baseLabel).arg(i);
+            }
             auto* pFoundDevice = new TreeItem(
-                    device.fileName(),
+                    std::move(label),
                     QVariant(QList<QString>{device.filePath(), IS_RECORDBOX_DEVICE}));
             foundDevices << pFoundDevice;
         }
@@ -1410,6 +1431,9 @@ RekordboxFeature::RekordboxFeature(
             &RekordboxFeature::onTracksFound);
     // initialize the model
     m_pSidebarModel->setRootItem(TreeItem::newRoot(this));
+#ifdef Q_OS_ANDROID
+    mixxx::android::watchUsbDevices(this);
+#endif
 }
 
 RekordboxFeature::~RekordboxFeature() {
@@ -1558,14 +1582,14 @@ void RekordboxFeature::activateChild(const QModelIndex& index) {
     if (doParseDeviceDB) {
         qDebug() << "Parse Rekordbox Device DB: " << playlist;
 
+        // This device is now a playlist element, future activations should treat is
+        // as such. Changed before the worker thread starts reading the item.
+        data[1] = QVariant(IS_NOT_RECORDBOX_DEVICE);
+        item->setData(QVariant(data));
+
         // Let a worker thread do the XML parsing
         m_tracksFuture = QtConcurrent::run(parseDeviceDB, static_cast<Library*>(parent())->dbConnectionPool(), item);
         m_tracksFutureWatcher.setFuture(m_tracksFuture);
-
-        // This device is now a playlist element, future activations should treat is
-        // as such
-        data[1] = QVariant(IS_NOT_RECORDBOX_DEVICE);
-        item->setData(QVariant(data));
     } else {
         qDebug() << "Activate Rekordbox Playlist: " << playlist;
         m_pRekordboxPlaylistModel->setPlaylist(playlist);
@@ -1666,3 +1690,7 @@ void RekordboxFeature::onTracksFound() {
     m_pRekordboxPlaylistModel->setPlaylist(devicePlaylist);
     emit showTrackModel(m_pRekordboxPlaylistModel);
 }
+
+#ifdef Q_OS_ANDROID
+#include "library/rekordbox/rekordboxandroid.inc"
+#endif

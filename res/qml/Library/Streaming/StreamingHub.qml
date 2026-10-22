@@ -54,7 +54,7 @@ Item {
                         normalColor: root.activePlatform === 1 ? "#ea80fc" : "#e1bee7"
                         font.bold: true
                         font.pixelSize: 11
-                        text: qsTr("🔥 AUDIUS (Free)")
+                        text: qsTr("🔥 AUDIUS (free)")
                         onClicked: root.activePlatform = 1
                     }
 

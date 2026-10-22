@@ -45,11 +45,6 @@ class ControllerManager : public QObject {
 
     static QList<QString> getMappingPaths(UserSettingsPointer pConfig);
 
-    /// Returns how well a mapping name matches a device name, 0 meaning no
-    /// match. Model numbers (tokens with digits like "400" or "S4") must match
-    /// exactly, so "DDJ-400" never matches "DDJ-4000" or "DDJ-SB2".
-    static int mappingNameMatchScore(const QString& deviceName, const QString& mappingName);
-
   signals:
     void initialized();
     void devicesChanged();

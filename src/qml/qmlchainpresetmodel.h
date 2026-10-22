@@ -41,8 +41,6 @@ class QmlChainPresetModel : public QAbstractListModel {
     void slotUpdated();
 
   private:
-    QString displayName(const EffectChainPresetPointer& pPreset) const;
-
     const std::shared_ptr<EffectsManager> m_pEffectsManager;
     const EffectChainPresetManagerPointer m_pEffectChainPresetManager;
     const PresetType m_presetType;

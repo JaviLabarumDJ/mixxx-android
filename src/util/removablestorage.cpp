@@ -1,5 +1,6 @@
 #include "util/removablestorage.h"
 
+#include <QCoreApplication>
 #include <QDir>
 #include <QStorageInfo>
 
@@ -8,6 +9,14 @@
 #endif
 
 namespace mixxx {
+
+namespace {
+
+#if defined(__ANDROID__)
+const QString kDriveCopiesFolder = QStringLiteral("/storage/emulated/0/Music/Mixxx/Rekordbox");
+#endif
+
+} // namespace
 
 QFileInfoList removableStorageRoots() {
     QFileInfoList roots;
@@ -24,6 +33,8 @@ QFileInfoList removableStorageRoots() {
         }
     }
     roots.append(QFileInfo(QStringLiteral("/storage/emulated/0")));
+    // Copies of USB sticks, read as if the stick was plugged in
+    roots += QDir(kDriveCopiesFolder).entryInfoList(QDir::AllDirs | QDir::NoDotAndDotDot);
 #ifdef __ANDROID_USB_DRIVE__
     // Drives Android didn't mount, read by Mixxx itself
     roots += mixxx::usbdrive::driveRoots();
@@ -46,6 +57,15 @@ QFileInfoList removableStorageRoots() {
                      .entryInfoList(QDir::AllDirs | QDir::NoDotAndDotDot);
 #endif
     return roots;
+}
+
+QString removableStorageLabel(const QFileInfo& root) {
+#if defined(__ANDROID__)
+    if (root.absolutePath() == kDriveCopiesFolder) {
+        return QCoreApplication::translate("RemovableStorage", "%1 (backup)").arg(root.fileName());
+    }
+#endif
+    return root.fileName();
 }
 
 } // namespace mixxx

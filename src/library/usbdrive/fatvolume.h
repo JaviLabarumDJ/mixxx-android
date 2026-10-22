@@ -46,6 +46,12 @@ class FatVolume {
     std::optional<Entry> find(const QString& path);
     QList<Entry> list(const QString& path);
 
+    /// How many reads of directories or of the FAT failed so far. A
+    /// directory that failed to read looks like an empty or shorter one.
+    int readErrors() const {
+        return m_readErrors;
+    }
+
     /// Copies a file to the local file system. The destination is only
     /// replaced once the copy is complete.
     bool copyFile(const Entry& entry, const QString& destination);
@@ -55,7 +61,8 @@ class FatVolume {
     bool mountAt(uint64_t firstBlock);
     uint32_t nextCluster(uint32_t cluster);
     uint64_t clusterSector(uint32_t cluster) const;
-    QList<Entry> readDirectory(uint32_t firstCluster);
+    /// Sets *pComplete to false if a part could not be read
+    QList<Entry> readDirectory(uint32_t firstCluster, bool* pComplete);
     QList<Entry> directory(uint32_t firstCluster);
 
     BlockReader m_readBlocks;
@@ -78,6 +85,7 @@ class FatVolume {
     std::mutex m_mutex;
     QHash<uint32_t, QByteArray> m_fatCache;
     QHash<uint32_t, QList<Entry>> m_directoryCache;
+    std::atomic<int> m_readErrors = 0;
 };
 
 } // namespace usbdrive

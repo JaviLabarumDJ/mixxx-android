@@ -13,23 +13,85 @@ Item {
     required property var currentTrack
     required property string group
 
-    property int activePadMode: 0 // 0: Hotcue, 1: Loop
+    Mixxx.ControlProxy {
+        id: stemCountControl
 
+        group: root.group
+        key: "stem_count"
+    }
+    Mixxx.ControlProxy {
+        id: trackLoadedControl
+
+        group: root.group
+        key: "track_loaded"
+    }
     Rectangle {
         color: '#0E0E0E'
+
+        states: [
+            State {
+                name: "inactive"
+                when: trackLoadedControl.value == 0
+
+                PropertyChanges {
+                    checked: false
+                    opacity: 0.75
+                    target: hotcueTabButton
+                }
+                PropertyChanges {
+                    checked: false
+                    opacity: 0.75
+                    target: stemTabButton
+                }
+                PropertyChanges {
+                    target: stemTab
+                    visible: false
+                }
+                PropertyChanges {
+                    target: hotcueTab
+                    visible: false
+                }
+            },
+            State {
+                name: "hotcue"
+                when: hotcueTabButton.checked || stemCountControl.value == 0
+
+                PropertyChanges {
+                    target: hotcueTab
+                    visible: true
+                }
+                PropertyChanges {
+                    target: stemTab
+                    visible: false
+                }
+            },
+            State {
+                name: "stem"
+                when: stemTabButton.checked && stemCountControl.value != 0
+
+                PropertyChanges {
+                    target: stemTab
+                    visible: true
+                }
+                PropertyChanges {
+                    target: hotcueTab
+                    visible: false
+                }
+            }
+        ]
 
         anchors {
             bottom: parent.bottom
             left: parent.left
-            right: tabs.left
-            rightMargin: 6
+            right: stemCountControl.value > 0 ? tabs.left : parent.right
+            rightMargin: stemCountControl.value > 0 ? 6 : 0
             top: parent.top
         }
         Item {
             id: hotcueTab
 
             anchors.fill: parent
-            visible: root.activePadMode === 0
+            visible: false
 
             Skin.FadeBehavior on visible {
                 fadeTarget: hotcueTab
@@ -38,10 +100,10 @@ Item {
             GridLayout {
                 anchors.bottomMargin: 8
                 anchors.fill: parent
-                anchors.leftMargin: root.width < 260 ? 4 : 16
-                anchors.rightMargin: root.width < 260 ? 4 : 16
+                anchors.leftMargin: 16
+                anchors.rightMargin: 16
                 anchors.topMargin: 8
-                columnSpacing: root.width < 260 ? 3 : 6
+                columnSpacing: 6
                 rowSpacing: 6
 
                 Repeater {
@@ -58,7 +120,7 @@ Item {
                         Skin.Hotcue {
                             id: hotcue
 
-                            readonly property var label: (isSet && root.currentTrack && root.currentTrack.hotcuesModel) ? root.currentTrack.hotcuesModel.get(index).label : null
+                            readonly property var label: isSet ? root.currentTrack.hotcuesModel.get(index).label : null
 
                             activate: activator.pressedButtons == Qt.LeftButton
                             // onIsSetChanged: {
@@ -72,10 +134,7 @@ Item {
                             id: backgroundImage
 
                             anchors.fill: parent
-                            color: hotcue.isSet ? hotcue.color : (activator.pressed ? "#3b4252" : "#20242b")
-                            radius: 3
-                            border.color: hotcue.isSet ? "#ffffff" : "#323946"
-                            border.width: 1
+                            color: hotcue.isSet ? hotcue.color : '#2B2B2B'
 
                             MouseArea {
                                 id: activator
@@ -122,15 +181,15 @@ Item {
 
                             Label {
                                 Layout.alignment: Qt.AlignHCenter
-                                color: hotcue.isSet ? "#ffffff" : "#9aaec4"
-                                font.pixelSize: 13
+                                color: "#626262"
+                                font.pixelSize: 14
                                 font.weight: Font.Bold
                                 text: `${index + 1}`
                             }
                             Label {
                                 Layout.alignment: Qt.AlignHCenter
-                                color: hotcue.isSet ? "#ffffff" : "#7c8d9e"
-                                font.pixelSize: 10
+                                color: "#626262"
+                                font.pixelSize: 12
                                 text: hotcue.label ?? ""
                                 visible: hotcue.label
                             }
@@ -140,94 +199,263 @@ Item {
             }
         }
         Item {
-            id: loopTab
+            id: stemTab
 
             anchors.fill: parent
-            visible: root.activePadMode === 1
+            visible: false
 
             Skin.FadeBehavior on visible {
-                fadeTarget: loopTab
+                fadeTarget: stemTab
             }
 
-            GridLayout {
-                anchors.bottomMargin: 8
+            RowLayout {
+                anchors.bottomMargin: 6
                 anchors.fill: parent
-                anchors.leftMargin: root.width < 260 ? 4 : 16
-                anchors.rightMargin: root.width < 260 ? 4 : 16
-                anchors.topMargin: 8
-                columnSpacing: root.width < 260 ? 3 : 6
-                rowSpacing: 6
+                anchors.leftMargin: 9
+                anchors.rightMargin: 9
+                anchors.topMargin: 6
+                spacing: 9
 
                 Repeater {
-                    model: [
-                        { label: "1/4", size: "0.25" },
-                        { label: "1/2", size: "0.5" },
-                        { label: "1", size: "1" },
-                        { label: "2", size: "2" },
-                        { label: "4", size: "4" },
-                        { label: "8", size: "8" },
-                        { label: "16", size: "16" },
-                        { label: "32", size: "32" }
-                    ]
+                    model: root.currentTrack.stemsModel
 
                     Item {
-                        id: loopPadItem
-                        required property int index
-                        required property var modelData
+                        id: stem
 
-                        Layout.column: index % 4
+                        required property color color
+                        readonly property string fxGroup: `[QuickEffectRack1_${group}]`
+                        readonly property string group: `${root.group.substr(0, root.group.length - 1)}_Stem${index + 1}]`
+                        required property int index
+                        required property string label
+
                         Layout.fillHeight: true
                         Layout.fillWidth: true
-                        Layout.row: parseInt(index / 4)
 
-                        Mixxx.ControlProxy {
-                            id: loopToggleProxy
-                            group: root.group
-                            key: "beatloop_" + loopPadItem.modelData.size + "_toggle"
-                        }
+                        Item {
+                            id: content
 
-                        Mixxx.ControlProxy {
-                            id: loopEnabledProxy
-                            group: root.group
-                            key: "beatloop_" + loopPadItem.modelData.size + "_enabled"
-                        }
-
-                        Rectangle {
-                            id: loopPadBg
                             anchors.fill: parent
-                            radius: 4
-                            color: (loopEnabledProxy.value > 0)
-                                ? "#00e5ff"
-                                : (loopPadMouse.pressed ? "#374151" : "#1a222e")
-                            border.color: (loopEnabledProxy.value > 0) ? "#ffffff" : "#2c3b4d"
-                            border.width: (loopEnabledProxy.value > 0) ? 2 : 1
+                            visible: false
 
-                            ColumnLayout {
-                                anchors.centerIn: parent
-                                spacing: 1
+                            Rectangle {
+                                id: backgroundColor
 
-                                Text {
-                                    Layout.alignment: Qt.AlignHCenter
-                                    font.bold: true
-                                    font.pixelSize: 15
-                                    color: (loopEnabledProxy.value > 0) ? "#001018" : "#00e5ff"
-                                    text: loopPadItem.modelData.label
-                                }
+                                anchors.fill: parent
+                                color: stem.color
+                                opacity: 0.75
+                                radius: 1
+                            }
+                        }
+                        InnerShadow {
+                            anchors.fill: parent
+                            color: "#4b000000"
+                            horizontalOffset: 0
+                            radius: 4.0
+                            samples: 24
+                            smooth: true
+                            source: content
+                            spread: 0
+                            verticalOffset: 4
+                        }
+                        Item {
+                            id: stemButton
 
-                                Text {
-                                    Layout.alignment: Qt.AlignHCenter
-                                    font.bold: true
-                                    font.pixelSize: 8
-                                    color: (loopEnabledProxy.value > 0) ? "#00364a" : "#78909c"
-                                    text: "BEATS"
+                            height: parent.height / 3 * 2
+                            width: parent.width / 3 * 2
+
+                            anchors {
+                                bottom: stemFxSelector.top
+                                left: parent.left
+                                top: parent.top
+                            }
+                            Item {
+                                id: contentStemButton
+
+                                anchors.fill: parent
+                                visible: false
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: stem.color
+                                    opacity: stemMute.value ? 0.6 : 1.0
                                 }
                             }
+                            DropShadow {
+                                id: effect1
 
-                            MouseArea {
-                                id: loopPadMouse
                                 anchors.fill: parent
-                                onClicked: {
-                                    loopToggleProxy.trigger();
+                                color: "#80000000"
+                                horizontalOffset: 0
+                                radius: 2.0
+                                source: contentStemButton
+                                spread: 0.5
+                                verticalOffset: 0
+                            }
+                            InnerShadow {
+                                id: effect2
+
+                                anchors.fill: parent
+                                color: "#353535"
+                                horizontalOffset: 2
+                                radius: 4.0
+                                samples: 24
+                                smooth: true
+                                source: effect1
+                                spread: 0.4
+                                verticalOffset: 2
+                            }
+                            InnerShadow {
+                                anchors.fill: parent
+                                color: "#353535"
+                                horizontalOffset: -2
+                                radius: 4.0
+                                samples: 24
+                                smooth: true
+                                source: effect2
+                                spread: 0.4
+                                verticalOffset: -2
+                            }
+                            Item {
+                                anchors.fill: parent
+                                anchors.margins: 6
+                                clip: true
+
+                                Label {
+                                    id: stemLabel
+
+                                    readonly property bool rotated: fontMetrics.advanceWidth > parent.width && parent.height >= parent.width
+
+                                    anchors.centerIn: parent
+                                    color: Theme.white
+                                    elide: Text.ElideRight
+                                    font.weight: Font.Bold
+                                    height: font.pixelSize
+                                    horizontalAlignment: rotated ? Text.AlignLeft : Text.AlignHCenter
+                                    text: stem.label
+                                    width: rotated ? parent.height : parent.width
+
+                                    transform: Rotation {
+                                        angle: stemLabel.rotated ? 90 : 0
+                                        origin.x: stemLabel.width / 2
+                                        origin.y: stemLabel.height / 2
+                                    }
+
+                                    TextMetrics {
+                                        id: fontMetrics
+
+                                        font: stemLabel.font
+                                        text: stem.label
+                                    }
+                                }
+                            }
+                            Mixxx.ControlProxy {
+                                id: stemMute
+
+                                group: stem.group
+                                key: "mute"
+                            }
+                            TapHandler {
+                                onTapped: stemMute.value = !stemMute.value
+                            }
+                        }
+                        Skin.ComboBox {
+                            id: stemFxSelector
+
+                            clip: true
+                            currentIndex: fxSelect.value == -1 ? 0 : fxSelect.value
+                            font.pixelSize: 10
+                            height: Math.min(parent.width, parent.height) / 3
+                            indicator.width: 0
+                            model: Mixxx.EffectsManager.quickChainPresetModel
+                            popupMaxItem: 8
+                            popupWidth: 100
+                            spacing: 2
+                            textRole: "display"
+                            width: parent.width / 3 * 2
+
+                            onActivated: index => {
+                                fxSelect.value = index;
+                            }
+
+                            anchors {
+                                bottom: parent.bottom
+                                left: parent.left
+                            }
+                            Mixxx.ControlProxy {
+                                id: fxSelect
+
+                                group: stem.fxGroup
+                                key: "loaded_chain_preset"
+                            }
+                        }
+                        Item {
+                            id: stemVolume
+
+                            width: parent.width / 3
+
+                            anchors {
+                                bottom: stemFxKnob.top
+                                bottomMargin: 3
+                                left: stemButton.right
+                                right: parent.right
+                                top: parent.top
+                            }
+
+                            // Skin.VuMeter {
+                            //     x: 15
+                            //     y: (parent.height - height) / 2
+                            //     width: 4
+                            //     height: parent.height - 40
+                            //     group: root.group
+                            //     key: "vu_meter_left"
+                            // }
+
+                            // Skin.VuMeter {
+                            //     x: parent.width - width - 15
+                            //     y: (parent.height - height) / 2
+                            //     width: 4
+                            //     height: parent.height - 40
+                            //     group: root.group
+                            //     key: "vu_meter_right"
+                            // }
+
+                            Skin.ControlFader {
+                                id: volumeSlider
+
+                                anchors.fill: parent
+                                bar.color: Theme.volumeSliderBarColor
+                                bg: Theme.imgVolumeSliderBackground
+                                group: stem.group
+                                implicitWidth: 10
+                                key: "volume"
+
+                                handleImage {
+                                    width: parent.width - 4
+                                }
+                            }
+                        }
+                        Item {
+                            id: stemFxKnob
+
+                            height: stemFxSelector.height
+                            width: parent.width / 3
+
+                            anchors {
+                                bottom: parent.bottom
+                                right: parent.right
+                            }
+                            Skin.QuickFxKnob {
+                                anchors.centerIn: parent
+                                group: stem.fxGroup
+                                height: width
+                                knob.arcStyle: ShapePath.DashLine
+                                knob.arcStylePattern: [2, 2]
+                                knob.color: Theme.eqFxColor
+                                width: Math.min(parent.width, parent.height)
+
+                                knob {
+                                    height: width * 0.8
+                                    width: width * 0.8
                                 }
                             }
                         }
@@ -235,115 +463,182 @@ Item {
                 }
             }
         }
-
     }
     ColumnLayout {
         id: tabs
 
         anchors.bottom: parent.bottom
         anchors.right: parent.right
-        anchors.rightMargin: root.width < 260 ? 3 : 6
+        anchors.rightMargin: 6
         anchors.top: parent.top
-        spacing: root.width < 260 ? 3 : 6
-        width: root.width < 260 ? 36 : 44
+        spacing: 10
+        width: stemCountControl.value > 0 ? 36 : 0
 
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            radius: 5
-            color: root.activePadMode === 0 ? ((root.group === "[Channel2]") ? "#e65100" : "#1565c0") : (cueTabMouse.pressed ? "#2e3440" : "#181c24")
-            border.color: root.activePadMode === 0 ? "#ffffff" : "#2c3544"
-            border.width: root.activePadMode === 0 ? 1.5 : 1
-
-            ColumnLayout {
-                anchors.centerIn: parent
-                spacing: 3
-
-                Shape {
-                    Layout.alignment: Qt.AlignHCenter
-                    width: 12
-                    height: 10
-                    antialiasing: true
-                    ShapePath {
-                        fillColor: root.activePadMode === 0 ? "#ffffff" : "#8293a7"
-                        strokeColor: "transparent"
-                        startX: 1; startY: 0
-                        PathLine { x: 11; y: 5 }
-                        PathLine { x: 1; y: 10 }
-                        PathLine { x: 1; y: 0 }
-                    }
-                }
-
-                Text {
-                    Layout.alignment: Qt.AlignHCenter
-                    text: "CUE"
-                    font.bold: true
-                    font.pixelSize: 9
-                    color: root.activePadMode === 0 ? "#ffffff" : "#8293a7"
-                }
-            }
-
-            MouseArea {
-                id: cueTabMouse
-                anchors.fill: parent
-                onClicked: {
-                    root.activePadMode = 0;
-                }
+        Behavior on width {
+            SpringAnimation {
+                damping: 0.2
+                duration: 500
+                spring: 2
             }
         }
 
-        Rectangle {
+        Skin.Button {
+            id: hotcueTabButton
+
             Layout.fillWidth: true
-            Layout.fillHeight: true
-            radius: 5
-            color: root.activePadMode === 1 ? "#00838f" : (loopTabMouse.pressed ? "#2e3440" : "#181c24")
-            border.color: root.activePadMode === 1 ? "#ffffff" : "#2c3544"
-            border.width: root.activePadMode === 1 ? 1.5 : 1
+            Layout.margins: 0
+            activeColor: Theme.deckActiveColor
+            checked: true
+            implicitHeight: 30
 
-            ColumnLayout {
-                anchors.centerIn: parent
-                spacing: 3
+            contentItem: Shape {
+                anchors.fill: parent
+                antialiasing: true
+                layer.enabled: true
+                layer.samples: 4
 
-                Shape {
-                    Layout.alignment: Qt.AlignHCenter
-                    width: 14
-                    height: 10
-                    antialiasing: true
-                    ShapePath {
-                        fillColor: "transparent"
-                        strokeColor: root.activePadMode === 1 ? "#ffffff" : "#8293a7"
-                        strokeWidth: 1.6
-                        capStyle: ShapePath.RoundCap
-                        startX: 2; startY: 2.5
-                        PathLine { x: 12; y: 2.5 }
-                        PathLine { x: 12; y: 7.5 }
-                        PathLine { x: 2; y: 7.5 }
+                ShapePath {
+                    fillColor: '#D9D9D9'
+                    startX: 10
+                    startY: 4
+
+                    PathLine {
+                        x: 26
+                        y: 4
                     }
-                    ShapePath {
-                        fillColor: root.activePadMode === 1 ? "#ffffff" : "#8293a7"
-                        strokeColor: "transparent"
-                        startX: 0.5; startY: 5.5
-                        PathLine { x: 4; y: 5.5 }
-                        PathLine { x: 2.2; y: 2 }
-                        PathLine { x: 0.5; y: 5.5 }
+                    PathLine {
+                        x: 19.5
+                        y: 10
                     }
-                }
-
-                Text {
-                    Layout.alignment: Qt.AlignHCenter
-                    text: "LOOP"
-                    font.bold: true
-                    font.pixelSize: 9
-                    color: root.activePadMode === 1 ? "#ffffff" : "#8293a7"
+                    PathLine {
+                        x: 19.5
+                        y: 24
+                    }
+                    PathLine {
+                        x: 16.5
+                        y: 24
+                    }
+                    PathLine {
+                        x: 16.5
+                        y: 10
+                    }
+                    PathLine {
+                        x: 10
+                        y: 4
+                    }
                 }
             }
 
-            MouseArea {
-                id: loopTabMouse
-                anchors.fill: parent
-                onClicked: {
-                    root.activePadMode = 1;
+            onClicked: {
+                stemTabButton.checked = false;
+                hotcueTabButton.checked = trackLoadedControl.value == 1;
+            }
+        }
+        Skin.Button {
+            id: stemTabButton
+
+            Layout.fillWidth: true
+            Layout.margins: 0
+            activeColor: Theme.deckActiveColor
+            implicitHeight: 30
+
+            contentItem: Item {
+                Rectangle {
+                    color: '#D9D9D9'
+                    height: 1
+
+                    anchors {
+                        left: parent.left
+                        leftMargin: 5
+                        right: parent.right
+                        rightMargin: 5
+                        top: parent.top
+                        topMargin: 6
+                    }
                 }
+                Rectangle {
+                    color: '#D9D9D9'
+                    height: 1
+
+                    anchors {
+                        left: parent.left
+                        leftMargin: 5
+                        right: parent.right
+                        rightMargin: 14
+                        top: parent.top
+                        topMargin: 12
+                    }
+                }
+                Rectangle {
+                    color: '#D9D9D9'
+                    height: 1
+
+                    anchors {
+                        bottom: parent.bottom
+                        bottomMargin: 12
+                        left: parent.left
+                        leftMargin: 5
+                        right: parent.right
+                        rightMargin: 22
+                    }
+                }
+                Rectangle {
+                    color: '#D9D9D9'
+                    height: 1
+
+                    anchors {
+                        bottom: parent.bottom
+                        bottomMargin: 13
+                        left: parent.left
+                        leftMargin: 22
+                        right: parent.right
+                        rightMargin: 5
+                    }
+                }
+                Rectangle {
+                    color: '#D9D9D9'
+                    height: 1
+
+                    anchors {
+                        bottom: parent.bottom
+                        bottomMargin: 6
+                        left: parent.left
+                        leftMargin: 5
+                        right: parent.right
+                        rightMargin: 26
+                    }
+                }
+                Rectangle {
+                    color: '#D9D9D9'
+                    height: 1
+
+                    anchors {
+                        bottom: parent.bottom
+                        bottomMargin: 6
+                        left: parent.left
+                        leftMargin: 14
+                        right: parent.right
+                        rightMargin: 15
+                    }
+                }
+                Rectangle {
+                    color: '#D9D9D9'
+                    height: 1
+
+                    anchors {
+                        bottom: parent.bottom
+                        bottomMargin: 6
+                        left: parent.left
+                        leftMargin: 26
+                        right: parent.right
+                        rightMargin: 5
+                    }
+                }
+            }
+
+            onClicked: {
+                stemTabButton.checked = trackLoadedControl.value == 1 && stemCountControl.value != 0;
+                hotcueTabButton.checked = !stemTabButton.checked;
             }
         }
     }

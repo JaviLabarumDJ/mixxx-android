@@ -129,7 +129,7 @@ Item {
                     Layout.fillWidth: true
                     elide: Text.ElideRight
                     text: {
-                        if (!card.isLoaded) return qsTr("No track - Load");
+                        if (!card.isLoaded) return qsTr("No track - load");
                         var t = card.currentTrack?.title || "";
                         var a = card.currentTrack?.artist || "";
                         return a.length > 0 ? (a + " - " + t) : t;
