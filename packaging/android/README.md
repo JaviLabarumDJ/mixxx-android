@@ -81,6 +81,11 @@ playlist with the same order (`src/library/rekordbox/rekordboxplaylistcopy.cpp`)
 Copying the same playlist again only copies files that are not in the folder
 yet and refills the Mixxx playlist.
 
+A copy of a whole USB stick can be used instead of the stick: each folder in
+`/storage/emulated/0/Music/Mixxx/Rekordbox` that contains a Rekordbox export
+(`PIONEER/rekordbox/export.pdb`) is listed like a stick named after the
+folder (see `src/util/removablestorage.cpp`).
+
 The Rekordbox data is read by `rekordboxandroid.inc`, which is included at
 the end of the upstream `rekordboxfeature.cpp` so that it can use the ANLZ
 reader there without changing it.

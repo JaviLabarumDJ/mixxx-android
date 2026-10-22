@@ -9,6 +9,14 @@
 
 namespace mixxx {
 
+namespace {
+
+#if defined(__ANDROID__)
+const QString kDriveCopiesFolder = QStringLiteral("/storage/emulated/0/Music/Mixxx/Rekordbox");
+#endif
+
+} // namespace
+
 QFileInfoList removableStorageRoots() {
     QFileInfoList roots;
 #if defined(__ANDROID__)
@@ -24,6 +32,8 @@ QFileInfoList removableStorageRoots() {
         }
     }
     roots.append(QFileInfo(QStringLiteral("/storage/emulated/0")));
+    // Copies of USB sticks, read as if the stick was plugged in
+    roots += QDir(kDriveCopiesFolder).entryInfoList(QDir::AllDirs | QDir::NoDotAndDotDot);
 #ifdef __ANDROID_USB_DRIVE__
     // Drives Android didn't mount, read by Mixxx itself
     roots += mixxx::usbdrive::driveRoots();
