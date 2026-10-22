@@ -7,6 +7,7 @@
 #include <QTimer>
 
 #include "analyzer/analyzerscheduledtrack.h"
+#include "library/androidtrackdates.h"
 #include "library/dao/directorydao.h"
 #include "library/dao/playlistdao.h"
 #include "library/library.h"
@@ -121,6 +122,24 @@ QVariantMap QmlMobileLibraryProxy::restoreBackup(const QString& name) {
     // Gives the UI time to show the message
     QTimer::singleShot(3000, QCoreApplication::instance(), &QCoreApplication::quit);
     return result(true, tr("Mixxx closes now. Open it again to finish restoring %1.").arg(name));
+}
+
+QVariantMap QmlMobileLibraryProxy::useFileDatesAsDateAdded() {
+    TrackCollectionManager* pTrackCollectionManager = trackCollectionManager();
+    if (!pTrackCollectionManager) {
+        return result(false, tr("The library is not available."));
+    }
+    const int count = mixxx::android::useFileDatesAsDateAdded(
+            pTrackCollectionManager->internalCollection()->database());
+    if (count < 0) {
+        return result(false, tr("Could not update the dates."));
+    }
+    // The track lists keep the old dates until they are reloaded
+    QTimer::singleShot(3000, QCoreApplication::instance(), &QCoreApplication::quit);
+    return result(true,
+            tr("Updated the dates of %1 tracks. Mixxx closes now, open it again "
+               "to see them.")
+                    .arg(count));
 }
 
 bool QmlMobileLibraryProxy::sidebarVisible() const {

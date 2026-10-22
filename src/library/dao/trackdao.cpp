@@ -10,6 +10,9 @@
 #include <sqlite3.h>
 #endif // __SQLITE3__
 
+#ifdef Q_OS_ANDROID
+#include "library/androidtrackdates.h"
+#endif
 #include "library/coverart.h"
 #include "library/coverartutils.h"
 #include "library/dao/analysisdao.h"
@@ -837,7 +840,15 @@ TrackId TrackDAO::addTracksAddTrack(const TrackPointer& pTrack, bool unremove) {
         }
 
         // Time stamps are stored with timezone UTC in the database
-        const auto trackDateAdded = QDateTime::currentDateTimeUtc();
+        auto trackDateAdded = QDateTime::currentDateTimeUtc();
+#ifdef Q_OS_ANDROID
+        // The date of the file, so the tracks of a first scan don't all get
+        // the same date (see library/androidtrackdates.h)
+        if (const auto fileDate = mixxx::android::fileDateUtc(fileInfo.location());
+                fileDate.isValid()) {
+            trackDateAdded = fileDate;
+        }
+#endif
         const auto trackRecord = pTrack->getRecord();
         if (!insertTrackLibrary(
                     m_pQueryLibraryInsert.get(),

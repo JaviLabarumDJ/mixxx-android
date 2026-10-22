@@ -42,6 +42,11 @@ class QmlMobileLibraryProxy : public QObject {
     /// {ok, message}.
     Q_INVOKABLE QVariantMap restoreBackup(const QString& name);
 
+    /// Sets the "date added" of all tracks to the date of their file, see
+    /// library/androidtrackdates.h, and closes Mixxx so the track lists
+    /// show the new dates. Returns {ok, message}.
+    Q_INVOKABLE QVariantMap useFileDatesAsDateAdded();
+
     bool sidebarVisible() const;
     void setSidebarVisible(bool visible);
 

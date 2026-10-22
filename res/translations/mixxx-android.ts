@@ -800,6 +800,22 @@ Are you sure you want to load a new track?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>📅 Date added</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New tracks get the date of their file as &quot;Added&quot; date, so they can be sorted by when they were downloaded or copied. Tracks scanned before all have the date of that scan; this converts them too. It can&apos;t be undone, back up the library first if unsure.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tap again to confirm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>📅 Use file dates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>🔍 Search &amp; organization</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2035,6 +2051,14 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>Mixxx closes now. Open it again to finish restoring %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not update the dates.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Updated the dates of %1 tracks. Mixxx closes now, open it again to see them.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

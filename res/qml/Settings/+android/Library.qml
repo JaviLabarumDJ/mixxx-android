@@ -17,6 +17,8 @@ Category {
     property var backupList: []
     property string backupMessage: ""
     property bool backupError: false
+    property bool fileDatesArmed: false
+    property string fileDatesMessage: ""
 
     function refreshBackups() {
         root.backupList = Mixxx.MobileLibrary.backups();
@@ -723,6 +725,73 @@ Category {
                                     restorePopup.open();
                                 }
                             }
+                        }
+                    }
+                }
+            }
+
+            // ================= DATE ADDED =================
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: fileDatesCol.implicitHeight + 24
+                color: Theme.darkGray3
+                radius: 8
+                border.color: "#303440"
+                border.width: 1
+
+                ColumnLayout {
+                    id: fileDatesCol
+                    anchors.fill: parent
+                    anchors.margins: 12
+                    spacing: 10
+
+                    Text {
+                        text: qsTr("📅 Date added")
+                        font.bold: true
+                        font.pixelSize: 14
+                        color: "#00e5ff"
+                        Layout.fillWidth: true
+                    }
+
+                    Text {
+                        text: qsTr("New tracks get the date of their file as \"Added\" date, so they can be sorted by when they were downloaded or copied. Tracks scanned before all have the date of that scan; this converts them too. It can't be undone, back up the library first if unsure.")
+                        font.pixelSize: 11
+                        color: "#90a4ae"
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 12
+
+                        Skin.Button {
+                            Layout.preferredHeight: 40
+                            Layout.preferredWidth: 230
+                            activeColor: "#ffab40"
+                            backgroundColor: "#3a2a14"
+                            normalColor: "#ffd180"
+                            font.bold: true
+                            highlight: root.fileDatesArmed
+                            // Tapped twice to confirm
+                            text: root.fileDatesArmed ? qsTr("Tap again to confirm") : qsTr("📅 Use file dates")
+                            onClicked: {
+                                if (!root.fileDatesArmed) {
+                                    root.fileDatesArmed = true;
+                                    root.fileDatesMessage = "";
+                                    return;
+                                }
+                                root.fileDatesArmed = false;
+                                root.fileDatesMessage = Mixxx.MobileLibrary.useFileDatesAsDateAdded().message;
+                            }
+                        }
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: root.fileDatesMessage
+                            font.pixelSize: 11
+                            color: "#ffd180"
+                            wrapMode: Text.WordWrap
                         }
                     }
                 }
