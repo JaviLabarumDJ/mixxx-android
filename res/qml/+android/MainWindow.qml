@@ -59,9 +59,15 @@ Item {
         numberOfDecks: root.show4decks ? root.numDecks : 2
 
         onFocusLibrarySearchRequested: {
-            if (library.item) {
-                library.item.focusSearch();
+            // The library stays loaded while hidden, show it first
+            if (!library.visible) {
+                root.viewMode = 2;
             }
+            Qt.callLater(() => {
+                if (library.item) {
+                    library.item.focusSearch();
+                }
+            });
         }
     }
     Skin.LibraryScanSummaryDialog {
@@ -786,7 +792,14 @@ Item {
                 Loader {
                     id: library
 
-                    active: root.viewMode === 0 || root.viewMode === 2 || root.maximizeLibrary || root.height - mixer.height >= 400
+                    // Once loaded, the library stays loaded (only hidden) when
+                    // switching to another view, so it keeps its search,
+                    // selection and scroll position, like the deck loaders.
+                    // Hidden, it ignores the controller (see Library.qml).
+                    property bool keepLoaded: false
+
+                    active: keepLoaded || root.viewMode === 0 || root.viewMode === 2 || root.maximizeLibrary || root.height - mixer.height >= 400
+                    onLoaded: keepLoaded = true
                     visible: root.viewMode === 0 || root.viewMode === 2 || root.maximizeLibrary || (root.viewMode === 1 && root.height - mixer.height >= 400)
                     width: parent.width
 
