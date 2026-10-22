@@ -1176,6 +1176,13 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
 </context>
 <context>
+    <name>RemovableStorage</name>
+    <message>
+        <source>%1 (backup)</source>
+        <translation>%1 (copia)</translation>
+    </message>
+</context>
+<context>
     <name>Settings</name>
     <message>
         <source>← Back</source>

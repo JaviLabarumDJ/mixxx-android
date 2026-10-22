@@ -13,4 +13,9 @@ namespace mixxx {
 /// this must not be called on the main thread.
 QFileInfoList removableStorageRoots();
 
+/// The name a drive found by removableStorageRoots() is shown with. Copies
+/// of sticks are marked as backups, so a stick and its backup can be told
+/// apart (Rekordbox identifies the drives by this name).
+QString removableStorageLabel(const QFileInfo& root);
+
 } // namespace mixxx

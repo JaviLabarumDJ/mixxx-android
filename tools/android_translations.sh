@@ -27,6 +27,7 @@ SOURCES=(
     src/library/rekordbox/rekordboxdrivebackup.cpp
     src/library/rekordbox/rekordboxplaylistcopy.cpp
     src/util/androidbackup.cpp
+    src/util/removablestorage.cpp
 )
 
 TS_FILES=(res/translations/mixxx-android.ts)

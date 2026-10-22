@@ -232,8 +232,17 @@ QList<TreeItem*> findRekordboxDevices() {
                         QStringLiteral(".PIONEER/rekordbox/export.pdb")});
 #endif
         if (!findRekordboxPdbPath(device.filePath()).isEmpty()) {
+            // The devices are identified by their label, which must be unique
+            const QString baseLabel = mixxx::removableStorageLabel(device);
+            QString label = baseLabel;
+            for (int i = 2; std::any_of(foundDevices.cbegin(),
+                         foundDevices.cend(),
+                         [&label](const TreeItem* pItem) { return pItem->getLabel() == label; });
+                    ++i) {
+                label = QStringLiteral("%1 (%2)").arg(baseLabel).arg(i);
+            }
             auto* pFoundDevice = new TreeItem(
-                    device.fileName(),
+                    std::move(label),
                     QVariant(QList<QString>{device.filePath(), IS_RECORDBOX_DEVICE}));
             foundDevices << pFoundDevice;
         }
@@ -258,8 +267,17 @@ QList<TreeItem*> findRekordboxDevices() {
 
     foreach (QFileInfo device, devices) {
         if (!findRekordboxPdbPath(device.filePath()).isEmpty()) {
+            // The devices are identified by their label, which must be unique
+            const QString baseLabel = mixxx::removableStorageLabel(device);
+            QString label = baseLabel;
+            for (int i = 2; std::any_of(foundDevices.cbegin(),
+                         foundDevices.cend(),
+                         [&label](const TreeItem* pItem) { return pItem->getLabel() == label; });
+                    ++i) {
+                label = QStringLiteral("%1 (%2)").arg(baseLabel).arg(i);
+            }
             auto* pFoundDevice = new TreeItem(
-                    device.fileName(),
+                    std::move(label),
                     QVariant(QList<QString>{device.filePath(), IS_RECORDBOX_DEVICE}));
             foundDevices << pFoundDevice;
         }

@@ -1,5 +1,6 @@
 #include "util/removablestorage.h"
 
+#include <QCoreApplication>
 #include <QDir>
 #include <QStorageInfo>
 
@@ -56,6 +57,15 @@ QFileInfoList removableStorageRoots() {
                      .entryInfoList(QDir::AllDirs | QDir::NoDotAndDotDot);
 #endif
     return roots;
+}
+
+QString removableStorageLabel(const QFileInfo& root) {
+#if defined(__ANDROID__)
+    if (root.absolutePath() == kDriveCopiesFolder) {
+        return QCoreApplication::translate("RemovableStorage", "%1 (backup)").arg(root.fileName());
+    }
+#endif
+    return root.fileName();
 }
 
 } // namespace mixxx
