@@ -608,11 +608,18 @@ Rectangle {
 
                     onClicked: {
                         const name = newPlaylistName.text.trim();
-                        const playlistId = Mixxx.MobileLibrary.createNamedPlaylist(name);
-                        if (playlistId < 0) {
-                            playlistPopup.message = qsTr("A playlist named %1 already exists").arg(name);
+                        if (name.length === 0) {
                             return;
                         }
+                        const playlistId = Mixxx.MobileLibrary.createNamedPlaylist(name);
+                        if (playlistId < 0) {
+                            playlistPopup.messageIsError = true;
+                            playlistPopup.message = qsTr("A playlist named %1 already exists. Choose it in the list above to add to it.").arg(name);
+                            return;
+                        }
+                        // The keyboard's Enter and the button both create:
+                        // only the first one does
+                        newPlaylistName.text = "";
                         playlistPopup.addTo(playlistId, name);
                     }
                 }

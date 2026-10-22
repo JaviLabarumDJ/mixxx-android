@@ -483,26 +483,30 @@ Category {
                             // Preset 1: Móvil / Bluetooth (Salida simple)
                             Rectangle {
                                 Layout.fillWidth: true
-                                Layout.preferredHeight: 96
+                                Layout.preferredHeight: Math.max(96, presetCol1.implicitHeight + 20)
+                                Layout.fillHeight: true
                                 radius: 10
                                 color: root.activePreset === "single" ? "#1e3a5f" : (p1Mouse.containsMouse ? "#212b38" : "#1a222c")
                                 border.color: root.activePreset === "single" ? "#42a5f5" : "#324050"
                                 border.width: root.activePreset === "single" ? 2 : 1
 
                                 ColumnLayout {
+                                    id: presetCol1
                                     anchors.fill: parent
                                     anchors.margins: 10
                                     spacing: 4
 
                                     RowLayout {
+                                        Layout.fillWidth: true
                                         Text { text: "📱"; font.pixelSize: 16 }
                                         Text {
+                                            Layout.fillWidth: true
+                                            elide: Text.ElideRight
                                             text: qsTr("Phone / Bluetooth")
                                             font.pixelSize: 13
                                             font.bold: true
                                             color: root.activePreset === "single" ? "#ffffff" : "#cfd8dc"
                                         }
-                                        Item { Layout.fillWidth: true }
                                         Text {
                                             text: root.activePreset === "single" ? qsTr("✓ ACTIVE") : ""
                                             font.pixelSize: 10
@@ -531,26 +535,30 @@ Category {
                             // Preset 2: Cable Splitter DJ
                             Rectangle {
                                 Layout.fillWidth: true
-                                Layout.preferredHeight: 96
+                                Layout.preferredHeight: Math.max(96, presetCol2.implicitHeight + 20)
+                                Layout.fillHeight: true
                                 radius: 10
                                 color: root.activePreset === "splitter" ? "#3e2723" : (p2Mouse.containsMouse ? "#2d221f" : "#1e1a19")
                                 border.color: root.activePreset === "splitter" ? "#ff7043" : "#4e342e"
                                 border.width: root.activePreset === "splitter" ? 2 : 1
 
                                 ColumnLayout {
+                                    id: presetCol2
                                     anchors.fill: parent
                                     anchors.margins: 10
                                     spacing: 4
 
                                     RowLayout {
+                                        Layout.fillWidth: true
                                         Text { text: "🎧"; font.pixelSize: 16 }
                                         Text {
+                                            Layout.fillWidth: true
+                                            elide: Text.ElideRight
                                             text: qsTr("DJ splitter cable")
                                             font.pixelSize: 13
                                             font.bold: true
                                             color: root.activePreset === "splitter" ? "#ffffff" : "#cfd8dc"
                                         }
-                                        Item { Layout.fillWidth: true }
                                         Text {
                                             text: root.activePreset === "splitter" ? qsTr("✓ ACTIVE") : ""
                                             font.pixelSize: 10
@@ -579,26 +587,30 @@ Category {
                             // Preset 3: Controladora DJ / 4 Canales
                             Rectangle {
                                 Layout.fillWidth: true
-                                Layout.preferredHeight: 96
+                                Layout.preferredHeight: Math.max(96, presetCol3.implicitHeight + 20)
+                                Layout.fillHeight: true
                                 radius: 10
                                 color: root.activePreset === "controller" ? "#1b3a24" : (p3Mouse.containsMouse ? "#1c2b1e" : "#172218")
                                 border.color: root.activePreset === "controller" ? "#66bb6a" : "#2e4c34"
                                 border.width: root.activePreset === "controller" ? 2 : 1
 
                                 ColumnLayout {
+                                    id: presetCol3
                                     anchors.fill: parent
                                     anchors.margins: 10
                                     spacing: 4
 
                                     RowLayout {
+                                        Layout.fillWidth: true
                                         Text { text: "🎛️"; font.pixelSize: 16 }
                                         Text {
+                                            Layout.fillWidth: true
+                                            elide: Text.ElideRight
                                             text: qsTr("DJ controller (RCA + headphones)")
                                             font.pixelSize: 13
                                             font.bold: true
                                             color: root.activePreset === "controller" ? "#ffffff" : "#cfd8dc"
                                         }
-                                        Item { Layout.fillWidth: true }
                                         Text {
                                             text: root.activePreset === "controller" ? qsTr("✓ ACTIVE") : ""
                                             font.pixelSize: 10
@@ -627,26 +639,30 @@ Category {
                             // Preset 4: Híbrido (Tablet Master + Auriculares Mesa)
                             Rectangle {
                                 Layout.fillWidth: true
-                                Layout.preferredHeight: 96
+                                Layout.preferredHeight: Math.max(96, presetCol4.implicitHeight + 20)
+                                Layout.fillHeight: true
                                 radius: 10
                                 color: root.activePreset === "hybrid" ? "#311b92" : (p4Mouse.containsMouse ? "#211a36" : "#191624")
                                 border.color: root.activePreset === "hybrid" ? "#b388ff" : "#4527a0"
                                 border.width: root.activePreset === "hybrid" ? 2 : 1
 
                                 ColumnLayout {
+                                    id: presetCol4
                                     anchors.fill: parent
                                     anchors.margins: 10
                                     spacing: 4
 
                                     RowLayout {
+                                        Layout.fillWidth: true
                                         Text { text: "🔊"; font.pixelSize: 16 }
                                         Text {
+                                            Layout.fillWidth: true
+                                            elide: Text.ElideRight
                                             text: qsTr("Tablet + controller headphones (hybrid)")
                                             font.pixelSize: 13
                                             font.bold: true
                                             color: root.activePreset === "hybrid" ? "#ffffff" : "#cfd8dc"
                                         }
-                                        Item { Layout.fillWidth: true }
                                         Text {
                                             text: root.activePreset === "hybrid" ? qsTr("✓ ACTIVE") : ""
                                             font.pixelSize: 10

@@ -2,6 +2,7 @@ import Mixxx 1.0 as Mixxx
 import QtQuick.Shapes
 import QtQuick 2.12
 import ".." as Skin
+import "." as DeckComponent
 import "../Theme"
 
 Item {
@@ -54,14 +55,27 @@ Item {
             }
         }
     }
+    // Opens the beatgrid corrections. Compact next to the pad switcher of
+    // narrow decks.
     Skin.Button {
         id: beatgridButton
+
+        readonly property bool compact: padSwitcher.visible
 
         anchors.right: ejectButton.left
         anchors.rightMargin: 5
         implicitHeight: 22
-        text: "Beatgrid"
-        visible: root.deck ? (root.deck.width >= 520 && root.width > 165) : root.width > 165
+        implicitWidth: Math.max(40, implicitContentWidth + leftPadding + rightPadding)
+        enabled: trackLoadedControl.value > 0
+        text: compact ? qsTr("GRID") : qsTr("Beatgrid")
+        visible: compact ? (root.width - padSwitcher.width) / 2 >= implicitWidth + ejectButton.width + 10 : root.width > 165
+
+        onClicked: beatgridPopup.open()
+    }
+    DeckComponent.BeatgridPopup {
+        id: beatgridPopup
+
+        group: root.group
     }
     Row {
         id: padSwitcher

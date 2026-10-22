@@ -136,7 +136,7 @@ Item {
                     normalColor: "#ffffff"
                     font.bold: true
                     font.pixelSize: 11
-                    text: root.isBusy ? qsTr("⟳ Loading...") : qsTr("⟳ Trending")
+                    text: root.isBusy ? qsTr("🔄 Loading...") : qsTr("🔄 Trending")
                     enabled: !root.isBusy
                     onClicked: {
                         root.isBusy = true;
@@ -477,7 +477,7 @@ Item {
                     spacing: 8
 
                     Text {
-                        text: "⟳"
+                        text: "🔄"
                         font.pixelSize: 16
                         color: "#ff9100"
                         RotationAnimation on rotation {

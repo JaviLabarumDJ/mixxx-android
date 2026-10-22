@@ -248,7 +248,7 @@ Item {
                         backgroundColor: "#00897b"
                         normalColor: "#ffffff"
                         font.bold: true
-                        text: root.isBusy ? qsTr("⟳ Connecting") : qsTr("✔ Connect")
+                        text: root.isBusy ? qsTr("🔄 Connecting") : qsTr("✔ Connect")
                         enabled: !root.isBusy
                         onClicked: {
                             Mixxx.StreamingManager.subsonicUrl = serverUrlField.text;
@@ -704,7 +704,7 @@ Item {
                     spacing: 8
 
                     Text {
-                        text: "⟳"
+                        text: "🔄"
                         font.pixelSize: 16
                         color: "#00e5ff"
                         RotationAnimation on rotation {
