@@ -451,6 +451,45 @@ bool fetchFile(const QString& localPath) {
     return ensureLocal(pDrive, localPath.mid(pDrive->root.size() + 1));
 }
 
+std::optional<QList<DriveFile>> listFiles(const QString& root, const QStringList& folders) {
+    const auto pDrive = driveFor(root + QStringLiteral("/"));
+    if (!pDrive) {
+        return std::nullopt;
+    }
+    // Reads only the directories, the file system guards itself
+    QList<DriveFile> files;
+    QStringList pending;
+    const QList<FatVolume::Entry> topLevel = pDrive->volume.list(QString());
+    for (const auto& entry : topLevel) {
+        if (entry.isDirectory && folders.contains(entry.name, Qt::CaseInsensitive)) {
+            pending.append(entry.name);
+        }
+    }
+    while (!pending.isEmpty()) {
+        const QString folder = pending.takeFirst();
+        const QList<FatVolume::Entry> entries = pDrive->volume.list(folder);
+        for (const auto& entry : entries) {
+            const QString path = folder + QChar('/') + entry.name;
+            if (entry.isDirectory) {
+                pending.append(path);
+            } else {
+                files.append({path, static_cast<qint64>(entry.size), entry.modified});
+            }
+        }
+    }
+    return files;
+}
+
+bool copyFileTo(const QString& root, const QString& relativePath, const QString& destination) {
+    const auto pDrive = driveFor(root + QStringLiteral("/"));
+    if (!pDrive) {
+        return false;
+    }
+    const std::lock_guard lock(pDrive->mutex);
+    const std::optional<FatVolume::Entry> entry = pDrive->volume.find(relativePath);
+    return entry && pDrive->volume.copyFile(*entry, destination);
+}
+
 bool isOnDrive(const QString& localPath) {
     return driveFor(localPath) != nullptr;
 }

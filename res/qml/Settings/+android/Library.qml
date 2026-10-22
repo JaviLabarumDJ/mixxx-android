@@ -728,6 +728,168 @@ Category {
                 }
             }
 
+            // ================= REKORDBOX STICK BACKUP =================
+            // Copies the Rekordbox export of a USB stick to the device, see
+            // library/rekordbox/rekordboxdrivebackup.h
+            Rectangle {
+                id: driveBackupCard
+
+                property string message: ""
+                property bool messageIsError: false
+
+                Layout.fillWidth: true
+                Layout.preferredHeight: driveBackupCol.implicitHeight + 24
+                color: Theme.darkGray3
+                radius: 8
+                border.color: "#303440"
+                border.width: 1
+
+                Connections {
+                    target: Mixxx.MobileLibrary
+
+                    function onDriveBackupFinished(message, error) {
+                        driveBackupCard.message = message;
+                        driveBackupCard.messageIsError = error;
+                    }
+                }
+
+                ColumnLayout {
+                    id: driveBackupCol
+                    anchors.fill: parent
+                    anchors.margins: 12
+                    spacing: 10
+
+                    Text {
+                        text: qsTr("🎛 Rekordbox stick backup")
+                        font.bold: true
+                        font.pixelSize: 14
+                        color: "#00e5ff"
+                        Layout.fillWidth: true
+                    }
+
+                    Text {
+                        text: qsTr("Copies the Rekordbox export of a USB stick (playlists, analysis and tracks) to %1/<name>. The copy appears under Rekordbox in the library like the stick itself, also when the stick is not plugged in. Backing up the stick again only copies what changed.").arg("/storage/emulated/0/Music/Mixxx/Rekordbox")
+                        font.pixelSize: 11
+                        color: "#90a4ae"
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 12
+
+                        Skin.Button {
+                            Layout.preferredHeight: 40
+                            Layout.preferredWidth: 170
+                            enabled: !Mixxx.MobileLibrary.rekordboxDrivesLoading
+                            activeColor: "#00e5ff"
+                            backgroundColor: "#14303a"
+                            normalColor: "#80deea"
+                            font.bold: true
+                            text: Mixxx.MobileLibrary.rekordboxDrivesLoading ? qsTr("Looking…") : qsTr("🔍 Find sticks")
+                            onClicked: {
+                                driveBackupCard.message = "";
+                                Mixxx.MobileLibrary.refreshRekordboxDrives();
+                            }
+                        }
+
+                        Text {
+                            Layout.fillWidth: true
+                            visible: !Mixxx.MobileLibrary.rekordboxDrivesLoading && Mixxx.MobileLibrary.rekordboxDrives.length === 0
+                            text: qsTr("Plug in a stick and tap Find sticks.")
+                            font.pixelSize: 11
+                            color: "#607d8b"
+                            wrapMode: Text.WordWrap
+                        }
+                    }
+
+                    Repeater {
+                        model: Mixxx.MobileLibrary.rekordboxDrives
+
+                        RowLayout {
+                            id: driveRow
+
+                            required property var modelData
+
+                            Layout.fillWidth: true
+                            spacing: 12
+
+                            Skin.TextField {
+                                id: driveBackupName
+
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 40
+                                enabled: !Mixxx.MobileLibrary.driveBackupRunning
+                                font.pixelSize: 13
+                                placeholderText: qsTr("Backup name")
+                                text: driveRow.modelData.name
+                            }
+
+                            Skin.Button {
+                                Layout.preferredHeight: 40
+                                Layout.preferredWidth: 130
+                                enabled: !Mixxx.MobileLibrary.driveBackupRunning && driveBackupName.text.trim().length > 0
+                                activeColor: "#00e676"
+                                backgroundColor: "#1b3a2a"
+                                normalColor: "#69f0ae"
+                                font.bold: true
+                                text: qsTr("BACK UP")
+                                onClicked: {
+                                    const error = Mixxx.MobileLibrary.backUpRekordboxDrive(driveRow.modelData.path, driveBackupName.text.trim());
+                                    driveBackupCard.messageIsError = error.length > 0;
+                                    driveBackupCard.message = error;
+                                }
+                            }
+                        }
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        visible: Mixxx.MobileLibrary.driveBackupRunning
+                        spacing: 12
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 4
+
+                            ProgressBar {
+                                Layout.fillWidth: true
+                                from: 0
+                                to: 1
+                                value: Mixxx.MobileLibrary.driveBackupProgress
+                            }
+                            Text {
+                                Layout.fillWidth: true
+                                text: Mixxx.MobileLibrary.driveBackupFilesTotal > 0 ? qsTr("%1 of %2 files").arg(Mixxx.MobileLibrary.driveBackupFilesDone).arg(Mixxx.MobileLibrary.driveBackupFilesTotal) : qsTr("Reading the stick…")
+                                font.pixelSize: 11
+                                color: Theme.white
+                            }
+                        }
+
+                        Skin.Button {
+                            Layout.preferredHeight: 40
+                            Layout.preferredWidth: 130
+                            activeColor: "#ff8a80"
+                            backgroundColor: "#3a1b1b"
+                            normalColor: "#ff8a80"
+                            font.bold: true
+                            text: qsTr("STOP")
+                            onClicked: Mixxx.MobileLibrary.cancelDriveBackup()
+                        }
+                    }
+
+                    Text {
+                        Layout.fillWidth: true
+                        visible: driveBackupCard.message.length > 0
+                        text: driveBackupCard.message
+                        font.pixelSize: 11
+                        color: driveBackupCard.messageIsError ? "#ff8a80" : "#69f0ae"
+                        wrapMode: Text.WordWrap
+                    }
+                }
+            }
+
             // ================= 3. OPCIONES DE BÚSQUEDA Y METADATOS =================
             Rectangle {
                 Layout.fillWidth: true

@@ -807,6 +807,46 @@ Are you sure you want to load a new track?</source>
         <translation>Restaurar</translation>
     </message>
     <message>
+        <source>🎛 Rekordbox stick backup</source>
+        <translation>🎛 Copia de seguridad del USB de Rekordbox</translation>
+    </message>
+    <message>
+        <source>Copies the Rekordbox export of a USB stick (playlists, analysis and tracks) to %1/&lt;name&gt;. The copy appears under Rekordbox in the library like the stick itself, also when the stick is not plugged in. Backing up the stick again only copies what changed.</source>
+        <translation>Copia la exportación de Rekordbox de un USB (listas, análisis y pistas) a %1/&lt;nombre&gt;. La copia aparece en Rekordbox en la biblioteca igual que el USB, también cuando el USB no está conectado. Al volver a hacer la copia solo se copia lo que ha cambiado.</translation>
+    </message>
+    <message>
+        <source>Looking…</source>
+        <translation>Buscando…</translation>
+    </message>
+    <message>
+        <source>🔍 Find sticks</source>
+        <translation>🔍 Buscar USB</translation>
+    </message>
+    <message>
+        <source>Plug in a stick and tap Find sticks.</source>
+        <translation>Conecta un USB y pulsa Buscar USB.</translation>
+    </message>
+    <message>
+        <source>Backup name</source>
+        <translation>Nombre de la copia</translation>
+    </message>
+    <message>
+        <source>BACK UP</source>
+        <translation>COPIAR</translation>
+    </message>
+    <message>
+        <source>%1 of %2 files</source>
+        <translation>%1 de %2 archivos</translation>
+    </message>
+    <message>
+        <source>Reading the stick…</source>
+        <translation>Leyendo el USB…</translation>
+    </message>
+    <message>
+        <source>STOP</source>
+        <translation>DETENER</translation>
+    </message>
+    <message>
         <source>🔍 Search &amp; organization</source>
         <translation>🔍 Búsqueda y Organización</translation>
     </message>
@@ -2052,6 +2092,45 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>Starting audio engine...</source>
         <translation>Iniciando motor de audio...</translation>
+    </message>
+</context>
+<context>
+    <name>mixxx::android::RekordboxDriveBackup</name>
+    <message>
+        <source>A stick is already being backed up</source>
+        <translation>Ya se está copiando un USB</translation>
+    </message>
+    <message>
+        <source>Enter a name for the backup</source>
+        <translation>Escribe un nombre para la copia</translation>
+    </message>
+    <message>
+        <source>Could not create the folder %1. Grant Mixxx access to all files and try again.</source>
+        <translation>No se pudo crear la carpeta %1. Da a Mixxx acceso a todos los archivos e inténtalo de nuevo.</translation>
+    </message>
+    <message>
+        <source>No Rekordbox export found on the stick</source>
+        <translation>No se encontró ninguna exportación de Rekordbox en el USB</translation>
+    </message>
+    <message>
+        <source>Not enough space: the backup needs %1 MB, %2 MB are free</source>
+        <translation>No hay espacio suficiente: la copia necesita %1 MB y hay %2 MB libres</translation>
+    </message>
+    <message>
+        <source>Backup stopped after %1 of %2 files. Back up again to continue.</source>
+        <translation>Copia detenida tras %1 de %2 archivos. Vuelve a copiar para continuar.</translation>
+    </message>
+    <message>
+        <source>%1 files backed up, %2 failed. Back up again to retry them.</source>
+        <translation>%1 archivos copiados, %2 con error. Vuelve a copiar para reintentarlos.</translation>
+    </message>
+    <message>
+        <source>The backup is up to date</source>
+        <translation>La copia está al día</translation>
+    </message>
+    <message>
+        <source>%1 files backed up to %2</source>
+        <translation>%1 archivos copiados a %2</translation>
     </message>
 </context>
 <context>

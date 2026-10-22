@@ -11,6 +11,7 @@
 
 namespace mixxx {
 namespace android {
+class RekordboxDriveBackup;
 class RekordboxPlaylistCopy;
 } // namespace android
 
@@ -31,6 +32,20 @@ class QmlMobileLibraryProxy : public QObject {
     Q_PROPERTY(bool playlistCopyRunning READ playlistCopyRunning NOTIFY playlistCopyProgressChanged)
     Q_PROPERTY(int playlistCopyDone READ playlistCopyDone NOTIFY playlistCopyProgressChanged)
     Q_PROPERTY(int playlistCopyTotal READ playlistCopyTotal NOTIFY playlistCopyProgressChanged)
+    /// The Rekordbox sticks found by refreshRekordboxDrives(), as a list of
+    /// {path, name}
+    Q_PROPERTY(QVariantList rekordboxDrives READ rekordboxDrives NOTIFY rekordboxDrivesChanged)
+    Q_PROPERTY(bool rekordboxDrivesLoading READ rekordboxDrivesLoading NOTIFY
+                    rekordboxDrivesChanged)
+    /// Progress of backUpRekordboxDrive()
+    Q_PROPERTY(bool driveBackupRunning READ driveBackupRunning NOTIFY driveBackupProgressChanged)
+    Q_PROPERTY(int driveBackupFilesDone READ driveBackupFilesDone NOTIFY
+                    driveBackupProgressChanged)
+    Q_PROPERTY(int driveBackupFilesTotal READ driveBackupFilesTotal NOTIFY
+                    driveBackupProgressChanged)
+    /// 0 to 1
+    Q_PROPERTY(double driveBackupProgress READ driveBackupProgress NOTIFY
+                    driveBackupProgressChanged)
     QML_NAMED_ELEMENT(MobileLibrary)
     QML_SINGLETON
 
@@ -90,6 +105,28 @@ class QmlMobileLibraryProxy : public QObject {
     int playlistCopyDone() const;
     int playlistCopyTotal() const;
 
+    /// Looks for connected Rekordbox sticks in the background, see
+    /// rekordboxDrives
+    Q_INVOKABLE void refreshRekordboxDrives();
+    QVariantList rekordboxDrives() const {
+        return m_rekordboxDrives;
+    }
+    bool rekordboxDrivesLoading() const {
+        return m_rekordboxDrivesLoading;
+    }
+    /// The folder backUpRekordboxDrive() copies a stick named `name` to
+    Q_INVOKABLE QString rekordboxDriveBackupDirectory(const QString& name) const;
+    /// Starts copying the Rekordbox export of the stick at `path`, see
+    /// library/rekordbox/rekordboxdrivebackup.h. Returns an error message,
+    /// or an empty string if the backup started; driveBackupFinished() is
+    /// emitted at the end.
+    Q_INVOKABLE QString backUpRekordboxDrive(const QString& path, const QString& name);
+    Q_INVOKABLE void cancelDriveBackup();
+    bool driveBackupRunning() const;
+    int driveBackupFilesDone() const;
+    int driveBackupFilesTotal() const;
+    double driveBackupProgress() const;
+
     /// Whether the databases on USB drives (Rekordbox, Engine DJ) can be
     /// read. On Android this needs "All files access".
     Q_INVOKABLE bool hasFullStorageAccess() const;
@@ -101,11 +138,17 @@ class QmlMobileLibraryProxy : public QObject {
     void sidebarVisibleChanged();
     void playlistCopyProgressChanged();
     void playlistCopyFinished(const QString& message, bool error);
+    void rekordboxDrivesChanged();
+    void driveBackupProgressChanged();
+    void driveBackupFinished(const QString& message, bool error);
 
   private:
     void analyzeTracksMatching(const QString& sqlQuery) const;
 
     QPointer<android::RekordboxPlaylistCopy> m_pPlaylistCopy;
+    QPointer<android::RekordboxDriveBackup> m_pDriveBackup;
+    QVariantList m_rekordboxDrives;
+    bool m_rekordboxDrivesLoading = false;
 };
 
 } // namespace qml

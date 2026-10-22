@@ -1,9 +1,12 @@
 #pragma once
 
+#include <QDateTime>
 #include <QFileInfoList>
+#include <QList>
 #include <QString>
 #include <QStringList>
 #include <functional>
+#include <optional>
 
 class QObject;
 
@@ -32,6 +35,23 @@ void prepareFiles(const QString& root, const QStringList& relativePaths);
 /// while copying, so it must not be called on the main thread. Returns true
 /// if the file is there, also for files that are not on a drive.
 bool fetchFile(const QString& localPath);
+
+struct DriveFile {
+    /// Relative to the drive root, with the names as stored on the drive
+    QString relativePath;
+    qint64 size;
+    QDateTime modified;
+};
+
+/// All files in the top level folders `folders` (compared ignoring case)
+/// of the drive whose local folder is `root`, recursively. Returns nothing
+/// if `root` is not a drive that Mixxx reads itself. Blocks while reading
+/// the drive.
+std::optional<QList<DriveFile>> listFiles(const QString& root, const QStringList& folders);
+
+/// Copies a file of the drive whose local folder is `root` to `destination`,
+/// directly, without the local cache. Blocks while copying.
+bool copyFileTo(const QString& root, const QString& relativePath, const QString& destination);
 
 /// True if the path is inside the local folder of a drive
 bool isOnDrive(const QString& localPath);

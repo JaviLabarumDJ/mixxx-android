@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QList>
+#include <QRegularExpression>
 #include <QString>
 #include <QVariant>
 #include <optional>
@@ -11,6 +12,18 @@ class QAbstractItemModel;
 
 namespace mixxx {
 namespace android {
+
+/// `name` without the characters that are not allowed in file names
+inline QString safeFileName(QString name) {
+    static const QRegularExpression kInvalid(QStringLiteral("[/\\\\:*?\"<>|\\x00-\\x1F]"));
+    name.replace(kInvalid, QStringLiteral("_"));
+    name = name.trimmed();
+    // Android's FAT and exFAT file systems drop trailing dots
+    while (name.endsWith(QChar('.'))) {
+        name.chop(1);
+    }
+    return name;
+}
 
 /// A track of a Rekordbox playlist with the data Rekordbox exported for it
 struct RekordboxTrack {

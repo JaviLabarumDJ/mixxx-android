@@ -800,6 +800,46 @@ Are you sure you want to load a new track?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>🎛 Rekordbox stick backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copies the Rekordbox export of a USB stick (playlists, analysis and tracks) to %1/&lt;name&gt;. The copy appears under Rekordbox in the library like the stick itself, also when the stick is not plugged in. Backing up the stick again only copies what changed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Looking…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>🔍 Find sticks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plug in a stick and tap Find sticks.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BACK UP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 of %2 files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reading the stick…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>STOP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>🔍 Search &amp; organization</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2044,6 +2084,45 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>Starting audio engine...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>mixxx::android::RekordboxDriveBackup</name>
+    <message>
+        <source>A stick is already being backed up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter a name for the backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not create the folder %1. Grant Mixxx access to all files and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Rekordbox export found on the stick</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not enough space: the backup needs %1 MB, %2 MB are free</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup stopped after %1 of %2 files. Back up again to continue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 files backed up, %2 failed. Back up again to retry them.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The backup is up to date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 files backed up to %2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

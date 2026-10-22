@@ -86,6 +86,10 @@ A copy of a whole USB stick can be used instead of the stick: each folder in
 (`PIONEER/rekordbox/export.pdb`) is listed like a stick named after the
 folder (see `src/util/removablestorage.cpp`). The library scanner skips that
 folder, so the tracks of the copies are not added to the library.
+*Settings → Music Library → Rekordbox stick backup* makes such a copy: it
+copies the `PIONEER` and `Contents` folders of a connected stick there, and
+on later backups only what is new or changed
+(`src/library/rekordbox/rekordboxdrivebackup.cpp`).
 
 The Rekordbox data is read by `rekordboxandroid.inc`, which is included at
 the end of the upstream `rekordboxfeature.cpp` so that it can use the ANLZ

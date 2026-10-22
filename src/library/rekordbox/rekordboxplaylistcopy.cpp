@@ -3,7 +3,6 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include <QRegularExpression>
 #include <QSet>
 #include <QtConcurrentRun>
 #include <QtDebug>
@@ -30,17 +29,6 @@ bool fetch(const QString& path) {
 #else
     return QFileInfo::exists(path);
 #endif
-}
-
-QString safeFileName(QString name) {
-    static const QRegularExpression kInvalid(QStringLiteral("[/\\\\:*?\"<>|\\x00-\\x1F]"));
-    name.replace(kInvalid, QStringLiteral("_"));
-    name = name.trimmed();
-    // Android's FAT and exFAT file systems drop trailing dots
-    while (name.endsWith(QChar('.'))) {
-        name.chop(1);
-    }
-    return name;
 }
 
 } // namespace

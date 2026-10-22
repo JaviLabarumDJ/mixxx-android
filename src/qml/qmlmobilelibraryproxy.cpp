@@ -2,15 +2,18 @@
 
 #include <QCoreApplication>
 #include <QDir>
+#include <QFutureWatcher>
 #include <QSqlQuery>
 #include <QStandardPaths>
 #include <QTimer>
+#include <QtConcurrentRun>
 
 #include "analyzer/analyzerscheduledtrack.h"
 #include "library/dao/directorydao.h"
 #include "library/dao/playlistdao.h"
 #include "library/library.h"
 #include "library/rekordbox/rekordboxandroid.h"
+#include "library/rekordbox/rekordboxdrivebackup.h"
 #include "library/rekordbox/rekordboxplaylistcopy.h"
 #include "library/trackcollection.h"
 #include "library/trackcollectionmanager.h"
@@ -377,6 +380,67 @@ int QmlMobileLibraryProxy::playlistCopyDone() const {
 
 int QmlMobileLibraryProxy::playlistCopyTotal() const {
     return m_pPlaylistCopy ? m_pPlaylistCopy->total() : 0;
+}
+
+void QmlMobileLibraryProxy::refreshRekordboxDrives() {
+    if (m_rekordboxDrivesLoading) {
+        return;
+    }
+    m_rekordboxDrivesLoading = true;
+    emit rekordboxDrivesChanged();
+    auto* pWatcher = new QFutureWatcher<QVariantList>(this);
+    connect(pWatcher, &QFutureWatcher<QVariantList>::finished, this, [this, pWatcher]() {
+        m_rekordboxDrives = pWatcher->result();
+        m_rekordboxDrivesLoading = false;
+        emit rekordboxDrivesChanged();
+        pWatcher->deleteLater();
+    });
+    pWatcher->setFuture(QtConcurrent::run(&android::RekordboxDriveBackup::findDrives));
+}
+
+QString QmlMobileLibraryProxy::rekordboxDriveBackupDirectory(const QString& name) const {
+    return android::RekordboxDriveBackup::targetDirectory(name);
+}
+
+QString QmlMobileLibraryProxy::backUpRekordboxDrive(const QString& path, const QString& name) {
+    if (!m_pDriveBackup) {
+        m_pDriveBackup = new android::RekordboxDriveBackup(this);
+        connect(m_pDriveBackup,
+                &android::RekordboxDriveBackup::progressChanged,
+                this,
+                &QmlMobileLibraryProxy::driveBackupProgressChanged);
+        connect(m_pDriveBackup,
+                &android::RekordboxDriveBackup::finished,
+                this,
+                &QmlMobileLibraryProxy::driveBackupFinished);
+    }
+    return m_pDriveBackup->start(path, name);
+}
+
+void QmlMobileLibraryProxy::cancelDriveBackup() {
+    if (m_pDriveBackup) {
+        m_pDriveBackup->cancel();
+    }
+}
+
+bool QmlMobileLibraryProxy::driveBackupRunning() const {
+    return m_pDriveBackup && m_pDriveBackup->isRunning();
+}
+
+int QmlMobileLibraryProxy::driveBackupFilesDone() const {
+    return m_pDriveBackup ? m_pDriveBackup->filesDone() : 0;
+}
+
+int QmlMobileLibraryProxy::driveBackupFilesTotal() const {
+    return m_pDriveBackup ? m_pDriveBackup->filesTotal() : 0;
+}
+
+double QmlMobileLibraryProxy::driveBackupProgress() const {
+    if (!m_pDriveBackup || m_pDriveBackup->bytesTotal() <= 0) {
+        return 0;
+    }
+    return static_cast<double>(m_pDriveBackup->bytesDone()) /
+            static_cast<double>(m_pDriveBackup->bytesTotal());
 }
 
 bool QmlMobileLibraryProxy::hasFullStorageAccess() const {
