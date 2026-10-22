@@ -357,6 +357,8 @@ Rectangle {
 
         readonly property var selectedUrls: view.selectionModel.selectedTrackUrls()
         readonly property bool hasTrack: selectedUrls && selectedUrls.length > 0
+        // Without a selection, "+ ALL" adds the whole list to a playlist
+        readonly property bool hasTracks: view.rows > 0
 
         RowLayout {
             anchors.fill: parent
@@ -396,13 +398,13 @@ Rectangle {
                 Layout.preferredHeight: 38
                 Layout.preferredWidth: 110
                 activeColor: Theme.accentColor
-                backgroundColor: quickLoadBar.hasTrack ? "#2e3440" : "#262930"
-                normalColor: quickLoadBar.hasTrack ? "#ffffff" : "#78909c"
-                enabled: quickLoadBar.hasTrack
+                backgroundColor: quickLoadBar.hasTracks ? "#2e3440" : "#262930"
+                normalColor: quickLoadBar.hasTracks ? "#ffffff" : "#78909c"
+                enabled: quickLoadBar.hasTracks
                 font.bold: true
-                text: "+ PLAYLIST"
+                text: quickLoadBar.hasTrack ? qsTr("+ PLAYLIST") : qsTr("+ ALL")
 
-                onClicked: playlistPopup.openFor(quickLoadBar.selectedUrls[0])
+                onClicked: playlistPopup.openFor(quickLoadBar.hasTrack ? quickLoadBar.selectedUrls[0] : "")
             }
 
             Skin.Button {
@@ -447,22 +449,35 @@ Rectangle {
         id: playlistPopup
 
         property url trackUrl
+        // All tracks of the list instead of the selected one
+        property bool allTracks: false
         property var playlists: []
         property string message: ""
+        property bool messageIsError: true
 
+        // Without a track URL, all tracks of the list are added
         function openFor(url) {
             trackUrl = url;
+            allTracks = url.toString().length === 0;
             message = "";
             newPlaylistName.text = "";
             playlists = Mixxx.MobileLibrary.playlists();
             open();
         }
         function addTo(playlistId, name) {
-            if (Mixxx.MobileLibrary.addTrackToPlaylist(playlistId, trackUrl)) {
-                close();
-            } else {
-                message = qsTr("Could not add to %1").arg(name);
+            if (!allTracks) {
+                if (Mixxx.MobileLibrary.addTrackToPlaylist(playlistId, trackUrl)) {
+                    close();
+                } else {
+                    messageIsError = true;
+                    message = qsTr("Could not add to %1").arg(name);
+                }
+                return;
             }
+            const count = Mixxx.MobileLibrary.addAllTracksToPlaylist(playlistId, view.model);
+            messageIsError = count < 0;
+            message = count < 0 ? qsTr("Could not add to %1").arg(name) : qsTr("Added %1 tracks to %2").arg(count).arg(name);
+            playlists = Mixxx.MobileLibrary.playlists();
         }
 
         anchors.centerIn: parent
@@ -486,7 +501,31 @@ Rectangle {
                 color: Theme.white
                 font.bold: true
                 font.pixelSize: 15
-                text: qsTr("Add to playlist")
+                text: playlistPopup.allTracks ? qsTr("Add all tracks of the list to a playlist") : qsTr("Add to playlist")
+                wrapMode: Text.WordWrap
+            }
+            // With a selected track, choose between it and the whole list
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 6
+                visible: playlistPopup.trackUrl.toString().length > 0
+
+                Skin.Button {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 36
+                    activeColor: "#ffffff"
+                    highlight: !playlistPopup.allTracks
+                    text: qsTr("SELECTED TRACK")
+                    onClicked: playlistPopup.allTracks = false
+                }
+                Skin.Button {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 36
+                    activeColor: "#ffffff"
+                    highlight: playlistPopup.allTracks
+                    text: qsTr("ALL TRACKS")
+                    onClicked: playlistPopup.allTracks = true
+                }
             }
             ListView {
                 Layout.fillHeight: true
@@ -505,7 +544,7 @@ Rectangle {
                     normalColor: Theme.white
                     activeColor: Theme.accentColor
                     font.pixelSize: 14
-                    text: modelData.locked ? qsTr("%1 (bloqueada)").arg(modelData.name) : modelData.name
+                    text: modelData.locked ? qsTr("%1 (locked)").arg(modelData.name) : modelData.name
                     onClicked: playlistPopup.addTo(modelData.id, modelData.name)
                 }
 
@@ -520,7 +559,7 @@ Rectangle {
             Text {
                 Layout.fillWidth: true
                 visible: playlistPopup.message.length > 0
-                color: Theme.red
+                color: playlistPopup.messageIsError ? Theme.red : "#69f0ae"
                 font.pixelSize: 12
                 text: playlistPopup.message
                 wrapMode: Text.WordWrap

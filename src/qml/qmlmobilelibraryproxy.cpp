@@ -15,6 +15,7 @@
 #include "moc_qmlmobilelibraryproxy.cpp"
 #include "qml/qmlconfigproxy.h"
 #include "qml/qmllibraryproxy.h"
+#include "qml/qmllibrarytracklistmodel.h"
 #include "track/track.h"
 #include "util/androidbackup.h"
 #include "util/assert.h"
@@ -292,6 +293,38 @@ bool QmlMobileLibraryProxy::addTrackToPlaylist(int playlistId, const QUrl& track
         return false;
     }
     return playlistDao.appendTrackToPlaylist(pTrack->getId(), playlistId);
+}
+
+int QmlMobileLibraryProxy::addAllTracksToPlaylist(int playlistId, QAbstractItemModel* pTrackList) {
+    auto* pModel = qobject_cast<QmlLibraryTrackListModel*>(pTrackList);
+    TrackCollectionManager* pTrackCollectionManager = trackCollectionManager();
+    VERIFY_OR_DEBUG_ASSERT(pModel && pTrackCollectionManager) {
+        return -1;
+    }
+    PlaylistDAO& playlistDao = pTrackCollectionManager->internalCollection()->getPlaylistDAO();
+    if (!playlistDao.playlistExists(playlistId) || playlistDao.isPlaylistLocked(playlistId)) {
+        return -1;
+    }
+    // The track lists load their rows on demand
+    while (pModel->canFetchMore(QModelIndex())) {
+        pModel->fetchMore(QModelIndex());
+    }
+    QList<QUrl> urls;
+    urls.reserve(pModel->rowCount());
+    for (int row = 0; row < pModel->rowCount(); ++row) {
+        const QUrl url = pModel->getUrl(row);
+        if (url.isValid()) {
+            urls.append(url);
+        }
+    }
+    // Keeps the order of the list
+    const QList<TrackId> trackIds = pTrackCollectionManager->resolveTrackIdsFromUrls(urls, true);
+    if (trackIds.isEmpty()) {
+        return 0;
+    }
+    return playlistDao.appendTracksToPlaylist(trackIds, playlistId)
+            ? static_cast<int>(trackIds.size())
+            : -1;
 }
 
 bool QmlMobileLibraryProxy::hasFullStorageAccess() const {

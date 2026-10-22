@@ -138,6 +138,16 @@ Mixxx.LibrarySourceTree {
             delegate: KeyDelegate {
             }
         },
+        // Sortable, e.g. to build a playlist from the newest tracks of a
+        // folder (where it is the time the file was last modified)
+        Mixxx.TrackListColumn {
+            columnIdx: Mixxx.TrackListColumn.SQLColumns.DateAdded
+            label: qsTr("Added")
+            preferredWidth: 150
+
+            delegate: DefaultDelegate {
+            }
+        },
         Mixxx.TrackListColumn {
             autoHideWidth: 900
             columnIdx: Mixxx.TrackListColumn.SQLColumns.FileType

@@ -23,6 +23,8 @@ LRELEASE="${QT_BIN:+$QT_BIN/}lrelease"
 SOURCES=(
     res/qml
     src/qml/qmlstreamingproxy.cpp
+    src/qml/qmlmobilelibraryproxy.cpp
+    src/util/androidbackup.cpp
 )
 
 TS_FILES=(res/translations/mixxx-android.ts)

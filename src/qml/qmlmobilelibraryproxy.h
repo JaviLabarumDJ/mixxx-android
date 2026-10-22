@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QAbstractItemModel>
 #include <QObject>
 #include <QQmlEngine>
 #include <QString>
@@ -61,6 +62,9 @@ class QmlMobileLibraryProxy : public QObject {
     Q_INVOKABLE int createNamedPlaylist(const QString& name);
     /// Appends the track, adding it to the library if needed
     Q_INVOKABLE bool addTrackToPlaylist(int playlistId, const QUrl& trackUrl);
+    /// Appends all tracks of a track list, in its current order, adding them
+    /// to the library if needed. Returns how many were added, or -1.
+    Q_INVOKABLE int addAllTracksToPlaylist(int playlistId, QAbstractItemModel* pTrackList);
 
     /// Whether the databases on USB drives (Rekordbox, Engine DJ) can be
     /// read. On Android this needs "All files access".

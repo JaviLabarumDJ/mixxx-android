@@ -56,6 +56,29 @@ This edition of Mixxx for Android was born from a personal need as a DJ: to have
     </message>
 </context>
 <context>
+    <name>AndroidBackup</name>
+    <message>
+        <source>Cannot create %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot copy the library database: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot copy %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup %1 not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot copy backup %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ApplicationMenuCommands</name>
     <message>
         <source>Deck %1 is currently playing a track.
@@ -757,6 +780,26 @@ Are you sure you want to load a new track?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>💾 Library backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saves the library (tracks, BPM, key, cues, playlists, crates and history) and the settings to %1. That folder is kept when Mixxx is uninstalled or its data is cleared, so a backup can be restored afterwards.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>💾 Back up now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No backups yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restore</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>🔍 Search &amp; organization</source>
         <translation type="unfinished"></translation>
     </message>
@@ -810,6 +853,14 @@ Are you sure you want to load a new track?</source>
     </message>
     <message>
         <source>Saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restore the backup of %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your current library and settings are replaced by the backup (a copy of them is kept). Mixxx closes; open it again to finish.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1434,6 +1485,10 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Added</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>File Type</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1670,7 +1725,19 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>+ PLAYLIST</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>+ ALL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Could not add to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Added %1 tracks to %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1678,7 +1745,19 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 (bloqueada)</source>
+        <source>Add all tracks of the list to a playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SELECTED TRACK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ALL TRACKS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (locked)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1933,6 +2012,29 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>Starting audio engine...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>mixxx::qml::QmlMobileLibraryProxy</name>
+    <message>
+        <source>Backups need &quot;All files access&quot;. Allow it, then try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The library is not available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup saved to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restoring needs &quot;All files access&quot;. Allow it, then try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mixxx closes now. Open it again to finish restoring %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

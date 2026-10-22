@@ -45,8 +45,10 @@ Rectangle {
         const row = root.currentRow();
         root.selectRow(row < 0 ? 0 : Math.max(0, Math.min(featureView.rows - 1, row + offset)));
     }
-    // Opens the selected source. Returns true if it has no children, so
-    // the track list is what the user wants to browse next.
+    // Opens the selected source. Returns true if the track list is what the
+    // user wants to browse next: for an item without children, or for a
+    // folder or playlist whose children are already shown (its own tracks
+    // are loaded too). The top level sections only open and close.
     function activateCurrent() {
         const row = root.currentRow();
         if (row < 0) {
@@ -56,11 +58,18 @@ Rectangle {
         const index = featureView.index(row, 0);
         root.checkStorageAccess(index);
         root.model.activate(index);
-        if (root.model.hasChildren(index)) {
+        if (!root.model.hasChildren(index)) {
+            return true;
+        }
+        if (!index.parent.valid) {
             featureView.toggleExpanded(row);
             return false;
         }
-        return true;
+        if (featureView.isExpanded(row)) {
+            return true;
+        }
+        featureView.expand(row);
+        return false;
     }
     // Collapses the selected source or moves to its parent
     function collapseCurrent() {
@@ -179,7 +188,9 @@ Rectangle {
                                 anchors.leftMargin: 10 + 15 * depth
                                 anchors.right: parent.right
                                 anchors.top: parent.top
-                                color: current ? Theme.midGray : 'transparent'
+                                // Clearly visible on the grey of the top level rows
+                                color: current ? "#2D4EA1" : 'transparent'
+                                radius: 4
                                 width: 25
 
                                 // The features give the name of their icon
@@ -221,9 +232,9 @@ Rectangle {
                                     anchors.verticalCenter: parent.verticalCenter
                                     clip: true
                                     elide: Text.ElideRight
-                                    color: Theme.textColor
+                                    color: current ? Theme.white : Theme.textColor
                                     font.pixelSize: 14
-                                    font.weight: depth == 0 ? Font.Bold : Font.Medium
+                                    font.weight: depth == 0 || current ? Font.Bold : Font.Medium
                                     text: label
                                 }
                                 Item {

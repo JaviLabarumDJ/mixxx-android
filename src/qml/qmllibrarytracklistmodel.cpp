@@ -61,6 +61,10 @@ int browseColumn(int column) {
         return COLUMN_TYPE;
     case ColumnCache::COLUMN_LIBRARYTABLE_BITRATE:
         return COLUMN_BITRATE;
+    // Folders have no "date added", the time the file was last modified
+    // takes its place
+    case ColumnCache::COLUMN_LIBRARYTABLE_DATETIMEADDED:
+        return COLUMN_FILE_MODIFIED_TIME;
     default:
         return column;
     }

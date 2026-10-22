@@ -63,6 +63,29 @@ Esta edición de Mixxx para Android nace de una necesidad personal como DJ: tene
     </message>
 </context>
 <context>
+    <name>AndroidBackup</name>
+    <message>
+        <source>Cannot create %1</source>
+        <translation>No se puede crear %1</translation>
+    </message>
+    <message>
+        <source>Cannot copy the library database: %1</source>
+        <translation>No se puede copiar la base de datos de la librería: %1</translation>
+    </message>
+    <message>
+        <source>Cannot copy %1</source>
+        <translation>No se puede copiar %1</translation>
+    </message>
+    <message>
+        <source>Backup %1 not found</source>
+        <translation>No se encuentra la copia %1</translation>
+    </message>
+    <message>
+        <source>Cannot copy backup %1</source>
+        <translation>No se puede copiar la copia %1</translation>
+    </message>
+</context>
+<context>
     <name>ApplicationMenuCommands</name>
     <message>
         <source>Deck %1 is currently playing a track.
@@ -764,6 +787,26 @@ Are you sure you want to load a new track?</source>
         <translation>🗑️ Vaciar Caché</translation>
     </message>
     <message>
+        <source>💾 Library backup</source>
+        <translation>💾 Copia de seguridad de la librería</translation>
+    </message>
+    <message>
+        <source>Saves the library (tracks, BPM, key, cues, playlists, crates and history) and the settings to %1. That folder is kept when Mixxx is uninstalled or its data is cleared, so a backup can be restored afterwards.</source>
+        <translation>Guarda la librería (pistas, BPM, tonalidad, cues, playlists, cajas e historial) y los ajustes en %1. Esa carpeta se conserva al desinstalar Mixxx o borrar sus datos, así que la copia se puede restaurar después.</translation>
+    </message>
+    <message>
+        <source>💾 Back up now</source>
+        <translation>💾 Hacer copia ahora</translation>
+    </message>
+    <message>
+        <source>No backups yet.</source>
+        <translation>Aún no hay copias.</translation>
+    </message>
+    <message>
+        <source>Restore</source>
+        <translation>Restaurar</translation>
+    </message>
+    <message>
         <source>🔍 Search &amp; organization</source>
         <translation>🔍 Búsqueda y Organización</translation>
     </message>
@@ -818,6 +861,14 @@ Are you sure you want to load a new track?</source>
     <message>
         <source>Saved</source>
         <translation>Guardado</translation>
+    </message>
+    <message>
+        <source>Restore the backup of %1?</source>
+        <translation>¿Restaurar la copia del %1?</translation>
+    </message>
+    <message>
+        <source>Your current library and settings are replaced by the backup (a copy of them is kept). Mixxx closes; open it again to finish.</source>
+        <translation>La librería y los ajustes actuales se sustituyen por la copia (se guarda una copia de ellos). Mixxx se cierra; ábrelo de nuevo para terminar.</translation>
     </message>
     <message>
         <source>This or a parent directory is already in your library.</source>
@@ -903,7 +954,7 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <source>Metadata</source>
@@ -1441,6 +1492,10 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Added</source>
+        <translation>Añadida</translation>
+    </message>
+    <message>
         <source>File Type</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1677,16 +1732,40 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation>Selecciona una pista para cargar</translation>
     </message>
     <message>
+        <source>+ PLAYLIST</source>
+        <translation>+ PLAYLIST</translation>
+    </message>
+    <message>
+        <source>+ ALL</source>
+        <translation>+ TODAS</translation>
+    </message>
+    <message>
         <source>Could not add to %1</source>
         <translation>No se ha podido añadir a %1</translation>
+    </message>
+    <message>
+        <source>Added %1 tracks to %2</source>
+        <translation>%1 pistas añadidas a %2</translation>
     </message>
     <message>
         <source>Add to playlist</source>
         <translation>Añadir a playlist</translation>
     </message>
     <message>
-        <source>%1 (bloqueada)</source>
-        <translation type="unfinished"></translation>
+        <source>Add all tracks of the list to a playlist</source>
+        <translation>Añadir todas las pistas de la lista a una playlist</translation>
+    </message>
+    <message>
+        <source>SELECTED TRACK</source>
+        <translation>PISTA SELECCIONADA</translation>
+    </message>
+    <message>
+        <source>ALL TRACKS</source>
+        <translation>TODAS LAS PISTAS</translation>
+    </message>
+    <message>
+        <source>%1 (locked)</source>
+        <translation>%1 (bloqueada)</translation>
     </message>
     <message>
         <source>You have no playlists yet</source>
@@ -1941,6 +2020,29 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>Starting audio engine...</source>
         <translation>Iniciando motor de audio...</translation>
+    </message>
+</context>
+<context>
+    <name>mixxx::qml::QmlMobileLibraryProxy</name>
+    <message>
+        <source>Backups need &quot;All files access&quot;. Allow it, then try again.</source>
+        <translation>Las copias necesitan «Acceso a todos los archivos». Actívalo y vuelve a intentarlo.</translation>
+    </message>
+    <message>
+        <source>The library is not available.</source>
+        <translation>La librería no está disponible.</translation>
+    </message>
+    <message>
+        <source>Backup saved to %1</source>
+        <translation>Copia guardada en %1</translation>
+    </message>
+    <message>
+        <source>Restoring needs &quot;All files access&quot;. Allow it, then try again.</source>
+        <translation>Restaurar necesita «Acceso a todos los archivos». Actívalo y vuelve a intentarlo.</translation>
+    </message>
+    <message>
+        <source>Mixxx closes now. Open it again to finish restoring %1.</source>
+        <translation>Mixxx se cierra ahora. Ábrelo de nuevo para terminar de restaurar %1.</translation>
     </message>
 </context>
 <context>
