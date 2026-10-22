@@ -47,7 +47,20 @@ void writeNumber(int fd, uint64_t value, int base) {
     writeString(fd, buffer + pos);
 }
 
+/// Removes the pointer authentication code from a return address
+uintptr_t stripPointerAuthentication(uintptr_t address) {
+#if defined(__aarch64__)
+    // XPACLRI, a no-op on CPUs without pointer authentication
+    register uintptr_t x30 asm("x30") = address;
+    asm("hint #7" : "+r"(x30));
+    return x30;
+#else
+    return address;
+#endif
+}
+
 void writeAddress(int fd, int index, uintptr_t address) {
+    address = stripPointerAuthentication(address);
     writeString(fd, "#");
     writeNumber(fd, index, 10);
     writeString(fd, " pc 0x");

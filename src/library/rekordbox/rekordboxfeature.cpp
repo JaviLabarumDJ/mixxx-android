@@ -1576,14 +1576,14 @@ void RekordboxFeature::activateChild(const QModelIndex& index) {
     if (doParseDeviceDB) {
         qDebug() << "Parse Rekordbox Device DB: " << playlist;
 
+        // This device is now a playlist element, future activations should treat is
+        // as such. Changed before the worker thread starts reading the item.
+        data[1] = QVariant(IS_NOT_RECORDBOX_DEVICE);
+        item->setData(QVariant(data));
+
         // Let a worker thread do the XML parsing
         m_tracksFuture = QtConcurrent::run(parseDeviceDB, static_cast<Library*>(parent())->dbConnectionPool(), item);
         m_tracksFutureWatcher.setFuture(m_tracksFuture);
-
-        // This device is now a playlist element, future activations should treat is
-        // as such
-        data[1] = QVariant(IS_NOT_RECORDBOX_DEVICE);
-        item->setData(QVariant(data));
     } else {
         qDebug() << "Activate Rekordbox Playlist: " << playlist;
         m_pRekordboxPlaylistModel->setPlaylist(playlist);
