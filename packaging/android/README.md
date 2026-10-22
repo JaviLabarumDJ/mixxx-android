@@ -51,7 +51,8 @@ The Android UI creates `[Skin]` controls that controller mappings can use
 `[ChannelN],LoadSelectedTrack` (LOAD) opens the deck loader of deck 1/2 when
 no library is on screen; with a library on screen it loads the selected
 track, and closes the deck loader if it was used. The DDJ-400 and DDJ-FLX4
-mappings map SHIFT+LOAD to `mobile_library_toggle`.
+mappings map SHIFT+LOAD (`0x96 0x68`/`0x7A`, measured on a DDJ-FLX4) to
+`mobile_library_toggle`.
 
 > _End of AI-written section._
 
