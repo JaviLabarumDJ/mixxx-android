@@ -10,6 +10,8 @@
 #include "library/dao/directorydao.h"
 #include "library/dao/playlistdao.h"
 #include "library/library.h"
+#include "library/rekordbox/rekordboxandroid.h"
+#include "library/rekordbox/rekordboxplaylistcopy.h"
 #include "library/trackcollection.h"
 #include "library/trackcollectionmanager.h"
 #include "moc_qmlmobilelibraryproxy.cpp"
@@ -325,6 +327,56 @@ int QmlMobileLibraryProxy::addAllTracksToPlaylist(int playlistId, QAbstractItemM
     return playlistDao.appendTracksToPlaylist(trackIds, playlistId)
             ? static_cast<int>(trackIds.size())
             : -1;
+}
+
+bool QmlMobileLibraryProxy::isRekordboxPlaylist(QAbstractItemModel* pTrackList) const {
+    return android::isRekordboxPlaylist(pTrackList);
+}
+
+QString QmlMobileLibraryProxy::rekordboxPlaylistCopyDirectory(const QString& name) const {
+    return android::RekordboxPlaylistCopy::targetDirectory(name);
+}
+
+QString QmlMobileLibraryProxy::copyRekordboxPlaylist(
+        QAbstractItemModel* pTrackList, const QString& name) {
+    const auto tracks = android::rekordboxPlaylistTracks(pTrackList);
+    if (!tracks) {
+        return tr("This list is not a Rekordbox playlist");
+    }
+    if (!m_pPlaylistCopy) {
+        TrackCollectionManager* pTrackCollectionManager = trackCollectionManager();
+        VERIFY_OR_DEBUG_ASSERT(pTrackCollectionManager) {
+            return tr("The library is not available");
+        }
+        m_pPlaylistCopy = new android::RekordboxPlaylistCopy(pTrackCollectionManager, this);
+        connect(m_pPlaylistCopy,
+                &android::RekordboxPlaylistCopy::progressChanged,
+                this,
+                &QmlMobileLibraryProxy::playlistCopyProgressChanged);
+        connect(m_pPlaylistCopy,
+                &android::RekordboxPlaylistCopy::finished,
+                this,
+                &QmlMobileLibraryProxy::playlistCopyFinished);
+    }
+    return m_pPlaylistCopy->start(*tracks, name);
+}
+
+void QmlMobileLibraryProxy::cancelPlaylistCopy() {
+    if (m_pPlaylistCopy) {
+        m_pPlaylistCopy->cancel();
+    }
+}
+
+bool QmlMobileLibraryProxy::playlistCopyRunning() const {
+    return m_pPlaylistCopy && m_pPlaylistCopy->isRunning();
+}
+
+int QmlMobileLibraryProxy::playlistCopyDone() const {
+    return m_pPlaylistCopy ? m_pPlaylistCopy->done() : 0;
+}
+
+int QmlMobileLibraryProxy::playlistCopyTotal() const {
+    return m_pPlaylistCopy ? m_pPlaylistCopy->total() : 0;
 }
 
 bool QmlMobileLibraryProxy::hasFullStorageAccess() const {

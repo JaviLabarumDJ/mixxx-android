@@ -24,6 +24,7 @@ SOURCES=(
     res/qml
     src/qml/qmlstreamingproxy.cpp
     src/qml/qmlmobilelibraryproxy.cpp
+    src/library/rekordbox/rekordboxplaylistcopy.cpp
     src/util/androidbackup.cpp
 )
 

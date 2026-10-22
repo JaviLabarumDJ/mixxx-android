@@ -1,0 +1,39 @@
+#pragma once
+
+#include <QList>
+#include <QString>
+#include <QVariant>
+#include <optional>
+
+#include "track/track_decl.h"
+
+class QAbstractItemModel;
+
+namespace mixxx {
+namespace android {
+
+/// A track of a Rekordbox playlist with the data Rekordbox exported for it
+struct RekordboxTrack {
+    QString location;
+    /// The ANLZ file with the beatgrid and the cues
+    QString analyzePath;
+    QString key;
+    QVariant color;
+};
+
+/// The tracks of the Rekordbox playlist that `pModel` shows, in the order
+/// of the playlist and regardless of the current search. `pModel` is a
+/// track list of the QML UI or a Rekordbox playlist model. Returns nothing
+/// if it doesn't show a Rekordbox playlist.
+std::optional<QList<RekordboxTrack>> rekordboxPlaylistTracks(QAbstractItemModel* pModel);
+
+/// True if `pModel` shows a Rekordbox playlist
+bool isRekordboxPlaylist(QAbstractItemModel* pModel);
+
+/// Applies the beatgrid, cues, key and color that Rekordbox exported for
+/// `rekordboxTrack` to `pTrack`, a copy of its file. Does the same as
+/// loading the track from the Rekordbox drive.
+void applyRekordboxData(const TrackPointer& pTrack, const RekordboxTrack& rekordboxTrack);
+
+} // namespace android
+} // namespace mixxx

@@ -1666,3 +1666,7 @@ void RekordboxFeature::onTracksFound() {
     m_pRekordboxPlaylistModel->setPlaylist(devicePlaylist);
     emit showTrackModel(m_pRekordboxPlaylistModel);
 }
+
+#ifdef Q_OS_ANDROID
+#include "library/rekordbox/rekordboxandroid.inc"
+#endif

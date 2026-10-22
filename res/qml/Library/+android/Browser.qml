@@ -19,6 +19,8 @@ Rectangle {
     required property var model
     // Shows that the controller's browse knob moves through the sources
     property bool highlighted: false
+    // The name of the playlist, crate or folder whose tracks are shown
+    property string activeLabel: ""
 
     // Reading the databases on USB drives needs more than the music permission
     signal storageAccessNeeded()
@@ -49,6 +51,11 @@ Rectangle {
     // user wants to browse next: for an item without children, or for a
     // folder or playlist whose children are already shown (its own tracks
     // are loaded too). The top level sections only open and close.
+    function activate(index) {
+        const label = root.model.data(index, Qt.DisplayRole);
+        root.activeLabel = label ? label.toString() : "";
+        root.model.activate(index);
+    }
     function activateCurrent() {
         const row = root.currentRow();
         if (row < 0) {
@@ -57,7 +64,7 @@ Rectangle {
         }
         const index = featureView.index(row, 0);
         root.checkStorageAccess(index);
-        root.model.activate(index);
+        root.activate(index);
         if (!root.model.hasChildren(index)) {
             return true;
         }
@@ -94,7 +101,7 @@ Rectangle {
     border.width: highlighted ? 2 : 0
 
     Component.onCompleted: {
-        root.model.activate(root.model.index(0, 0));
+        root.activate(root.model.index(0, 0));
     }
 
     Rectangle {
@@ -175,7 +182,7 @@ Rectangle {
                                 onClicked: event => {
                                     treeView.selectionModel.setCurrentIndex(treeView.index(row, 0), ItemSelectionModel.ClearAndSelect | ItemSelectionModel.Rows);
                                     root.checkStorageAccess(index);
-                                    treeView.model.activate(index);
+                                    root.activate(index);
                                     if (isTreeNode && hasChildren) {
                                         treeView.toggleExpanded(row);
                                     }

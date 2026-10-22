@@ -27,6 +27,11 @@ QFileInfoList driveRoots();
 /// Database files are refreshed whenever they changed on the drive.
 void prepareFiles(const QString& root, const QStringList& relativePaths);
 
+/// Makes sure a file of a drive has been copied to its local folder. Blocks
+/// while copying, so it must not be called on the main thread. Returns true
+/// if the file is there, also for files that are not on a drive.
+bool fetchFile(const QString& localPath);
+
 /// True if the path is inside the local folder of a drive
 bool isOnDrive(const QString& localPath);
 

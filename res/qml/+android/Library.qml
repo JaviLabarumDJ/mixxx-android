@@ -272,6 +272,7 @@ Item {
                     SplitView.fillHeight: true
                     clip: true
                     model: root.sidebar ? root.sidebar.tracklist : null
+                    sourceName: browser.activeLabel
                 }
             }
         }

@@ -50,6 +50,8 @@ struct Drive {
     std::unique_ptr<UsbMassStorage> pStorage;
     FatVolume volume;
     QString root;
+    /// The drive reads one file at a time
+    std::mutex mutex;
 
     ~Drive() {
         if (pHandle) {
@@ -280,6 +282,7 @@ void trimTrackCache(const QString& keep) {
 
 /// Copies a file of the drive unless the local copy is current
 bool ensureLocal(const std::shared_ptr<Drive>& pDrive, const QString& relativePath) {
+    const std::lock_guard lock(pDrive->mutex);
     const std::optional<FatVolume::Entry> entry = pDrive->volume.find(relativePath);
     if (!entry || entry->isDirectory) {
         return false;
@@ -399,6 +402,14 @@ void prepareFiles(const QString& root, const QStringList& relativePaths) {
             ensureLocal(pDrive, relativePath);
         }
     }
+}
+
+bool fetchFile(const QString& localPath) {
+    const auto pDrive = driveFor(localPath);
+    if (!pDrive) {
+        return QFileInfo::exists(localPath);
+    }
+    return ensureLocal(pDrive, localPath.mid(pDrive->root.size() + 1));
 }
 
 bool isOnDrive(const QString& localPath) {

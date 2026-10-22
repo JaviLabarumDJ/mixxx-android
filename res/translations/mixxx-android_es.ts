@@ -1740,6 +1740,10 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation>+ TODAS</translation>
     </message>
     <message>
+        <source>⬇ COPY</source>
+        <translation>⬇ COPIAR</translation>
+    </message>
+    <message>
         <source>Could not add to %1</source>
         <translation>No se ha podido añadir a %1</translation>
     </message>
@@ -1782,6 +1786,34 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>A playlist named %1 already exists</source>
         <translation>Ya existe una playlist llamada %1</translation>
+    </message>
+    <message>
+        <source>Copy the playlist to this device</source>
+        <translation>Copiar la lista a este dispositivo</translation>
+    </message>
+    <message>
+        <source>Copies the files to the folder below and creates a Mixxx playlist with this name, in the order of the Rekordbox playlist. Beatgrids, cues, keys and colors from Rekordbox are kept. Copying the playlist again only copies new files and updates the Mixxx playlist.</source>
+        <translation>Copia los archivos a la carpeta de abajo y crea una lista de Mixxx con este nombre, en el orden de la lista de Rekordbox. Se conservan las rejillas de beats, los cues, las tonalidades y los colores de Rekordbox. Si vuelves a copiar la lista, solo se copian los archivos nuevos y se actualiza la lista de Mixxx.</translation>
+    </message>
+    <message>
+        <source>Playlist name</source>
+        <translation>Nombre de la lista</translation>
+    </message>
+    <message>
+        <source>Copying %1 of %2 files…</source>
+        <translation>Copiando %1 de %2 archivos…</translation>
+    </message>
+    <message>
+        <source>STOP</source>
+        <translation>DETENER</translation>
+    </message>
+    <message>
+        <source>CLOSE</source>
+        <translation type="unfinished">CERRAR</translation>
+    </message>
+    <message>
+        <source>COPY</source>
+        <translation>COPIAR</translation>
     </message>
 </context>
 <context>
@@ -2023,6 +2055,53 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
 </context>
 <context>
+    <name>mixxx::android::RekordboxPlaylistCopy</name>
+    <message>
+        <source>A playlist is already being copied</source>
+        <translation>Ya se está copiando una lista</translation>
+    </message>
+    <message>
+        <source>The playlist is empty</source>
+        <translation>La lista está vacía</translation>
+    </message>
+    <message>
+        <source>Enter a name for the playlist</source>
+        <translation>Escribe un nombre para la lista</translation>
+    </message>
+    <message>
+        <source>Could not create the folder %1. Grant Mixxx access to all files and try again.</source>
+        <translation>No se pudo crear la carpeta %1. Da a Mixxx acceso a todos los archivos e inténtalo de nuevo.</translation>
+    </message>
+    <message>
+        <source>%1 copied</source>
+        <translation>%1 copiados</translation>
+    </message>
+    <message>
+        <source>%1 already in the folder</source>
+        <translation>%1 ya estaban en la carpeta</translation>
+    </message>
+    <message>
+        <source>%1 failed</source>
+        <translation>%1 con error</translation>
+    </message>
+    <message>
+        <source>Copy canceled: %1. The playlist was not changed.</source>
+        <translation>Copia cancelada: %1. La lista no se modificó.</translation>
+    </message>
+    <message>
+        <source>%1. The playlist %2 is locked and was not changed.</source>
+        <translation>%1. La lista %2 está bloqueada y no se modificó.</translation>
+    </message>
+    <message>
+        <source>%1. Could not create the playlist %2.</source>
+        <translation>%1. No se pudo crear la lista %2.</translation>
+    </message>
+    <message>
+        <source>Playlist %1 has %2 tracks: %3.</source>
+        <translation>La lista %1 tiene %2 pistas: %3.</translation>
+    </message>
+</context>
+<context>
     <name>mixxx::qml::QmlMobileLibraryProxy</name>
     <message>
         <source>Backups need &quot;All files access&quot;. Allow it, then try again.</source>
@@ -2043,6 +2122,14 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>Mixxx closes now. Open it again to finish restoring %1.</source>
         <translation>Mixxx se cierra ahora. Ábrelo de nuevo para terminar de restaurar %1.</translation>
+    </message>
+    <message>
+        <source>This list is not a Rekordbox playlist</source>
+        <translation>Esta lista no es una lista de Rekordbox</translation>
+    </message>
+    <message>
+        <source>The library is not available</source>
+        <translation>La biblioteca no está disponible</translation>
     </message>
 </context>
 <context>

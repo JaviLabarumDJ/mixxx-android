@@ -12,6 +12,7 @@ target_sources(
     src/controllers/mappingmatcher.cpp
     src/soundio/soundmanagerandroid.cpp
     src/library/androidscanorder.cpp
+    src/library/rekordbox/rekordboxplaylistcopy.cpp
     src/util/androidbackup.cpp
     src/util/androidpermissions.cpp
     src/util/removablestorage.cpp

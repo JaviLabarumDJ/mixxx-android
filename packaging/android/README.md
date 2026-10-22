@@ -69,6 +69,24 @@ the library are not changed.
 
 > _End of AI-written section._
 
+## Copying Rekordbox playlists
+
+> _The following section was written by an AI agent (Claude Code)._
+
+A Rekordbox playlist of a USB drive has a *COPY* button in the library. It
+copies the files to `/storage/emulated/0/Music/Mixxx/<playlist name>`, adds
+the copies to the library in the order of the playlist and gives them the
+beatgrid, cues, key and color that Rekordbox exported, then creates a Mixxx
+playlist with the same order (`src/library/rekordbox/rekordboxplaylistcopy.cpp`).
+Copying the same playlist again only copies files that are not in the folder
+yet and refills the Mixxx playlist.
+
+The Rekordbox data is read by `rekordboxandroid.inc`, which is included at
+the end of the upstream `rekordboxfeature.cpp` so that it can use the ANLZ
+reader there without changing it.
+
+> _End of AI-written section._
+
 ## Merging upstream Mixxx
 
 ### QML overrides

@@ -2,6 +2,7 @@
 
 #include <QAbstractItemModel>
 #include <QObject>
+#include <QPointer>
 #include <QQmlEngine>
 #include <QString>
 #include <QStringList>
@@ -9,6 +10,10 @@
 #include <QVariantList>
 
 namespace mixxx {
+namespace android {
+class RekordboxPlaylistCopy;
+} // namespace android
+
 namespace qml {
 
 /// Library functions used by the Android UI, exposed as the
@@ -22,6 +27,10 @@ class QmlMobileLibraryProxy : public QObject {
                     sidebarVisibleChanged)
     /// Where library backups are stored, see util/androidbackup.h
     Q_PROPERTY(QString backupDirectory READ backupDirectory CONSTANT)
+    /// Progress of copyRekordboxPlaylist()
+    Q_PROPERTY(bool playlistCopyRunning READ playlistCopyRunning NOTIFY playlistCopyProgressChanged)
+    Q_PROPERTY(int playlistCopyDone READ playlistCopyDone NOTIFY playlistCopyProgressChanged)
+    Q_PROPERTY(int playlistCopyTotal READ playlistCopyTotal NOTIFY playlistCopyProgressChanged)
     QML_NAMED_ELEMENT(MobileLibrary)
     QML_SINGLETON
 
@@ -66,6 +75,21 @@ class QmlMobileLibraryProxy : public QObject {
     /// to the library if needed. Returns how many were added, or -1.
     Q_INVOKABLE int addAllTracksToPlaylist(int playlistId, QAbstractItemModel* pTrackList);
 
+    /// Whether the track list shows a Rekordbox playlist of a USB drive
+    Q_INVOKABLE bool isRekordboxPlaylist(QAbstractItemModel* pTrackList) const;
+    /// The folder copyRekordboxPlaylist() copies the files to
+    Q_INVOKABLE QString rekordboxPlaylistCopyDirectory(const QString& name) const;
+    /// Starts copying the files of the Rekordbox playlist shown by the track
+    /// list into rekordboxPlaylistCopyDirectory(name), and makes a playlist
+    /// `name` of the copies, see library/rekordbox/rekordboxplaylistcopy.h.
+    /// Returns an error message, or an empty string if the copy started;
+    /// playlistCopyFinished() is emitted at the end.
+    Q_INVOKABLE QString copyRekordboxPlaylist(QAbstractItemModel* pTrackList, const QString& name);
+    Q_INVOKABLE void cancelPlaylistCopy();
+    bool playlistCopyRunning() const;
+    int playlistCopyDone() const;
+    int playlistCopyTotal() const;
+
     /// Whether the databases on USB drives (Rekordbox, Engine DJ) can be
     /// read. On Android this needs "All files access".
     Q_INVOKABLE bool hasFullStorageAccess() const;
@@ -75,9 +99,13 @@ class QmlMobileLibraryProxy : public QObject {
   signals:
     void sourcesChanged();
     void sidebarVisibleChanged();
+    void playlistCopyProgressChanged();
+    void playlistCopyFinished(const QString& message, bool error);
 
   private:
     void analyzeTracksMatching(const QString& sqlQuery) const;
+
+    QPointer<android::RekordboxPlaylistCopy> m_pPlaylistCopy;
 };
 
 } // namespace qml

@@ -18,6 +18,9 @@ Rectangle {
 
     // Shows that the controller's browse knob moves through this list
     property bool highlighted: false
+    // The name of the playlist, crate or folder shown, if known
+    property string sourceName: ""
+    readonly property bool isRekordboxPlaylist: Mixxx.MobileLibrary.isRekordboxPlaylist(root.model)
 
     function focusList() {
         view.forceActiveFocus();
@@ -407,6 +410,20 @@ Rectangle {
                 onClicked: playlistPopup.openFor(quickLoadBar.hasTrack ? quickLoadBar.selectedUrls[0] : "")
             }
 
+            // Copies a Rekordbox playlist of a USB drive to the device
+            Skin.Button {
+                Layout.preferredHeight: 38
+                Layout.preferredWidth: 100
+                visible: root.isRekordboxPlaylist
+                activeColor: Theme.accentColor
+                backgroundColor: "#2e3440"
+                normalColor: "#ffffff"
+                font.bold: true
+                text: Mixxx.MobileLibrary.playlistCopyRunning ? "%1/%2".arg(Mixxx.MobileLibrary.playlistCopyDone).arg(Mixxx.MobileLibrary.playlistCopyTotal) : qsTr("⬇ COPY")
+
+                onClicked: copyPopup.openForList()
+            }
+
             Skin.Button {
                 id: loadDeck1Btn
 
@@ -597,6 +614,136 @@ Rectangle {
                             return;
                         }
                         playlistPopup.addTo(playlistId, name);
+                    }
+                }
+            }
+        }
+    }
+    // Copies the files of a Rekordbox playlist to the device and makes a
+    // Mixxx playlist of them, see library/rekordbox/rekordboxplaylistcopy.h
+    Popup {
+        id: copyPopup
+
+        property string message: ""
+        property bool messageIsError: false
+
+        function openForList() {
+            if (!Mixxx.MobileLibrary.playlistCopyRunning) {
+                message = "";
+                copyName.text = root.sourceName;
+            }
+            open();
+        }
+
+        anchors.centerIn: parent
+        width: Math.min(420, root.width - 20)
+        modal: true
+        focus: true
+        padding: 12
+
+        background: Rectangle {
+            color: Theme.darkGray2
+            border.color: Theme.darkGray3
+            radius: 8
+        }
+
+        Connections {
+            target: Mixxx.MobileLibrary
+
+            function onPlaylistCopyFinished(message, error) {
+                copyPopup.message = message;
+                copyPopup.messageIsError = error;
+            }
+        }
+
+        contentItem: ColumnLayout {
+            spacing: 8
+
+            Text {
+                Layout.fillWidth: true
+                color: Theme.white
+                font.bold: true
+                font.pixelSize: 15
+                text: qsTr("Copy the playlist to this device")
+                wrapMode: Text.WordWrap
+            }
+            Text {
+                Layout.fillWidth: true
+                color: Theme.lightGray2
+                font.pixelSize: 12
+                text: qsTr("Copies the files to the folder below and creates a Mixxx playlist with this name, in the order of the Rekordbox playlist. Beatgrids, cues, keys and colors from Rekordbox are kept. Copying the playlist again only copies new files and updates the Mixxx playlist.")
+                wrapMode: Text.WordWrap
+            }
+            Skin.TextField {
+                id: copyName
+
+                Layout.fillWidth: true
+                Layout.preferredHeight: 44
+                enabled: !Mixxx.MobileLibrary.playlistCopyRunning
+                font.pixelSize: 14
+                placeholderText: qsTr("Playlist name")
+            }
+            Text {
+                Layout.fillWidth: true
+                color: Theme.lightGray2
+                elide: Text.ElideMiddle
+                font.pixelSize: 12
+                text: Mixxx.MobileLibrary.rekordboxPlaylistCopyDirectory(copyName.text)
+            }
+            ProgressBar {
+                Layout.fillWidth: true
+                visible: Mixxx.MobileLibrary.playlistCopyRunning
+                from: 0
+                to: Math.max(1, Mixxx.MobileLibrary.playlistCopyTotal)
+                value: Mixxx.MobileLibrary.playlistCopyDone
+            }
+            Text {
+                Layout.fillWidth: true
+                visible: Mixxx.MobileLibrary.playlistCopyRunning
+                color: Theme.white
+                font.pixelSize: 12
+                text: qsTr("Copying %1 of %2 files…").arg(Math.min(Mixxx.MobileLibrary.playlistCopyDone + 1, Mixxx.MobileLibrary.playlistCopyTotal)).arg(Mixxx.MobileLibrary.playlistCopyTotal)
+            }
+            Text {
+                Layout.fillWidth: true
+                visible: copyPopup.message.length > 0
+                color: copyPopup.messageIsError ? Theme.red : "#69f0ae"
+                font.pixelSize: 12
+                text: copyPopup.message
+                wrapMode: Text.WordWrap
+            }
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 6
+
+                Skin.Button {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 44
+                    activeColor: Theme.accentColor
+                    font.bold: true
+                    text: Mixxx.MobileLibrary.playlistCopyRunning ? qsTr("STOP") : qsTr("CLOSE")
+                    onClicked: {
+                        if (Mixxx.MobileLibrary.playlistCopyRunning) {
+                            Mixxx.MobileLibrary.cancelPlaylistCopy();
+                        } else {
+                            copyPopup.close();
+                        }
+                    }
+                }
+                Skin.Button {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 44
+                    visible: !Mixxx.MobileLibrary.playlistCopyRunning
+                    enabled: copyName.text.trim().length > 0 && root.isRekordboxPlaylist
+                    activeColor: Theme.accentColor
+                    backgroundColor: "#1565c0"
+                    normalColor: "#ffffff"
+                    font.bold: true
+                    text: qsTr("COPY")
+                    onClicked: {
+                        const error = Mixxx.MobileLibrary.copyRekordboxPlaylist(root.model, copyName.text.trim());
+                        copyPopup.messageIsError = error.length > 0;
+                        copyPopup.message = error;
                     }
                 }
             }
