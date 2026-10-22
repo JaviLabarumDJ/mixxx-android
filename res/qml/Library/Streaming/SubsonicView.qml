@@ -325,7 +325,7 @@ Item {
                     backgroundColor: root.activeMode === "playlists" ? "#006064" : "#222733"
                     normalColor: "#ffffff"
                     font.bold: true
-                    text: "📜 Playlists"
+                    text: qsTr("📜 Playlists")
                     onClicked: {
                         root.isBusy = true;
                         Mixxx.StreamingManager.getSubsonicPlaylists();

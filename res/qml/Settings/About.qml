@@ -86,7 +86,7 @@ Category {
                                 width: 56
                                 Text {
                                     anchors.centerIn: parent
-                                    text: "DJ / CREATOR"
+                                    text: qsTr("DJ / CREATOR")
                                     font.pixelSize: 7
                                     font.bold: true
                                     color: "#00e5ff"
@@ -260,7 +260,7 @@ Category {
                         }
                         Item { Layout.fillWidth: true }
                         Text {
-                            text: "v2.6-mobile (ARM64)"
+                            text: `v${Mixxx.MobileApp.packageVersion} (Mixxx ${Mixxx.Application.version})`
                             font.pixelSize: 10
                             color: "#78909c"
                         }

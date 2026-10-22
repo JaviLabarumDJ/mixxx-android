@@ -42,6 +42,9 @@ class QmlLanguageProxy : public QObject {
     QVariantList availableLocales() const;
 
   signals:
+    /// Emitted before the texts are translated again, so that views can keep
+    /// their state while their models are rebuilt
+    void localeAboutToChange();
     void localeChanged();
 };
 

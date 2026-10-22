@@ -8,6 +8,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>DJ / CREATOR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>DJ, producer and digital audio enthusiast. Bringing a professional mixing experience and real touch control to Android devices.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -91,6 +95,99 @@ Are you sure you want to load a new track?</source>
     </message>
     <message>
         <source>Keywheel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AudioRouter</name>
+    <message>
+        <source>Inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 connections hidden
+Use the advanced mode to view them</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 connection hidden
+Use the advanced mode to view them</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Short delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Long delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multi-Soundcard Synchronization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Outputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vinyl Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Booth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left Bus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Center Bus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right Bus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auxiliary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Microphone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mixer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Broadcast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alternative input</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -280,6 +377,48 @@ Are you sure you want to load a new track?</source>
 <context>
     <name>ControllerCard</name>
     <message>
+        <source>Vendor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Product</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Serial number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Supported since %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press to
+set a visual</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press to
+set another visual</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No visual</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Images (*.png *.gif *.jpg)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Select an image</source>
         <translation type="unfinished"></translation>
     </message>
@@ -289,6 +428,34 @@ Are you sure you want to load a new track?</source>
     </message>
     <message>
         <source>Select mapping...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Author</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> (edited by you)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forum Link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wiki Link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -358,6 +525,31 @@ Are you sure you want to load a new track?</source>
     </message>
 </context>
 <context>
+    <name>Deck</name>
+    <message>
+        <source>Waveform overview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FX Assign</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play
+Button</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cue
+Button</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>EffectChainPresetPopup</name>
     <message>
         <source>Update Preset</source>
@@ -393,6 +585,10 @@ Are you sure you want to load a new track?</source>
 <context>
     <name>Interface</name>
     <message>
+        <source>Interface</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Appearance &amp; Colors</source>
         <translation type="unfinished"></translation>
     </message>
@@ -417,11 +613,31 @@ Are you sure you want to load a new track?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Unnamed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Theme color</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Dark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Performance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Broadcast</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -636,11 +852,39 @@ Are you sure you want to load a new track?</source>
         <source>Saved</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Traditional (Coarse)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seconds (Long)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Kiloseconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hectoseconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Traditional</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Library</name>
     <message>
         <source>LOCAL MUSIC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>STREAMING HUB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1059,6 +1303,29 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
 </context>
 <context>
+    <name>MainWindow</name>
+    <message>
+        <source>WAVE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LIB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CTL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LOAD %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>OnlineStreamView</name>
     <message>
         <source>%1 tracks found on streaming</source>
@@ -1156,6 +1423,10 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>STREAMING HUB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>CLOSE</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1227,6 +1498,10 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>JaviLabarum, Socials &amp; Info</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1445,6 +1720,18 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Main output only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main and booth outputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Direct monitor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>🔧 Advanced routing matrix (virtual cables)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1655,6 +1942,10 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>🔍 Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>📜 Playlists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2028,11 +2319,215 @@ Aborting the operation to avoid library inconsistencies</source>
         <source>No track - load</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>REMAIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TIME</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Waveform</name>
     <message>
+        <source>Waveforms</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Overview Waveforms</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filtered</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stereo channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minute markers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gain scaling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scrolling Waveforms</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Simple</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stacked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Simple, Filtered, HSV, RGB and Stacked are supported by the QML renderer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Waveform smoothness (FPS)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frame rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sync deck zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>End-of-track warning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Beat-grid opacity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play-marker position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Visual gain (all)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Visual gain (low)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Visual gain (mid)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Visual gain (high)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Split stereo signal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Split stereo signal is used by the RGB renderer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High detail (legacy)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High detail is retained for compatibility but is unavailable in the QML scene-graph renderer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show beats until marker</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show time until marker</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Marker alignment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Top</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Center</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bottom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Marker text size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stem channel opacity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stem outline opacity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reorder stems when volume changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stem display mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Caching</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable waveform caching</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generate while analyzing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cached waveforms occupy %1 on disk.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear cached waveforms</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Graphics API Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Qt Quick renderer: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Average frame rate: %1 fps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Average frame rate: Measuring…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Runtime API reported by Qt Quick</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2076,7 +2571,46 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
 </context>
 <context>
+    <name>XYPad</name>
+    <message>
+        <source>⚡ XY TOUCH PAD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RESET</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>◀ LOW PASS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HIGH PASS ▶</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FILTER: NEUTRAL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FILTER: LPF %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FILTER: HPF %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FX DEPTH: %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>main</name>
+    <message>
+        <source>By JaviLabarumDJ on Android</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <source>Ready to mix!</source>
         <translation type="unfinished"></translation>

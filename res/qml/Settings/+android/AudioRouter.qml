@@ -428,7 +428,7 @@ Rectangle {
                 Layout.margins: 15
                 color: '#626262'
                 font.pixelSize: 14
-                text: "Inputs"
+                text: qsTr("Inputs")
             }
             ListView {
                 id: inputList
@@ -525,7 +525,7 @@ Rectangle {
                     id: modeChoice
 
                     options: ["simple", !root.hiddenConnections ? "advanced" : "advanced (!)", "legacy"]
-                    tooltips: !root.hiddenConnections ? [] : [null, `${root.hiddenConnections} connection${root.hiddenConnections > 1 ? 's' : ''} hidden\nUse the advanced mode to view them`, null]
+                    tooltips: !root.hiddenConnections ? [] : [null, (root.hiddenConnections > 1 ? qsTr("%1 connections hidden\nUse the advanced mode to view them") : qsTr("%1 connection hidden\nUse the advanced mode to view them")).arg(root.hiddenConnections), null]
 
                     onOptionsChanged: {
                         if (modeChoice.selected?.startsWith("advanced")) {
@@ -548,20 +548,20 @@ Rectangle {
                     // Indexed by the sync buffers value: 0 = experimental,
                     // 1 = disabled (short delay), 2 = default (long delay)
                     options: ["experimental", "disabled", "default"]
-                    tooltips: ["No delay", "Short delay", "Long delay"]
+                    tooltips: [qsTr("No delay"), qsTr("Short delay"), qsTr("Long delay")]
 
                     onSelectedChanged: {
                         root.hasChanges = true;
                     }
 
                     Mixxx.SettingParameter {
-                        label: "Multi-Soundcard Synchronization"
+                        label: qsTr("Multi-Soundcard Synchronization")
                     }
                 }
                 Text {
                     color: Theme.white
                     font.pixelSize: 14
-                    text: "Multi-Soundcard Synchronization"
+                    text: qsTr("Multi-Soundcard Synchronization")
                 }
                 Item {
                     Layout.fillWidth: true
@@ -585,7 +585,7 @@ Rectangle {
                 Layout.margins: 15
                 color: '#626262'
                 font.pixelSize: 14
-                text: "Outputs"
+                text: qsTr("Outputs")
             }
             ListView {
                 id: outputList
@@ -685,12 +685,14 @@ Rectangle {
             advanced: root.mode == AudioRouter.Mode.Advanced
             gateways: [
                 {
-                    name: "Output",
+                    address: "Output",
+                    name: qsTr("Output"),
                     type: "source",
                     advanced: true
                 },
                 {
-                    name: "Vinyl Control",
+                    address: "Vinyl Control",
+                    name: qsTr("Vinyl Control"),
                     type: "sink",
                     advanced: true
                 }
@@ -727,37 +729,44 @@ Rectangle {
                 type: "source"
             },
             {
-                name: "Main",
+                address: "Main",
+                name: qsTr("Main"),
                 type: "source",
                 required: true
             },
             {
-                name: "Booth",
+                address: "Booth",
+                name: qsTr("Booth"),
                 type: "source"
             },
             {
-                name: "Left Bus",
+                address: "Left Bus",
+                name: qsTr("Left Bus"),
                 type: "source",
                 advanced: true
             },
             {
-                name: "Center Bus",
+                address: "Center Bus",
+                name: qsTr("Center Bus"),
                 type: "source",
                 advanced: true
             },
             {
-                name: "Right Bus",
+                address: "Right Bus",
+                name: qsTr("Right Bus"),
                 type: "source",
                 advanced: true
             },
             {
-                name: "Auxiliary",
+                address: "Auxiliary",
+                name: qsTr("Auxiliary"),
                 type: "sink",
                 instances: 4,
                 advanced: true
             },
             {
-                name: "Microphone",
+                address: "Microphone",
+                name: qsTr("Microphone"),
                 type: "sink",
                 instances: 4,
                 advanced: true
@@ -797,25 +806,25 @@ Rectangle {
             label: "PFL"
         }
         Mixxx.SettingParameter {
-            label: "Main"
+            label: qsTr("Main")
         }
         Mixxx.SettingParameter {
-            label: "Booth"
+            label: qsTr("Booth")
         }
         Mixxx.SettingParameter {
-            label: "Mixer"
+            label: qsTr("Mixer")
         }
         Mixxx.SettingParameter {
-            label: "Decks"
+            label: qsTr("Decks")
         }
         Mixxx.SettingParameter {
-            label: "Input"
+            label: qsTr("Input")
         }
         Mixxx.SettingParameter {
-            label: "Output"
+            label: qsTr("Output")
         }
         Mixxx.SettingParameter {
-            label: "Broadcast"
+            label: qsTr("Broadcast")
         }
     }
     Repeater {
@@ -843,7 +852,8 @@ Rectangle {
 
         gateways: [
             {
-                name: "Alternative input",
+                address: "Alternative input",
+                name: qsTr("Alternative input"),
                 type: "sink"
             }
         ]

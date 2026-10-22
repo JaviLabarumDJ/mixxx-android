@@ -79,6 +79,7 @@ void QmlLanguageProxy::setLocale(const QString& locale) {
     if (!pApp || !pConfig || locale == this->locale()) {
         return;
     }
+    emit localeAboutToChange();
     if (locale.isEmpty()) {
         pConfig->remove(kLocaleConfigKey);
         // Translations::initializeTranslations() keeps the previous default

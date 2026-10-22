@@ -127,7 +127,7 @@ Popup {
                     normalColor: root.activeTab === 1 ? "#00ffff" : "#80deea"
                     font.bold: true
                     font.pixelSize: 10
-                    text: "STREAMING HUB"
+                    text: qsTr("STREAMING HUB")
                     onClicked: root.activeTab = 1
                 }
 

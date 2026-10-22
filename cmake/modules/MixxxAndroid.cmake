@@ -28,9 +28,11 @@ if(QML)
   target_sources(
     mixxx-qml-lib
     PRIVATE
+      src/qml/androidpresetnames.cpp
       src/qml/librarycoverloader.cpp
       src/qml/qmllanguageproxy.cpp
       src/qml/qmllibraryfeaturesource.cpp
+      src/qml/qmlmobileappproxy.cpp
       src/qml/qmlmobileaudioproxy.cpp
       src/qml/qmlmobilecontrollersproxy.cpp
       src/qml/qmlmobilelibraryproxy.cpp

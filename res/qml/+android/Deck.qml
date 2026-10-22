@@ -275,7 +275,7 @@ Item {
                 blurRadius: 4
                 editLabel.color: Theme.white
                 editLabel.font.pixelSize: 14
-                editLabel.text: "Waveform overview"
+                editLabel.text: qsTr("Waveform overview")
                 editOverlay.color: Qt.alpha('black', 0.5)
 
                 DeckComponent.WaveformOverview {
@@ -297,7 +297,7 @@ Item {
                 Layout.fillHeight: true
                 editLabel.color: Theme.midGray
                 editLabel.font.capitalization: Font.AllUppercase
-                editLabel.text: "FX Assign"
+                editLabel.text: qsTr("FX Assign")
                 editOverlay.color: Theme.darkGray2
                 width: 135
 
@@ -332,7 +332,7 @@ Item {
                 Layout.preferredWidth: 60
                 editLabel.color: Theme.white
                 editLabel.horizontalAlignment: Text.AlignHCenter
-                editLabel.text: "Play\nButton"
+                editLabel.text: qsTr("Play\nButton")
                 editOverlay.border.color: '#000000'
                 editOverlay.border.width: 2
                 editOverlay.color: Theme.darkGray2
@@ -352,7 +352,7 @@ Item {
                 Layout.preferredWidth: 60
                 editLabel.color: Theme.white
                 editLabel.horizontalAlignment: Text.AlignHCenter
-                editLabel.text: "Cue\nButton"
+                editLabel.text: qsTr("Cue\nButton")
                 editOverlay.border.color: '#000000'
                 editOverlay.border.width: 2
                 editOverlay.color: Theme.darkGray2
@@ -408,7 +408,7 @@ Item {
                 blurRadius: 4
                 editLabel.color: Theme.white
                 editLabel.font.pixelSize: 14
-                editLabel.text: "Toolbar"
+                editLabel.text: qsTr("Toolbar")
                 editOverlay.color: Qt.alpha('black', 0.5)
 
                 DeckComponent.Toolbar {

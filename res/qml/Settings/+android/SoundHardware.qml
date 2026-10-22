@@ -1018,7 +1018,7 @@ Category {
                             }
                             Skin.ComboBox {
                                 id: microphoneMonitorMode
-                                model: ["Main output only", "Main and booth outputs", "Direct monitor"]
+                                model: [qsTr("Main output only"), qsTr("Main and booth outputs"), qsTr("Direct monitor")]
                             }
                         }
                     }

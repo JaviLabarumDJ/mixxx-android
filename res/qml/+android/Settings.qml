@@ -478,7 +478,7 @@ Popup {
         ListElement {
             label: QT_TR_NOOP("About")
             iconGlyph: "✨"
-            subtext: "JaviLabarum, RRSS & Info"
+            subtext: qsTr("JaviLabarum, Socials & Info")
         }
     }
 }

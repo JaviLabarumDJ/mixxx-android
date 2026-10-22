@@ -140,7 +140,7 @@ ApplicationWindow {
                 font.pixelSize: 15
                 font.bold: true
                 font.letterSpacing: 0.8
-                text: "By JaviLabarumDJ on Android"
+                text: qsTr("By JaviLabarumDJ on Android")
             }
 
             Item {

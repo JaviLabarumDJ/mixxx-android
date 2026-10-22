@@ -207,7 +207,7 @@ Item {
                         spacing: 4
 
                         Text {
-                            text: card.timeDisplayMode === 0 ? "REMAIN" : "TIME"
+                            text: card.timeDisplayMode === 0 ? qsTr("REMAIN") : qsTr("TIME")
                             font.bold: true
                             font.pixelSize: 8
                             color: card.accentColor

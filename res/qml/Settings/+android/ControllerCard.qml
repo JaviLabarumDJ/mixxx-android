@@ -208,7 +208,7 @@ Item {
                             Layout.fillWidth: true
                             color: Theme.white
                             font.pixelSize: 12
-                            text: "Vendor"
+                            text: qsTr("Vendor")
                         }
                         Text {
                             Layout.alignment: Qt.AlignRight
@@ -221,7 +221,7 @@ Item {
                             Layout.fillWidth: true
                             color: Theme.white
                             font.pixelSize: 12
-                            text: "Product"
+                            text: qsTr("Product")
                         }
                         Text {
                             Layout.alignment: Qt.AlignLeft
@@ -234,7 +234,7 @@ Item {
                             Layout.fillWidth: true
                             color: Theme.white
                             font.pixelSize: 12
-                            text: "Serial number"
+                            text: qsTr("Serial number")
                         }
                         Text {
                             Layout.alignment: Qt.AlignRight
@@ -247,7 +247,7 @@ Item {
                             Layout.fillWidth: true
                             color: Theme.white
                             font.pixelSize: 12
-                            text: "Type"
+                            text: qsTr("Type")
                         }
                         Text {
                             Layout.alignment: Qt.AlignRight
@@ -288,7 +288,7 @@ Item {
             color: '#FFFFFF'
             font.pixelSize: 10
             font.weight: Font.Light
-            text: root.editable ? 'User device' : `Supported since ${modelData.sinceVersion}`
+            text: root.editable ? qsTr("User device") : qsTr("Supported since %1").arg(modelData.sinceVersion)
 
             states: [
                 State {
@@ -410,13 +410,13 @@ Item {
                     anchors.centerIn: parent
                     color: Theme.white
                     horizontalAlignment: Text.AlignHCenter
-                    text: root.editable ? `Press to\nset ${!controllerVisual.source.toString() ? 'a' : 'another'} visual` : "No visual"
+                    text: root.editable ? (!controllerVisual.source.toString() ? qsTr("Press to\nset a visual") : qsTr("Press to\nset another visual")) : qsTr("No visual")
                     visible: controllerVisual.status != Image.Ready || visualMouseArea.containsMouse
                 }
                 FileDialog {
                     id: fileDialog
 
-                    nameFilters: ["Images (*.png *.gif *.jpg)"]
+                    nameFilters: [qsTr("Images (*.png *.gif *.jpg)")]
                     title: qsTr("Select an image")
 
                     onAccepted: {
@@ -532,14 +532,14 @@ Item {
                                 Layout.fillWidth: true
                                 color: Theme.white
                                 font.pixelSize: 12
-                                text: "Author"
+                                text: qsTr("Author")
                             }
                             Text {
                                 Layout.alignment: Qt.AlignRight
                                 Layout.maximumWidth: 280
                                 color: Theme.white
                                 font.pixelSize: 12
-                                text: (root.modelData.mapping?.author || 'N/A') + (root.modelData.mapping?.isUserMapping(Mixxx.Config) ? ' (edited by you)' : '')
+                                text: (root.modelData.mapping?.author || 'N/A') + (root.modelData.mapping?.isUserMapping(Mixxx.Config) ? qsTr(" (edited by you)") : '')
                                 wrapMode: Text.WordWrap
                             }
                             Text {
@@ -547,7 +547,7 @@ Item {
                                 Layout.fillWidth: true
                                 color: Theme.white
                                 font.pixelSize: 12
-                                text: "Forum Link"
+                                text: qsTr("Forum Link")
                             }
                             ControllerMappingLink {
                                 Layout.alignment: Qt.AlignRight
@@ -559,7 +559,7 @@ Item {
                                 Layout.fillWidth: true
                                 color: Theme.white
                                 font.pixelSize: 12
-                                text: "Wiki Link"
+                                text: qsTr("Wiki Link")
                             }
                             ControllerMappingLink {
                                 Layout.alignment: Qt.AlignRight
@@ -571,7 +571,7 @@ Item {
                                 Layout.fillWidth: true
                                 color: Theme.white
                                 font.pixelSize: 12
-                                text: "Description"
+                                text: qsTr("Description")
                             }
                             Text {
                                 Layout.alignment: Qt.AlignRight
@@ -677,7 +677,7 @@ Item {
             anchors.rightMargin: root.focused ? 15 : 25
             checkable: true
             checked: modelData.enabled
-            text: checked ? "On" : "Off"
+            text: checked ? qsTr("On") : qsTr("Off")
 
             onCheckedChanged: {
                 modelData.enabled = checked;

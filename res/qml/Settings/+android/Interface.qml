@@ -131,7 +131,7 @@ Category {
         loadInterface();
     }
 
-    label: "Interface"
+    label: qsTr("Interface")
     selectedIndex: 0
     tabs: [qsTr("Appearance & Colors"), qsTr("Decks & Playback")]
 
@@ -259,7 +259,7 @@ Category {
                                 Skin.ComboBox {
                                     id: skinInput
                                     Layout.preferredWidth: 180
-                                    model: ["Unnamed"]
+                                    model: [qsTr("Unnamed")]
                                     onCurrentIndexChanged: themeColorTab.dirty = true
                                 }
                             }
@@ -270,7 +270,7 @@ Category {
                                 Skin.ComboBox {
                                     id: colorInput
                                     Layout.preferredWidth: 180
-                                    model: ["Dark", "Light"]
+                                    model: [qsTr("Dark"), qsTr("Light")]
                                     onCurrentIndexChanged: themeColorTab.dirty = true
                                 }
                             }
@@ -281,7 +281,7 @@ Category {
                                 Skin.ComboBox {
                                     id: layoutInput
                                     Layout.preferredWidth: 180
-                                    model: ["Performance", "Broadcast"]
+                                    model: [qsTr("Performance"), qsTr("Broadcast")]
                                     onCurrentIndexChanged: themeColorTab.dirty = true
                                 }
                             }
@@ -1056,18 +1056,18 @@ Category {
             text: {
                 switch (parent.mode) {
                 case DeckComponents.TrackTime.Mode.TraditionalCoarse:
-                    return "Traditional (Coarse)";
+                    return qsTr("Traditional (Coarse)");
                 case DeckComponents.TrackTime.Mode.Seconds:
-                    return "Seconds";
+                    return qsTr("Seconds");
                 case DeckComponents.TrackTime.Mode.SecondsLong:
-                    return "Seconds (Long)";
+                    return qsTr("Seconds (Long)");
                 case DeckComponents.TrackTime.Mode.KiloSeconds:
-                    return "Kiloseconds";
+                    return qsTr("Kiloseconds");
                 case DeckComponents.TrackTime.Mode.HectoSeconds:
-                    return "Hectoseconds";
+                    return qsTr("Hectoseconds");
                 default:
                 case DeckComponents.TrackTime.Mode.Traditional:
-                    return "Traditional";
+                    return qsTr("Traditional");
                 }
             }
             verticalAlignment: Text.AlignVCenter

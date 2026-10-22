@@ -11,7 +11,7 @@ Category {
     id: root
 
     property bool dirty: false
-    label: "Waveforms"
+    label: qsTr("Waveforms")
     readonly property string graphicsApiName: {
         switch (GraphicsInfo.api) {
         case GraphicsInfo.OpenGL:
@@ -29,7 +29,7 @@ Category {
         case GraphicsInfo.Null:
             return "Null";
         default:
-            return "Unknown";
+            return qsTr("Unknown");
         }
     }
     readonly property list<int> waveformTypes: [Mixxx.WaveformDisplay.Type.Simple, Mixxx.WaveformDisplay.Type.Filtered, Mixxx.WaveformDisplay.Type.HSV, Mixxx.WaveformDisplay.Type.RGB, Mixxx.WaveformDisplay.Type.Stacked]
@@ -168,19 +168,19 @@ Category {
                 color: Theme.white
                 font.pixelSize: 14
                 font.weight: Font.DemiBold
-                text: "Overview Waveforms"
+                text: qsTr("Overview Waveforms")
             }
             RowLayout {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: "Type"
+                    label: qsTr("Type")
                 }
                 Skin.ComboBox {
                     id: overviewTypeInput
 
                     Layout.preferredWidth: 180
-                    model: ["Filtered", "HSV", "RGB"]
+                    model: [qsTr("Filtered"), "HSV", "RGB"]
 
                     onCurrentIndexChanged: root.markDirty()
                 }
@@ -189,7 +189,7 @@ Category {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: "Stereo channels"
+                    label: qsTr("Stereo channels")
                 }
                 RatioChoice {
                     id: overviewStereoInput
@@ -203,7 +203,7 @@ Category {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: "Minute markers"
+                    label: qsTr("Minute markers")
                 }
                 RatioChoice {
                     id: overviewMinuteMarkersInput
@@ -217,7 +217,7 @@ Category {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: "Gain scaling"
+                    label: qsTr("Gain scaling")
                 }
                 RatioChoice {
                     id: overviewScalingInput
@@ -237,19 +237,19 @@ Category {
                 color: Theme.white
                 font.pixelSize: 14
                 font.weight: Font.DemiBold
-                text: "Scrolling Waveforms"
+                text: qsTr("Scrolling Waveforms")
             }
             RowLayout {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: "Type"
+                    label: qsTr("Type")
                 }
                 Skin.ComboBox {
                     id: waveformTypeInput
 
                     Layout.preferredWidth: 180
-                    model: ["Simple", "Filtered", "HSV", "RGB", "Stacked"]
+                    model: [qsTr("Simple"), qsTr("Filtered"), "HSV", "RGB", qsTr("Stacked")]
 
                     onCurrentIndexChanged: root.markDirty()
                 }
@@ -257,14 +257,14 @@ Category {
             Text {
                 Layout.fillWidth: true
                 color: Theme.midGray
-                text: "Simple, Filtered, HSV, RGB and Stacked are supported by the QML renderer."
+                text: qsTr("Simple, Filtered, HSV, RGB and Stacked are supported by the QML renderer.")
                 wrapMode: Text.WordWrap
             }
             RowLayout {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: "Enabled"
+                    label: qsTr("Enabled")
                 }
                 RatioChoice {
                     id: waveformEnabledInput
@@ -294,7 +294,7 @@ Category {
                 id: frameRateInput
 
                 decimals: 0
-                label: "Frame rate"
+                label: qsTr("Frame rate")
                 max: 240
                 min: 10
                 suffix: " fps"
@@ -306,7 +306,7 @@ Category {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: "Sync deck zoom"
+                    label: qsTr("Sync deck zoom")
                 }
                 RatioChoice {
                     id: zoomSynchronizationInput
@@ -320,7 +320,7 @@ Category {
                 id: defaultZoomInput
 
                 decimals: 0
-                label: "Default zoom"
+                label: qsTr("Default zoom")
                 max: 10
                 min: 1
                 suffix: "x"
@@ -331,7 +331,7 @@ Category {
                 id: endOfTrackWarningInput
 
                 decimals: 0
-                label: "End-of-track warning"
+                label: qsTr("End-of-track warning")
                 max: 120
                 min: 0
                 suffix: "s"
@@ -342,7 +342,7 @@ Category {
                 id: beatGridAlphaInput
 
                 decimals: 0
-                label: "Beat-grid opacity"
+                label: qsTr("Beat-grid opacity")
                 max: 100
                 min: 0
                 suffix: "%"
@@ -353,7 +353,7 @@ Category {
                 id: playMarkerPositionInput
 
                 decimals: 0
-                label: "Play-marker position"
+                label: qsTr("Play-marker position")
                 max: 100
                 min: 0
                 suffix: "%"
@@ -364,7 +364,7 @@ Category {
                 id: visualGainAllInput
 
                 decimals: 2
-                label: "Visual gain (all)"
+                label: qsTr("Visual gain (all)")
                 max: 3
                 min: 0
                 suffix: "x"
@@ -375,7 +375,7 @@ Category {
                 id: visualGainLowInput
 
                 decimals: 2
-                label: "Visual gain (low)"
+                label: qsTr("Visual gain (low)")
                 max: 3
                 min: 0
                 suffix: "x"
@@ -386,7 +386,7 @@ Category {
                 id: visualGainMidInput
 
                 decimals: 2
-                label: "Visual gain (mid)"
+                label: qsTr("Visual gain (mid)")
                 max: 3
                 min: 0
                 suffix: "x"
@@ -397,7 +397,7 @@ Category {
                 id: visualGainHighInput
 
                 decimals: 2
-                label: "Visual gain (high)"
+                label: qsTr("Visual gain (high)")
                 max: 3
                 min: 0
                 suffix: "x"
@@ -408,7 +408,7 @@ Category {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: "Split stereo signal"
+                    label: qsTr("Split stereo signal")
                 }
                 RatioChoice {
                     id: splitStereoSignalInput
@@ -422,14 +422,14 @@ Category {
             Text {
                 Layout.fillWidth: true
                 color: Theme.midGray
-                text: "Split stereo signal is used by the RGB renderer."
+                text: qsTr("Split stereo signal is used by the RGB renderer.")
                 wrapMode: Text.WordWrap
             }
             RowLayout {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: "High detail (legacy)"
+                    label: qsTr("High detail (legacy)")
                 }
                 RatioChoice {
                     id: highDetailInput
@@ -443,14 +443,14 @@ Category {
             Text {
                 Layout.fillWidth: true
                 color: Theme.midGray
-                text: "High detail is retained for compatibility but is unavailable in the QML scene-graph renderer."
+                text: qsTr("High detail is retained for compatibility but is unavailable in the QML scene-graph renderer.")
                 wrapMode: Text.WordWrap
             }
             RowLayout {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: "Show beats until marker"
+                    label: qsTr("Show beats until marker")
                 }
                 RatioChoice {
                     id: untilMarkShowBeatsInput
@@ -464,7 +464,7 @@ Category {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: "Show time until marker"
+                    label: qsTr("Show time until marker")
                 }
                 RatioChoice {
                     id: untilMarkShowTimeInput
@@ -478,13 +478,13 @@ Category {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: "Marker alignment"
+                    label: qsTr("Marker alignment")
                 }
                 Skin.ComboBox {
                     id: untilMarkAlignInput
 
                     Layout.preferredWidth: 180
-                    model: ["Top", "Center", "Bottom"]
+                    model: [qsTr("Top"), qsTr("Center"), qsTr("Bottom")]
 
                     onCurrentIndexChanged: root.markDirty()
                 }
@@ -493,7 +493,7 @@ Category {
                 id: untilMarkTextSizeInput
 
                 decimals: 0
-                label: "Marker text size"
+                label: qsTr("Marker text size")
                 max: 48
                 min: 6
                 suffix: "px"
@@ -504,7 +504,7 @@ Category {
                 id: stemOpacityInput
 
                 decimals: 2
-                label: "Stem channel opacity"
+                label: qsTr("Stem channel opacity")
                 max: 1
                 min: 0
 
@@ -514,7 +514,7 @@ Category {
                 id: stemOutlineOpacityInput
 
                 decimals: 2
-                label: "Stem outline opacity"
+                label: qsTr("Stem outline opacity")
                 max: 1
                 min: 0
 
@@ -524,7 +524,7 @@ Category {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: "Reorder stems when volume changes"
+                    label: qsTr("Reorder stems when volume changes")
                 }
                 RatioChoice {
                     id: stemReorderInput
@@ -538,7 +538,7 @@ Category {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: "Stem display mode"
+                    label: qsTr("Stem display mode")
                 }
                 RatioChoice {
                     id: stemDisplayModeInput
@@ -558,13 +558,13 @@ Category {
                 color: Theme.white
                 font.pixelSize: 14
                 font.weight: Font.DemiBold
-                text: "Caching"
+                text: qsTr("Caching")
             }
             RowLayout {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: "Enable waveform caching"
+                    label: qsTr("Enable waveform caching")
                 }
                 RatioChoice {
                     id: cachingInput
@@ -578,7 +578,7 @@ Category {
                 Layout.fillWidth: true
 
                 WaveformSettingParameter {
-                    label: "Generate while analyzing"
+                    label: qsTr("Generate while analyzing")
                 }
                 RatioChoice {
                     id: generateWithAnalysisInput
@@ -594,10 +594,10 @@ Category {
                 Text {
                     Layout.fillWidth: true
                     color: Theme.white
-                    text: "Cached waveforms occupy " + (Mixxx.Library.waveformCacheDiskUsage || "unknown") + " on disk."
+                    text: qsTr("Cached waveforms occupy %1 on disk.").arg(Mixxx.Library.waveformCacheDiskUsage || qsTr("unknown"))
                 }
                 Skin.Button {
-                    text: "Clear cached waveforms"
+                    text: qsTr("Clear cached waveforms")
 
                     onPressed: Mixxx.Library.clearCachedWaveforms()
                 }
@@ -612,24 +612,24 @@ Category {
                 color: Theme.white
                 font.pixelSize: 14
                 font.weight: Font.DemiBold
-                text: "Graphics API Status"
+                text: qsTr("Graphics API Status")
             }
             Text {
                 Layout.fillWidth: true
                 color: Theme.white
-                text: "Qt Quick renderer: " + root.graphicsApiName
+                text: qsTr("Qt Quick renderer: %1").arg(root.graphicsApiName)
             }
             Text {
                 Layout.fillWidth: true
                 color: Theme.white
                 text: Mixxx.Config.waveformAverageFrameRate > 0
-                        ? "Average frame rate: " + Number(Mixxx.Config.waveformAverageFrameRate).toFixed(2) + " fps"
-                        : "Average frame rate: Measuring…"
+                        ? qsTr("Average frame rate: %1 fps").arg(Number(Mixxx.Config.waveformAverageFrameRate).toFixed(2))
+                        : qsTr("Average frame rate: Measuring…")
             }
             Text {
                 Layout.fillWidth: true
                 color: Theme.midGray
-                text: GraphicsInfo.api === GraphicsInfo.OpenGL ? "OpenGL " + GraphicsInfo.majorVersion + "." + GraphicsInfo.minorVersion : "Runtime API reported by Qt Quick"
+                text: GraphicsInfo.api === GraphicsInfo.OpenGL ? "OpenGL " + GraphicsInfo.majorVersion + "." + GraphicsInfo.minorVersion : qsTr("Runtime API reported by Qt Quick")
             }
         }
     }

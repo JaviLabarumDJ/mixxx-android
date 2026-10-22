@@ -5,8 +5,8 @@
 ![Android Version](https://img.shields.io/badge/Android-10.0%2B%20(API%2029--35)-brightgreen?logo=android&logoColor=white)
 ![Architecture](https://img.shields.io/badge/Arch-ARM64%20(arm64--v8a)-blue?logo=arm)
 ![Framework](https://img.shields.io/badge/Qt-6.8%20%7C%20QML-41cd52?logo=qt)
-[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.2.0-android)
-[![Download APK](https://img.shields.io/badge/Download-APK%20(248%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.2.0-android/mixxx-android-v1.2.0.apk)
+[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.3.0-android)
+[![Download APK](https://img.shields.io/badge/Download-APK%20(248%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.3.0-android/mixxx-android-v1.3.0.apk)
 ![License](https://img.shields.io/badge/License-GPL%20v2-orange.svg)
 
 **The world's premier open-source DJ software, fully ported, modernized, and touch-optimized for Android smartphones, tablets, and standalone hardware setups.**
@@ -28,7 +28,13 @@ Whether you're performing live sets using a USB DJ controller, mixing on the go 
 <!-- START_AI_GENERATED_DISCLAIMER -->
 <!-- This section was written with the assistance of an AI Agent (Claude). -->
 
-## 🆕 What's New in v1.2.0
+## 🆕 What's New in v1.3.0
+
+* **English and Spanish:** the whole Android interface is now available in English and Spanish. By default Mixxx follows the language of the device; change it in *Settings → Interface → Language*. Effect presets created on the first launch are shown in the selected language too.
+* **Smoother selectors:** drop-down lists (quick effects, effect units, settings) scroll smoothly, no longer jump to the item under your finger while you drag, and open at the selected item.
+* **About:** shows the real version of the installed app.
+
+## 🗂️ What was new in v1.2.0
 
 * **Play straight from Rekordbox and Engine DJ USB drives:** plug in the drive you use on Pioneer or Denon players and its playlists show up in the library (*Rekordbox* and *Engine DJ* sections). Engine DJ 2.x–4.x libraries are read directly; tracks are copied to the tablet when you load them into a deck.
 * **Built-in USB drive reader:** drives that Android doesn't mount (e.g. FAT32 sticks formatted without a partition table, which Pioneer players accept) are read by Mixxx itself, read-only. Nothing is ever written to the drive.
@@ -112,7 +118,7 @@ Whether you're performing live sets using a USB DJ controller, mixing on the go 
 ## 🚀 Installation & Quick Start
 
 ### Option A: Install Pre-Built Signed APK
-1. Download [**mixxx-android-v1.2.0.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.2.0-android/mixxx-android-v1.2.0.apk) from the [Official GitHub Release v1.2.0](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.2.0-android).
+1. Download [**mixxx-android-v1.3.0.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.3.0-android/mixxx-android-v1.3.0.apk) from the [Official GitHub Release v1.3.0](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.3.0-android).
 2. Enable *"Install unknown apps"* in your Android device settings.
 3. Install and launch **MIXXX**.
 4. Grant storage and audio permissions when prompted.

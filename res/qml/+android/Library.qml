@@ -131,7 +131,7 @@ Item {
                 normalColor: root.librarySourceMode === 1 ? "#00ffff" : "#80deea"
                 font.bold: true
                 font.pixelSize: 11
-                text: "STREAMING HUB"
+                text: qsTr("STREAMING HUB")
                 onClicked: root.librarySourceMode = 1
             }
 

@@ -8,6 +8,10 @@
         <translation>Acerca de</translation>
     </message>
     <message>
+        <source>DJ / CREATOR</source>
+        <translation>DJ / CREADOR</translation>
+    </message>
+    <message>
         <source>DJ, producer and digital audio enthusiast. Bringing a professional mixing experience and real touch control to Android devices.</source>
         <translation>DJ, productor y apasionado del audio digital. Llevando la experiencia de mezcla profesional y tactilidad real a dispositivos Android.</translation>
     </message>
@@ -99,6 +103,101 @@ Are you sure you want to load a new track?</source>
     <message>
         <source>Keywheel</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AudioRouter</name>
+    <message>
+        <source>Inputs</source>
+        <translation>Entradas</translation>
+    </message>
+    <message>
+        <source>%1 connections hidden
+Use the advanced mode to view them</source>
+        <translation>%1 conexiones ocultas
+Usa el modo avanzado para verlas</translation>
+    </message>
+    <message>
+        <source>%1 connection hidden
+Use the advanced mode to view them</source>
+        <translation>%1 conexión oculta
+Usa el modo avanzado para verla</translation>
+    </message>
+    <message>
+        <source>No delay</source>
+        <translation>Sin retardo</translation>
+    </message>
+    <message>
+        <source>Short delay</source>
+        <translation>Retardo corto</translation>
+    </message>
+    <message>
+        <source>Long delay</source>
+        <translation>Retardo largo</translation>
+    </message>
+    <message>
+        <source>Multi-Soundcard Synchronization</source>
+        <translation>Sincronización multitarjeta de sonido</translation>
+    </message>
+    <message>
+        <source>Outputs</source>
+        <translation>Salidas</translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation>Salida</translation>
+    </message>
+    <message>
+        <source>Vinyl Control</source>
+        <translation>Control por vinilo</translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation>Master</translation>
+    </message>
+    <message>
+        <source>Booth</source>
+        <translation>Cabina</translation>
+    </message>
+    <message>
+        <source>Left Bus</source>
+        <translation>Bus izquierdo</translation>
+    </message>
+    <message>
+        <source>Center Bus</source>
+        <translation>Bus central</translation>
+    </message>
+    <message>
+        <source>Right Bus</source>
+        <translation>Bus derecho</translation>
+    </message>
+    <message>
+        <source>Auxiliary</source>
+        <translation>Auxiliar</translation>
+    </message>
+    <message>
+        <source>Microphone</source>
+        <translation>Micrófono</translation>
+    </message>
+    <message>
+        <source>Mixer</source>
+        <translation>Mezclador</translation>
+    </message>
+    <message>
+        <source>Decks</source>
+        <translation>Decks</translation>
+    </message>
+    <message>
+        <source>Input</source>
+        <translation>Entrada</translation>
+    </message>
+    <message>
+        <source>Broadcast</source>
+        <translation>Retransmisión</translation>
+    </message>
+    <message>
+        <source>Alternative input</source>
+        <translation>Entrada alternativa</translation>
     </message>
 </context>
 <context>
@@ -261,7 +360,7 @@ Are you sure you want to load a new track?</source>
     </message>
     <message>
         <source>USB MIDI</source>
-        <translation type="unfinished"></translation>
+        <translation>MIDI USB</translation>
     </message>
     <message>
         <source>Reset</source>
@@ -287,8 +386,52 @@ Are you sure you want to load a new track?</source>
 <context>
     <name>ControllerCard</name>
     <message>
+        <source>Vendor</source>
+        <translation>Fabricante</translation>
+    </message>
+    <message>
+        <source>Product</source>
+        <translation>Producto</translation>
+    </message>
+    <message>
+        <source>Serial number</source>
+        <translation>Número de serie</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Tipo</translation>
+    </message>
+    <message>
+        <source>User device</source>
+        <translation>Dispositivo de usuario</translation>
+    </message>
+    <message>
+        <source>Supported since %1</source>
+        <translation>Compatible desde %1</translation>
+    </message>
+    <message>
+        <source>Press to
+set a visual</source>
+        <translation>Pulsa para
+poner una imagen</translation>
+    </message>
+    <message>
+        <source>Press to
+set another visual</source>
+        <translation>Pulsa para
+poner otra imagen</translation>
+    </message>
+    <message>
+        <source>No visual</source>
+        <translation>Sin imagen</translation>
+    </message>
+    <message>
+        <source>Images (*.png *.gif *.jpg)</source>
+        <translation>Imágenes (*.png *.gif *.jpg)</translation>
+    </message>
+    <message>
         <source>Select an image</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecciona una imagen</translation>
     </message>
     <message>
         <source>Show all mappings (MIDI/HID)...</source>
@@ -299,6 +442,34 @@ Are you sure you want to load a new track?</source>
         <translation>Seleccionar mapeo...</translation>
     </message>
     <message>
+        <source>Author</source>
+        <translation>Autor</translation>
+    </message>
+    <message>
+        <source> (edited by you)</source>
+        <translation> (editado por ti)</translation>
+    </message>
+    <message>
+        <source>Forum Link</source>
+        <translation>Enlace al foro</translation>
+    </message>
+    <message>
+        <source>Wiki Link</source>
+        <translation>Enlace a la wiki</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation>Descripción</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation>On</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>Off</translation>
+    </message>
+    <message>
         <source>Show all mappings...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -307,7 +478,7 @@ Are you sure you want to load a new track?</source>
     <name>ControllerScreens</name>
     <message>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Off</translation>
     </message>
     <message>
         <source>FPS: %0/%1</source>
@@ -365,6 +536,33 @@ Are you sure you want to load a new track?</source>
     </message>
 </context>
 <context>
+    <name>Deck</name>
+    <message>
+        <source>Waveform overview</source>
+        <translation>Vista general de la onda</translation>
+    </message>
+    <message>
+        <source>FX Assign</source>
+        <translation>Asignar FX</translation>
+    </message>
+    <message>
+        <source>Play
+Button</source>
+        <translation>Botón
+Play</translation>
+    </message>
+    <message>
+        <source>Cue
+Button</source>
+        <translation>Botón
+Cue</translation>
+    </message>
+    <message>
+        <source>Toolbar</source>
+        <translation>Barra de herramientas</translation>
+    </message>
+</context>
+<context>
     <name>EffectChainPresetPopup</name>
     <message>
         <source>Update Preset</source>
@@ -400,6 +598,10 @@ Are you sure you want to load a new track?</source>
 <context>
     <name>Interface</name>
     <message>
+        <source>Interface</source>
+        <translation type="unfinished">Interfaz</translation>
+    </message>
+    <message>
         <source>Appearance &amp; Colors</source>
         <translation>Apariencia &amp; Colores</translation>
     </message>
@@ -424,12 +626,32 @@ Are you sure you want to load a new track?</source>
         <translation>Skin / Piel visual</translation>
     </message>
     <message>
+        <source>Unnamed</source>
+        <translation>Sin nombre</translation>
+    </message>
+    <message>
         <source>Theme color</source>
         <translation>Color del tema</translation>
     </message>
     <message>
+        <source>Dark</source>
+        <translation>Oscuro</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>Claro</translation>
+    </message>
+    <message>
         <source>Layout</source>
         <translation>Disposición / Layout</translation>
+    </message>
+    <message>
+        <source>Performance</source>
+        <translation>Performance</translation>
+    </message>
+    <message>
+        <source>Broadcast</source>
+        <translation>Emisión</translation>
     </message>
     <message>
         <source>Tooltips</source>
@@ -643,12 +865,40 @@ Are you sure you want to load a new track?</source>
         <source>Saved</source>
         <translation>Guardado</translation>
     </message>
+    <message>
+        <source>Traditional (Coarse)</source>
+        <translation>Tradicional (aproximado)</translation>
+    </message>
+    <message>
+        <source>Seconds</source>
+        <translation>Segundos</translation>
+    </message>
+    <message>
+        <source>Seconds (Long)</source>
+        <translation>Segundos (largo)</translation>
+    </message>
+    <message>
+        <source>Kiloseconds</source>
+        <translation>Kilosegundos</translation>
+    </message>
+    <message>
+        <source>Hectoseconds</source>
+        <translation>Hectosegundos</translation>
+    </message>
+    <message>
+        <source>Traditional</source>
+        <translation>Tradicional</translation>
+    </message>
 </context>
 <context>
     <name>Library</name>
     <message>
         <source>LOCAL MUSIC</source>
         <translation>MÚSICA LOCAL</translation>
+    </message>
+    <message>
+        <source>STREAMING HUB</source>
+        <translation>STREAMING HUB</translation>
     </message>
     <message>
         <source>SIDEBAR</source>
@@ -1066,6 +1316,29 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
 </context>
 <context>
+    <name>MainWindow</name>
+    <message>
+        <source>WAVE</source>
+        <translation>WAVE</translation>
+    </message>
+    <message>
+        <source>LIB</source>
+        <translation>LIB</translation>
+    </message>
+    <message>
+        <source>CTL</source>
+        <translation>CTL</translation>
+    </message>
+    <message>
+        <source>LOAD %1</source>
+        <translation>LOAD %1</translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation>Editar</translation>
+    </message>
+</context>
+<context>
     <name>OnlineStreamView</name>
     <message>
         <source>%1 tracks found on streaming</source>
@@ -1163,6 +1436,10 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation>MÚSICA LOCAL</translation>
     </message>
     <message>
+        <source>STREAMING HUB</source>
+        <translation>STREAMING HUB</translation>
+    </message>
+    <message>
         <source>CLOSE</source>
         <translation>CERRAR</translation>
     </message>
@@ -1236,6 +1513,10 @@ Aborting the operation to avoid library inconsistencies</source>
         <source>About</source>
         <translation>Acerca de</translation>
     </message>
+    <message>
+        <source>JaviLabarum, Socials &amp; Info</source>
+        <translation>JaviLabarum, RRSS &amp; Info</translation>
+    </message>
 </context>
 <context>
     <name>SoundHardware</name>
@@ -1285,7 +1566,7 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>%1 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Hz</translation>
     </message>
     <message>
         <source>Audio &amp; Outputs</source>
@@ -1381,7 +1662,7 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>%1 ms</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 ms</translation>
     </message>
     <message>
         <source>⚡ Ultra-low latency: instant response for scratching and fast mixing.</source>
@@ -1405,7 +1686,7 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>Soundtouch</source>
-        <translation type="unfinished"></translation>
+        <translation>Soundtouch</translation>
     </message>
     <message>
         <source>Fast</source>
@@ -1413,7 +1694,7 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>Rubberband</source>
-        <translation type="unfinished"></translation>
+        <translation>Rubberband</translation>
     </message>
     <message>
         <source>High quality</source>
@@ -1421,7 +1702,7 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>Rubberband R3</source>
-        <translation type="unfinished"></translation>
+        <translation>Rubberband R3</translation>
     </message>
     <message>
         <source>Highest quality</source>
@@ -1450,6 +1731,18 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>Mixxx drives the USB sound card directly when Android cannot use all of its channels (e.g. the headphones of a DJ controller). Changes take effect after restarting Mixxx.</source>
         <translation>Mixxx controla directamente la tarjeta de sonido USB cuando Android no puede usar todos sus canales (p. ej. los auriculares de una controladora DJ). Los cambios se aplican al reiniciar Mixxx.</translation>
+    </message>
+    <message>
+        <source>Main output only</source>
+        <translation>Solo salida principal</translation>
+    </message>
+    <message>
+        <source>Main and booth outputs</source>
+        <translation>Salidas principal y de cabina</translation>
+    </message>
+    <message>
+        <source>Direct monitor</source>
+        <translation>Monitorización directa</translation>
     </message>
     <message>
         <source>🔧 Advanced routing matrix (virtual cables)</source>
@@ -1516,27 +1809,27 @@ Aborting the operation to avoid library inconsistencies</source>
     <name>SourceTree</name>
     <message>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Título</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Artista</translation>
     </message>
     <message>
         <source>Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Álbum</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Año</translation>
     </message>
     <message>
         <source>Bpm</source>
-        <translation type="unfinished"></translation>
+        <translation>BPM</translation>
     </message>
     <message>
         <source>Key</source>
-        <translation type="unfinished"></translation>
+        <translation>Tonalidad</translation>
     </message>
     <message>
         <source>Added</source>
@@ -1544,15 +1837,15 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>File Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo de archivo</translation>
     </message>
     <message>
         <source>Bitrate</source>
-        <translation type="unfinished"></translation>
+        <translation>Tasa de bits</translation>
     </message>
     <message>
         <source>All...</source>
-        <translation type="unfinished"></translation>
+        <translation>Todas...</translation>
     </message>
 </context>
 <context>
@@ -1665,6 +1958,10 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation>🔍 Buscar</translation>
     </message>
     <message>
+        <source>📜 Playlists</source>
+        <translation>📜 Playlists</translation>
+    </message>
+    <message>
         <source>Search artists, tracks or albums in your cloud...</source>
         <translation>Buscar artistas, temas, o álbumes en tu nube...</translation>
     </message>
@@ -1713,7 +2010,7 @@ Aborting the operation to avoid library inconsistencies</source>
     <name>Track</name>
     <message>
         <source>File</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivo</translation>
     </message>
     <message>
         <source>◀ Load Deck 1</source>
@@ -1725,51 +2022,51 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>Load to</source>
-        <translation type="unfinished"></translation>
+        <translation>Cargar en</translation>
     </message>
     <message>
         <source>Deck</source>
-        <translation type="unfinished"></translation>
+        <translation>Deck</translation>
     </message>
     <message>
         <source>Deck %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Deck %1</translation>
     </message>
     <message>
         <source>Sampler</source>
-        <translation type="unfinished"></translation>
+        <translation>Sampler</translation>
     </message>
     <message>
         <source>Add to playlists</source>
-        <translation type="unfinished"></translation>
+        <translation>Añadir a listas</translation>
     </message>
     <message>
         <source>Create New Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Crear lista nueva</translation>
     </message>
     <message>
         <source>Crates</source>
-        <translation type="unfinished"></translation>
+        <translation>Cajas</translation>
     </message>
     <message>
         <source>Create New Crate</source>
-        <translation type="unfinished"></translation>
+        <translation>Crear caja nueva</translation>
     </message>
     <message>
         <source>Analyze</source>
-        <translation type="unfinished"></translation>
+        <translation>Analizar</translation>
     </message>
     <message>
         <source>Reanalyze</source>
-        <translation type="unfinished"></translation>
+        <translation>Volver a analizar</translation>
     </message>
     <message>
         <source>Reanalyze (constant BPM)</source>
-        <translation type="unfinished"></translation>
+        <translation>Volver a analizar (BPM constante)</translation>
     </message>
     <message>
         <source>Reanalyze (variable BPM)</source>
-        <translation type="unfinished"></translation>
+        <translation>Volver a analizar (BPM variable)</translation>
     </message>
 </context>
 <context>
@@ -2035,12 +2332,216 @@ Aborting the operation to avoid library inconsistencies</source>
         <source>No track - load</source>
         <translation>Sin pista - Cargar</translation>
     </message>
+    <message>
+        <source>REMAIN</source>
+        <translation>RESTA</translation>
+    </message>
+    <message>
+        <source>TIME</source>
+        <translation>TIEMPO</translation>
+    </message>
 </context>
 <context>
     <name>Waveform</name>
     <message>
+        <source>Waveforms</source>
+        <translation type="unfinished">Formas de Onda</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation>Desconocido</translation>
+    </message>
+    <message>
+        <source>Overview Waveforms</source>
+        <translation>Vista general de onda</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Tipo</translation>
+    </message>
+    <message>
+        <source>Filtered</source>
+        <translation>Filtrada</translation>
+    </message>
+    <message>
+        <source>Stereo channels</source>
+        <translation>Canales estéreo</translation>
+    </message>
+    <message>
+        <source>Minute markers</source>
+        <translation>Marcas de minuto</translation>
+    </message>
+    <message>
+        <source>Gain scaling</source>
+        <translation>Escalado de ganancia</translation>
+    </message>
+    <message>
+        <source>Scrolling Waveforms</source>
+        <translation>Formas de onda en movimiento</translation>
+    </message>
+    <message>
+        <source>Simple</source>
+        <translation>Simple</translation>
+    </message>
+    <message>
+        <source>Stacked</source>
+        <translation>Apilada</translation>
+    </message>
+    <message>
+        <source>Simple, Filtered, HSV, RGB and Stacked are supported by the QML renderer.</source>
+        <translation>El renderizador QML admite Simple, Filtrada, HSV, RGB y Apilada.</translation>
+    </message>
+    <message>
+        <source>Enabled</source>
+        <translation type="unfinished">Habilitado</translation>
+    </message>
+    <message>
         <source>Waveform smoothness (FPS)</source>
         <translation>Fluidez de Ondas (FPS)</translation>
+    </message>
+    <message>
+        <source>Frame rate</source>
+        <translation>Tasa de fotogramas</translation>
+    </message>
+    <message>
+        <source>Sync deck zoom</source>
+        <translation>Sincronizar zoom de los decks</translation>
+    </message>
+    <message>
+        <source>Default zoom</source>
+        <translation>Zoom predeterminado</translation>
+    </message>
+    <message>
+        <source>End-of-track warning</source>
+        <translation>Aviso de fin de pista</translation>
+    </message>
+    <message>
+        <source>Beat-grid opacity</source>
+        <translation>Opacidad del beatgrid</translation>
+    </message>
+    <message>
+        <source>Play-marker position</source>
+        <translation>Posición del marcador de reproducción</translation>
+    </message>
+    <message>
+        <source>Visual gain (all)</source>
+        <translation>Ganancia visual (todo)</translation>
+    </message>
+    <message>
+        <source>Visual gain (low)</source>
+        <translation>Ganancia visual (graves)</translation>
+    </message>
+    <message>
+        <source>Visual gain (mid)</source>
+        <translation>Ganancia visual (medios)</translation>
+    </message>
+    <message>
+        <source>Visual gain (high)</source>
+        <translation>Ganancia visual (agudos)</translation>
+    </message>
+    <message>
+        <source>Split stereo signal</source>
+        <translation>Dividir señal estéreo</translation>
+    </message>
+    <message>
+        <source>Split stereo signal is used by the RGB renderer.</source>
+        <translation>El renderizador RGB usa la señal estéreo dividida.</translation>
+    </message>
+    <message>
+        <source>High detail (legacy)</source>
+        <translation>Alto detalle (heredado)</translation>
+    </message>
+    <message>
+        <source>High detail is retained for compatibility but is unavailable in the QML scene-graph renderer.</source>
+        <translation>El alto detalle se mantiene por compatibilidad, pero no está disponible en el renderizador QML de escena.</translation>
+    </message>
+    <message>
+        <source>Show beats until marker</source>
+        <translation>Mostrar beats hasta el marcador</translation>
+    </message>
+    <message>
+        <source>Show time until marker</source>
+        <translation>Mostrar tiempo hasta el marcador</translation>
+    </message>
+    <message>
+        <source>Marker alignment</source>
+        <translation>Alineación del marcador</translation>
+    </message>
+    <message>
+        <source>Top</source>
+        <translation>Arriba</translation>
+    </message>
+    <message>
+        <source>Center</source>
+        <translation>Centro</translation>
+    </message>
+    <message>
+        <source>Bottom</source>
+        <translation>Abajo</translation>
+    </message>
+    <message>
+        <source>Marker text size</source>
+        <translation>Tamaño del texto del marcador</translation>
+    </message>
+    <message>
+        <source>Stem channel opacity</source>
+        <translation>Opacidad del canal de stem</translation>
+    </message>
+    <message>
+        <source>Stem outline opacity</source>
+        <translation>Opacidad del contorno de stem</translation>
+    </message>
+    <message>
+        <source>Reorder stems when volume changes</source>
+        <translation>Reordenar stems al cambiar el volumen</translation>
+    </message>
+    <message>
+        <source>Stem display mode</source>
+        <translation>Modo de visualización de stems</translation>
+    </message>
+    <message>
+        <source>Caching</source>
+        <translation>Caché</translation>
+    </message>
+    <message>
+        <source>Enable waveform caching</source>
+        <translation>Activar caché de formas de onda</translation>
+    </message>
+    <message>
+        <source>Generate while analyzing</source>
+        <translation>Generar durante el análisis</translation>
+    </message>
+    <message>
+        <source>Cached waveforms occupy %1 on disk.</source>
+        <translation>Las formas de onda en caché ocupan %1 en disco.</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>desconocido</translation>
+    </message>
+    <message>
+        <source>Clear cached waveforms</source>
+        <translation>Borrar formas de onda en caché</translation>
+    </message>
+    <message>
+        <source>Graphics API Status</source>
+        <translation>Estado de la API gráfica</translation>
+    </message>
+    <message>
+        <source>Qt Quick renderer: %1</source>
+        <translation>Renderizador Qt Quick: %1</translation>
+    </message>
+    <message>
+        <source>Average frame rate: %1 fps</source>
+        <translation>Tasa media de fotogramas: %1 fps</translation>
+    </message>
+    <message>
+        <source>Average frame rate: Measuring…</source>
+        <translation>Tasa media de fotogramas: midiendo…</translation>
+    </message>
+    <message>
+        <source>Runtime API reported by Qt Quick</source>
+        <translation>API en uso según Qt Quick</translation>
     </message>
     <message>
         <source>Unsaved changes</source>
@@ -2083,7 +2584,46 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
 </context>
 <context>
+    <name>XYPad</name>
+    <message>
+        <source>⚡ XY TOUCH PAD</source>
+        <translation>⚡ PAD TÁCTIL XY</translation>
+    </message>
+    <message>
+        <source>RESET</source>
+        <translation>RESET</translation>
+    </message>
+    <message>
+        <source>◀ LOW PASS</source>
+        <translation>◀ PASO BAJO</translation>
+    </message>
+    <message>
+        <source>HIGH PASS ▶</source>
+        <translation>PASO ALTO ▶</translation>
+    </message>
+    <message>
+        <source>FILTER: NEUTRAL</source>
+        <translation>FILTRO: NEUTRO</translation>
+    </message>
+    <message>
+        <source>FILTER: LPF %1%</source>
+        <translation>FILTRO: LPF %1%</translation>
+    </message>
+    <message>
+        <source>FILTER: HPF %1%</source>
+        <translation>FILTRO: HPF %1%</translation>
+    </message>
+    <message>
+        <source>FX DEPTH: %1%</source>
+        <translation>PROFUNDIDAD FX: %1%</translation>
+    </message>
+</context>
+<context>
     <name>main</name>
+    <message>
+        <source>By JaviLabarumDJ on Android</source>
+        <translation>Por JaviLabarumDJ en Android</translation>
+    </message>
     <message>
         <source>Ready to mix!</source>
         <translation>¡Listo para pinchar!</translation>
