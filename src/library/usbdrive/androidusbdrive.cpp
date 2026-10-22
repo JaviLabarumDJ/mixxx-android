@@ -10,12 +10,10 @@
 #include <QFile>
 #include <QFutureWatcher>
 #include <QGuiApplication>
-#include <QHash>
 #include <QJniEnvironment>
 #include <QJniObject>
 #include <QPointer>
 #include <QStandardPaths>
-#include <QThread>
 #include <QtConcurrentRun>
 #include <QtCore/private/qandroidextras_p.h>
 #include <algorithm>
@@ -39,10 +37,6 @@ constexpr jint kSubclassScsi = 6;
 constexpr jint kProtocolBulkOnly = 0x50;
 constexpr jint kEndpointBulk = 2;
 constexpr jint kDirectionIn = 0x80;
-
-/// Android takes a few seconds to mount a drive after it was plugged in.
-/// Taking the drive over meanwhile would keep Android from mounting it.
-constexpr qint64 kMountGraceMs = 10000;
 
 /// mixxx::android::waitForPermission() gives up after 30 s
 constexpr qint64 kPermissionTimeoutMs = 29000;
@@ -84,8 +78,6 @@ std::mutex s_drivesMutex;
 std::vector<std::shared_ptr<Drive>> s_drives;
 // The permission is only requested once per plug-in
 QStringList s_permissionRequested;
-// When the drives were first seen, by device name. Guarded by s_scanMutex.
-QHash<QString, qint64> s_firstSeenMs;
 
 QString cacheRoot() {
     return QStandardPaths::writableLocation(QStandardPaths::CacheLocation) +
@@ -389,33 +381,7 @@ QFileInfoList driveRoots() {
                                         }),
             s_permissionRequested.end());
 
-    for (auto it = s_firstSeenMs.begin(); it != s_firstSeenMs.end();) {
-        it = connected.contains(it.key()) ? std::next(it) : s_firstSeenMs.erase(it);
-    }
-    // Gives Android the time to mount drives that were just plugged in
-    qint64 mountDeadlineMs = 0;
-    for (const QString& name : std::as_const(connected)) {
-        const bool known = std::any_of(drives.cbegin(),
-                drives.cend(),
-                [&name](const auto& pDrive) { return pDrive->usbDeviceName == name; });
-        if (!known) {
-            if (!s_firstSeenMs.contains(name)) {
-                s_firstSeenMs.insert(name, QDateTime::currentMSecsSinceEpoch());
-            }
-            const qint64 firstSeenMs = s_firstSeenMs.value(name);
-            mountDeadlineMs = std::max(mountDeadlineMs, firstSeenMs + kMountGraceMs);
-        }
-    }
-    while (!androidMountedRemovableStorage() &&
-            QDateTime::currentMSecsSinceEpoch() < mountDeadlineMs) {
-        QThread::msleep(250);
-    }
-
     if (!androidMountedRemovableStorage()) {
-        if (mountDeadlineMs > 0) {
-            qInfo() << "Android didn't mount the USB drives" << connected
-                    << ", reading them directly";
-        }
         for (const QJniObject& usbDevice : usbDevices) {
             if (!massStorageInterface(usbDevice).isValid()) {
                 continue;
@@ -472,11 +438,13 @@ bool fetchFile(const QString& localPath) {
     return ensureLocal(pDrive, localPath.mid(pDrive->root.size() + 1));
 }
 
-std::optional<QList<DriveFile>> listFiles(const QString& root, const QStringList& folders) {
+std::optional<QList<DriveFile>> listFiles(
+        const QString& root, const QStringList& folders, bool* pComplete) {
     const auto pDrive = driveFor(root + QStringLiteral("/"));
     if (!pDrive) {
         return std::nullopt;
     }
+    const int readErrors = pDrive->volume.readErrors();
     // Reads only the directories, the file system guards itself
     QList<DriveFile> files;
     QStringList pending;
@@ -498,6 +466,8 @@ std::optional<QList<DriveFile>> listFiles(const QString& root, const QStringList
             }
         }
     }
+    *pComplete = pDrive->volume.readErrors() == readErrors &&
+            !pDrive->pStorage->isDisconnected();
     return files;
 }
 

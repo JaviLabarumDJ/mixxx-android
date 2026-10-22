@@ -811,8 +811,8 @@ Are you sure you want to load a new track?</source>
         <translation>🎛 Copia de seguridad del USB de Rekordbox</translation>
     </message>
     <message>
-        <source>Copies the Rekordbox export of a USB stick (playlists, analysis and tracks) to %1/&lt;name&gt;. The copy appears under Rekordbox in the library like the stick itself, also when the stick is not plugged in. Backing up the stick again only copies what changed.</source>
-        <translation>Copia la exportación de Rekordbox de un USB (listas, análisis y pistas) a %1/&lt;nombre&gt;. La copia aparece en Rekordbox en la biblioteca igual que el USB, también cuando el USB no está conectado. Al volver a hacer la copia solo se copia lo que ha cambiado.</translation>
+        <source>Copies the Rekordbox export of a USB stick (playlists, analysis and tracks) to %1/&lt;name&gt;. The copy appears under Rekordbox in the library like the stick itself, also when the stick is not plugged in. Backing up the stick again only copies what changed, and deletes what was removed from the stick.</source>
+        <translation>Copia la exportación de Rekordbox de un USB (listas, análisis y pistas) a %1/&lt;nombre&gt;. La copia aparece en Rekordbox en la biblioteca igual que el USB, también cuando el USB no está conectado. Al volver a hacer la copia solo se copia lo que ha cambiado y se borra lo que se quitó del USB.</translation>
     </message>
     <message>
         <source>Looking…</source>
@@ -2124,6 +2124,10 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation>No hay espacio suficiente: la copia necesita %1 MB y hay %2 MB libres</translation>
     </message>
     <message>
+        <source>%1 files that are no longer on the stick were deleted.</source>
+        <translation>Se borraron %1 archivos que ya no están en el USB.</translation>
+    </message>
+    <message>
         <source>Backup stopped after %1 of %2 files. Back up again to continue.</source>
         <translation>Copia detenida tras %1 de %2 archivos. Vuelve a copiar para continuar.</translation>
     </message>
@@ -2136,8 +2140,8 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation>La copia está al día</translation>
     </message>
     <message>
-        <source>%1 files backed up to %2</source>
-        <translation>%1 archivos copiados a %2</translation>
+        <source>%1 files backed up to %2.</source>
+        <translation>%1 archivos copiados a %2.</translation>
     </message>
 </context>
 <context>

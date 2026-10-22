@@ -768,7 +768,7 @@ Category {
                     }
 
                     Text {
-                        text: qsTr("Copies the Rekordbox export of a USB stick (playlists, analysis and tracks) to %1/<name>. The copy appears under Rekordbox in the library like the stick itself, also when the stick is not plugged in. Backing up the stick again only copies what changed.").arg("/storage/emulated/0/Music/Mixxx/Rekordbox")
+                        text: qsTr("Copies the Rekordbox export of a USB stick (playlists, analysis and tracks) to %1/<name>. The copy appears under Rekordbox in the library like the stick itself, also when the stick is not plugged in. Backing up the stick again only copies what changed, and deletes what was removed from the stick.").arg("/storage/emulated/0/Music/Mixxx/Rekordbox")
                         font.pixelSize: 11
                         color: "#90a4ae"
                         wrapMode: Text.WordWrap

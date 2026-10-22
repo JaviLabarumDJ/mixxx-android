@@ -20,8 +20,7 @@ namespace usbdrive {
 /// readers and the decks can use ordinary file paths.
 
 /// Looks for USB drives and returns the local folders standing in for them.
-/// May ask for the USB permission and block until it is answered, and waits
-/// up to 10 s after a drive was plugged in for Android to mount it, so it
+/// May ask for the USB permission and block until it is answered, so it
 /// must not be called on the main thread.
 QFileInfoList driveRoots();
 
@@ -46,8 +45,10 @@ struct DriveFile {
 /// All files in the top level folders `folders` (compared ignoring case)
 /// of the drive whose local folder is `root`, recursively. Returns nothing
 /// if `root` is not a drive that Mixxx reads itself. Blocks while reading
-/// the drive.
-std::optional<QList<DriveFile>> listFiles(const QString& root, const QStringList& folders);
+/// the drive. Sets *pComplete to false if a part of the drive could not be
+/// read, in which case files may be missing from the list.
+std::optional<QList<DriveFile>> listFiles(
+        const QString& root, const QStringList& folders, bool* pComplete);
 
 /// Copies a file of the drive whose local folder is `root` to `destination`,
 /// directly, without the local cache. Blocks while copying.

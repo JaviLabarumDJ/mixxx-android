@@ -199,6 +199,7 @@ uint32_t FatVolume::nextCluster(uint32_t cluster) {
     if (it == m_fatCache.constEnd()) {
         QByteArray sector(m_bytesPerSector, Qt::Uninitialized);
         if (!readSectors(fatSector, 1, reinterpret_cast<uint8_t*>(sector.data()))) {
+            ++m_readErrors;
             return 0;
         }
         if (m_fatCache.size() >= kMaxCachedFatSectors) {
@@ -220,12 +221,18 @@ QList<FatVolume::Entry> FatVolume::directory(uint32_t firstCluster) {
     if (it != m_directoryCache.constEnd()) {
         return it.value();
     }
-    const QList<Entry> entries = readDirectory(firstCluster);
-    m_directoryCache.insert(firstCluster, entries);
+    bool complete = true;
+    const QList<Entry> entries = readDirectory(firstCluster, &complete);
+    if (complete) {
+        m_directoryCache.insert(firstCluster, entries);
+    } else {
+        // Read again next time
+        ++m_readErrors;
+    }
     return entries;
 }
 
-QList<FatVolume::Entry> FatVolume::readDirectory(uint32_t firstCluster) {
+QList<FatVolume::Entry> FatVolume::readDirectory(uint32_t firstCluster, bool* pComplete) {
     QList<Entry> entries;
     std::vector<uint8_t> buffer;
     const uint32_t clusterBytes = m_sectorsPerCluster * m_bytesPerSector;
@@ -319,6 +326,8 @@ QList<FatVolume::Entry> FatVolume::readDirectory(uint32_t firstCluster) {
         buffer.resize(static_cast<size_t>(m_rootDirSectors) * m_bytesPerSector);
         if (readSectors(m_rootDirStart, m_rootDirSectors, buffer.data())) {
             parse(buffer.data(), static_cast<uint32_t>(buffer.size()));
+        } else {
+            *pComplete = false;
         }
         return entries;
     }
@@ -328,6 +337,7 @@ QList<FatVolume::Entry> FatVolume::readDirectory(uint32_t firstCluster) {
     uint32_t remaining = m_clusterCount;
     while (cluster >= 2 && !done && remaining-- > 0) {
         if (!readSectors(clusterSector(cluster), m_sectorsPerCluster, buffer.data())) {
+            *pComplete = false;
             break;
         }
         parse(buffer.data(), clusterBytes);

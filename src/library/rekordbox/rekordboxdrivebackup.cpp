@@ -5,6 +5,7 @@
 #include <QElapsedTimer>
 #include <QFile>
 #include <QFileInfo>
+#include <QSet>
 #include <QStorageInfo>
 #include <QVariantMap>
 #include <QtConcurrentRun>
@@ -44,10 +45,6 @@ struct File {
     QDateTime modified;
 };
 
-bool isDatabase(const QString& relativePath) {
-    return !relativePath.startsWith(QLatin1String("Contents/"), Qt::CaseInsensitive);
-}
-
 /// FAT stores the time with 2 s resolution
 bool sameTime(const QDateTime& a, const QDateTime& b) {
     return a.isValid() && b.isValid() && std::abs(a.secsTo(b)) <= 2;
@@ -72,6 +69,44 @@ QList<File> listMountedFiles(const QString& root) {
         }
     }
     return files;
+}
+
+/// Deletes the files in the export folders of the backup `target` that are
+/// not in `stickFiles` (relative paths in lower case), and the folders that
+/// become empty. Returns the number of deleted files.
+int removeDeletedFiles(const QString& target, const QSet<QString>& stickFiles) {
+    int deleted = 0;
+    const QDir targetDir(target);
+    const QStringList topLevel =
+            targetDir.entryList(QDir::Dirs | QDir::Hidden | QDir::NoDotAndDotDot);
+    for (const QString& folder : topLevel) {
+        if (!kExportFolders.contains(folder, Qt::CaseInsensitive)) {
+            continue;
+        }
+        QStringList folders;
+        QDirIterator it(target + QChar('/') + folder,
+                QDir::Files | QDir::Dirs | QDir::Hidden | QDir::NoDotAndDotDot,
+                QDirIterator::Subdirectories);
+        while (it.hasNext()) {
+            const QFileInfo info(it.next());
+            if (info.isDir()) {
+                folders.append(info.filePath());
+                continue;
+            }
+            const QString relativePath = targetDir.relativeFilePath(info.filePath());
+            if (!stickFiles.contains(relativePath.toLower()) && QFile::remove(info.filePath())) {
+                ++deleted;
+            }
+        }
+        // Deepest first; rmdir() only removes empty folders
+        std::sort(folders.begin(), folders.end(), [](const QString& a, const QString& b) {
+            return a.size() > b.size();
+        });
+        for (const QString& path : std::as_const(folders)) {
+            QDir().rmdir(path);
+        }
+    }
+    return deleted;
 }
 
 void setModified(const QString& path, const QDateTime& modified) {
@@ -192,8 +227,12 @@ void RekordboxDriveBackup::run(const QString& drivePath, const QString& target) 
 
     QList<File> files;
     bool isDrive = false;
+    // Whether every folder could be read, so that a file missing from the
+    // list was really removed from the stick
+    bool complete = true;
 #ifdef __ANDROID_USB_DRIVE__
-    if (const auto driveFiles = mixxx::usbdrive::listFiles(drivePath, kExportFolders)) {
+    if (const auto driveFiles =
+                    mixxx::usbdrive::listFiles(drivePath, kExportFolders, &complete)) {
         isDrive = true;
         for (const auto& file : *driveFiles) {
             files.append({file.relativePath, file.size, file.modified});
@@ -208,14 +247,16 @@ void RekordboxDriveBackup::run(const QString& drivePath, const QString& target) 
         return;
     }
 
-    // Only what is new or changed
+    // Only what is new or changed. The copies get the date of the file on
+    // the stick, so a changed date means the file was changed.
     QList<File> pending;
     qint64 pendingBytes = 0;
+    QSet<QString> stickFiles;
     for (const File& file : std::as_const(files)) {
+        stickFiles.insert(file.relativePath.toLower());
         const QFileInfo existing(target + QChar('/') + file.relativePath);
         const bool upToDate = existing.isFile() && existing.size() == file.size &&
-                (!isDatabase(file.relativePath) ||
-                        sameTime(existing.lastModified(), file.modified));
+                sameTime(existing.lastModified(), file.modified);
         if (!upToDate) {
             pending.append(file);
             pendingBytes += file.size;
@@ -274,6 +315,18 @@ void RekordboxDriveBackup::run(const QString& drivePath, const QString& target) 
     }
 
     const int copied = m_filesDone.load() - failed;
+    // Mirrors the stick only if it was read completely and everything was
+    // copied, so a read error never deletes files of the backup
+    int deleted = 0;
+    if (!m_canceled && failed == 0 && complete) {
+        deleted = removeDeletedFiles(target, stickFiles);
+    } else if (!complete) {
+        qWarning() << "The stick" << drivePath
+                   << "could not be read completely, no files are deleted from the backup";
+    }
+    const QString deletedText = deleted > 0
+            ? QStringLiteral(" ") + tr("%1 files that are no longer on the stick were deleted.").arg(deleted)
+            : QString();
     if (m_canceled) {
         finish(tr("Backup stopped after %1 of %2 files. Back up again to continue.")
                         .arg(m_filesDone.load())
@@ -284,12 +337,13 @@ void RekordboxDriveBackup::run(const QString& drivePath, const QString& target) 
                         .arg(copied)
                         .arg(failed),
                 true);
-    } else if (copied == 0) {
+    } else if (copied == 0 && deleted == 0) {
         finish(tr("The backup is up to date"), false);
     } else {
-        finish(tr("%1 files backed up to %2").arg(copied).arg(target), false);
+        finish(tr("%1 files backed up to %2.").arg(copied).arg(target) + deletedText, false);
     }
-    qInfo() << "Backup of" << drivePath << "done:" << copied << "copied," << failed << "failed";
+    qInfo() << "Backup of" << drivePath << "done:" << copied << "copied," << failed << "failed,"
+            << deleted << "deleted";
 }
 
 } // namespace android

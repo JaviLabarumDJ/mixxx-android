@@ -804,7 +804,7 @@ Are you sure you want to load a new track?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Copies the Rekordbox export of a USB stick (playlists, analysis and tracks) to %1/&lt;name&gt;. The copy appears under Rekordbox in the library like the stick itself, also when the stick is not plugged in. Backing up the stick again only copies what changed.</source>
+        <source>Copies the Rekordbox export of a USB stick (playlists, analysis and tracks) to %1/&lt;name&gt;. The copy appears under Rekordbox in the library like the stick itself, also when the stick is not plugged in. Backing up the stick again only copies what changed, and deletes what was removed from the stick.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2117,6 +2117,10 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>%1 files that are no longer on the stick were deleted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Backup stopped after %1 of %2 files. Back up again to continue.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2129,7 +2133,7 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 files backed up to %2</source>
+        <source>%1 files backed up to %2.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

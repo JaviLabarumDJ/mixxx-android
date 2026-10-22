@@ -13,9 +13,10 @@ namespace android {
 /// folders) to /storage/emulated/0/Music/Mixxx/Rekordbox/<name>, where it is
 /// read like the stick itself (see util/removablestorage.cpp).
 ///
-/// Backing up a stick again only copies the files that are new or changed;
-/// the Rekordbox database is compared by date as well. Files that were
-/// deleted from the stick are kept in the backup.
+/// Backing up a stick again mirrors it: files that are new or changed (by
+/// size or date) are copied, and files that were removed from the stick
+/// are deleted from the backup. Files are only deleted if the stick could
+/// be read completely and nothing failed to copy.
 class RekordboxDriveBackup : public QObject {
     Q_OBJECT
   public:
