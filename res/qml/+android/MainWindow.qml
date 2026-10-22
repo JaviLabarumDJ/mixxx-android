@@ -806,6 +806,7 @@ Item {
                     sourceComponent: Component {
                         Skin.Library {
                             anchors.fill: parent
+                            acceptsController: !quickLoadDrawer.opened && !settingsPopup.opened
                         }
                     }
                     states: [

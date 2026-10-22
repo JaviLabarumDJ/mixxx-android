@@ -16,6 +16,9 @@ Item {
 
     property var sidebar: librarySources.sidebar()
     property int librarySourceMode: 0 // 0: Local, 1: Streaming Hub
+    // False while a popup (e.g. a deck loader with its own library) covers
+    // this library, so only the library in front follows the controller
+    property bool acceptsController: true
     // Remembered across restarts, see Mixxx.MobileLibrary
     readonly property bool showSidebar: Mixxx.MobileLibrary.sidebarVisible
 
@@ -42,10 +45,10 @@ Item {
         id: libraryControl
 
         // Only the library view that is on screen follows the controller
-        enabled: root.visible
+        enabled: root.visible && root.acceptsController
 
         onFocusWidgetChanged: {
-            if (!root.visible) {
+            if (!enabled) {
                 return;
             }
             switch (focusWidget) {
