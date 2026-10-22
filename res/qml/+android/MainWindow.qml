@@ -908,6 +908,10 @@ Item {
     // Besides, LOAD 1/2 open the deck loader when no library is on screen,
     // instead of loading the track selected in a library that can't be seen.
     property int viewModeBeforeLibrary: 1
+    // A ControlProxy only connects to its control if it exists when the
+    // proxy is created, so the proxies of these [Skin] controls only get
+    // their key once their SkinControlCreator has created them.
+    property bool mobileControlsCreated: false
 
     function toggleLibraryView() {
         if (root.viewMode === 2) {
@@ -921,11 +925,13 @@ Item {
     Mixxx.SkinControlCreator {
         group: "[Skin]"
         key: "mobile_library_toggle"
+
+        Component.onCompleted: root.mobileControlsCreated = true
     }
 
     Mixxx.ControlProxy {
         group: "[Skin]"
-        key: "mobile_library_toggle"
+        key: root.mobileControlsCreated ? "mobile_library_toggle" : ""
         onValueChanged: value => {
             if (value > 0) {
                 quickLoadDrawer.close();
@@ -942,15 +948,18 @@ Item {
 
             required property int index
             readonly property string group: `[Channel${index + 1}]`
+            property bool controlCreated: false
 
             Mixxx.SkinControlCreator {
                 group: "[Skin]"
                 key: `mobile_loader_deck${deckLoaderAccess.index + 1}`
+
+                Component.onCompleted: deckLoaderAccess.controlCreated = true
             }
 
             Mixxx.ControlProxy {
                 group: "[Skin]"
-                key: `mobile_loader_deck${deckLoaderAccess.index + 1}`
+                key: deckLoaderAccess.controlCreated ? `mobile_loader_deck${deckLoaderAccess.index + 1}` : ""
                 onValueChanged: value => {
                     if (value > 0) {
                         root.openQuickLoad(deckLoaderAccess.group);
