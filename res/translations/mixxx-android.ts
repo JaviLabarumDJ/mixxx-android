@@ -362,6 +362,10 @@ Are you sure you want to load a new track?</source>
         <source>No track - press LOAD</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>LOAD</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Interface</name>
@@ -614,6 +618,14 @@ Are you sure you want to load a new track?</source>
     <name>Library</name>
     <message>
         <source>LOCAL MUSIC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HIDE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PLAYLISTS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1054,6 +1066,10 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>LOCAL MUSIC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CLOSE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

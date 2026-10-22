@@ -140,7 +140,7 @@ Popup {
                     normalColor: "#ffffff"
                     font.bold: true
                     font.pixelSize: 10
-                    text: "CERRAR"
+                    text: qsTr("CLOSE")
                     onClicked: root.close()
                 }
             }

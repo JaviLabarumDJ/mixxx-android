@@ -299,7 +299,7 @@ Rectangle {
             normalColor: "#ffffff"
             font.bold: true
             font.pixelSize: (root.width < 360 || root.minimized) ? 9 : 11
-            text: (root.width < 360) ? "LOAD" : "CARGAR"
+            text: (root.width < 360) ? "LOAD" : qsTr("LOAD")
 
             onClicked: {
                 if (typeof root.Window?.window?.openQuickLoad === "function") {

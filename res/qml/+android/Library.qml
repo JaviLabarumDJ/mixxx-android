@@ -134,7 +134,7 @@ Item {
                 checked: root.showSidebar
                 font.bold: true
                 font.pixelSize: 10
-                text: root.showSidebar ? "OCULTAR" : "PLAYLISTS"
+                text: root.showSidebar ? qsTr("HIDE") : qsTr("PLAYLISTS")
                 onClicked: root.showSidebar = !root.showSidebar
             }
 

@@ -369,6 +369,10 @@ Are you sure you want to load a new track?</source>
         <source>No track - press LOAD</source>
         <translation>Sin pista - Pulsa CARGAR</translation>
     </message>
+    <message>
+        <source>LOAD</source>
+        <translation>CARGAR</translation>
+    </message>
 </context>
 <context>
     <name>Interface</name>
@@ -622,6 +626,14 @@ Are you sure you want to load a new track?</source>
     <message>
         <source>LOCAL MUSIC</source>
         <translation>MÚSICA LOCAL</translation>
+    </message>
+    <message>
+        <source>HIDE</source>
+        <translation>OCULTAR</translation>
+    </message>
+    <message>
+        <source>PLAYLISTS</source>
+        <translation>PLAYLISTS</translation>
     </message>
     <message>
         <source>Search your local collection...</source>
@@ -1062,6 +1074,10 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>LOCAL MUSIC</source>
         <translation>MÚSICA LOCAL</translation>
+    </message>
+    <message>
+        <source>CLOSE</source>
+        <translation>CERRAR</translation>
     </message>
     <message>
         <source>Local track collection</source>
