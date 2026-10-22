@@ -17,7 +17,8 @@ namespace usbdrive {
 /// readers and the decks can use ordinary file paths.
 
 /// Looks for USB drives and returns the local folders standing in for them.
-/// May ask for the USB permission and block until it is answered, so it
+/// May ask for the USB permission and block until it is answered, and waits
+/// up to 10 s after a drive was plugged in for Android to mount it, so it
 /// must not be called on the main thread.
 QFileInfoList driveRoots();
 
