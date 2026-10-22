@@ -162,10 +162,10 @@ void RekordboxPlaylistCopy::copyFiles(const QList<Source>& sources) {
                     QFile::remove(partialPath);
                 }
             }
-            if (result != FileResult::Failed) {
+            const QString& anlzPath = source.track.analyzePath;
+            if (result != FileResult::Failed && !anlzPath.isEmpty()) {
                 // The beatgrid and the cues are read after the copy
-                fetch(source.track.analyzePath);
-                const QString& anlzPath = source.track.analyzePath;
+                fetch(anlzPath);
                 fetch(anlzPath.left(anlzPath.length() - 3) + QStringLiteral("EXT"));
             }
         } else {

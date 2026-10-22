@@ -3,7 +3,9 @@
 // without changing it.
 
 #include <QAbstractProxyModel>
+#include <QFileInfo>
 #include <algorithm>
+#include <exception>
 
 #include "library/rekordbox/rekordboxandroid.h"
 
@@ -101,12 +103,23 @@ void applyRekordboxData(const TrackPointer& pTrack, const RekordboxTrack& rekord
     const mixxx::audio::SampleRate sampleRate = pTrack->getSampleRate();
     const QString& anlzPath = rekordboxTrack.analyzePath;
     const QString anlzPathExt = anlzPath.left(anlzPath.length() - 3) + "EXT";
-    if (QFile(anlzPathExt).exists()) {
-        // Beatgrids appear to be only correct in legacy ANLZ file
-        readAnalyze(pTrack, sampleRate, timingOffset, true, anlzPath);
-        readAnalyze(pTrack, sampleRate, timingOffset, false, anlzPathExt);
-    } else {
-        readAnalyze(pTrack, sampleRate, timingOffset, false, anlzPath);
+    // Tracks that were not analyzed have no ANLZ path, which would be the
+    // root of the drive
+    const bool hasAnlz = QFileInfo(anlzPath).isFile();
+    const bool hasAnlzExt = QFileInfo(anlzPathExt).isFile();
+    try {
+        if (hasAnlzExt) {
+            // Beatgrids appear to be only correct in legacy ANLZ file
+            if (hasAnlz) {
+                readAnalyze(pTrack, sampleRate, timingOffset, true, anlzPath);
+            }
+            readAnalyze(pTrack, sampleRate, timingOffset, false, anlzPathExt);
+        } else if (hasAnlz) {
+            readAnalyze(pTrack, sampleRate, timingOffset, false, anlzPath);
+        }
+    } catch (const std::exception& e) {
+        // A damaged file shouldn't stop copying the playlist
+        qWarning() << "Unable to read the Rekordbox analysis" << anlzPath << e.what();
     }
 
     // Unlike for a track on the drive, a missing key or color doesn't
