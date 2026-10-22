@@ -252,6 +252,11 @@ PioneerDDJFLX4.toggleLight = function(midiIn, active) {
 
 PioneerDDJFLX4.init = function() {
     engine.setValue("[EffectRack1_EffectUnit1]", "show_focus", 1);
+    // focused_effect is 0 (no focus) on a fresh install, so BEAT FX would
+    // address a non-existing effect slot until BEAT LEFT/RIGHT is pressed
+    if (engine.getValue("[EffectRack1_EffectUnit1]", "focused_effect") < 1) {
+        engine.setValue("[EffectRack1_EffectUnit1]", "focused_effect", 1);
+    }
 
     engine.makeConnection("[Channel1]", "vu_meter", PioneerDDJFLX4.vuMeterUpdate);
     engine.makeConnection("[Channel2]", "vu_meter", PioneerDDJFLX4.vuMeterUpdate);
@@ -291,6 +296,8 @@ PioneerDDJFLX4.init = function() {
         engine.makeConnection("[EffectRack1_EffectUnit1_Effect" + i +"]", "enabled", PioneerDDJFLX4.toggleFxLight);
     }
     engine.makeConnection("[EffectRack1_EffectUnit1]", "focused_effect", PioneerDDJFLX4.toggleFxLight);
+    // Show the state of effects restored from the previous session
+    PioneerDDJFLX4.toggleFxLight();
 
     // Register callbacks for each deck, when a file is loaded and the number of stems is available
     engine.makeConnection("[Channel1]", "stem_count", PioneerDDJFLX4.stemCountChanged);
@@ -360,7 +367,9 @@ PioneerDDJFLX4.toggleFxLight = function(_value, _group, _control) {
 };
 
 PioneerDDJFLX4.focusedFxGroup = function() {
-    const focusedFx = engine.getValue("[EffectRack1_EffectUnit1]", "focused_effect");
+    // The skin can remove the focus (0); fall back to the first slot
+    const focusedFx = Math.min(3, Math.max(1,
+        engine.getValue("[EffectRack1_EffectUnit1]", "focused_effect")));
     return "[EffectRack1_EffectUnit1_Effect" + focusedFx + "]";
 };
 
