@@ -1087,7 +1087,7 @@ Button</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>⟳ Scanning...</source>
+        <source>🔄 Scanning...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1139,7 +1139,7 @@ Button</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>⟳ Rescan music</source>
+        <source>🔄 Rescan music</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1275,7 +1275,7 @@ Button</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>⟳ Re-analyze the whole collection</source>
+        <source>🔄 Re-analyze the whole collection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1583,11 +1583,11 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>⟳ Loading...</source>
+        <source>🔄 Loading...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>⟳ Trending</source>
+        <source>🔄 Trending</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2184,7 +2184,7 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>⟳ Connecting</source>
+        <source>🔄 Connecting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2400,7 +2400,7 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>A playlist named %1 already exists</source>
+        <source>A playlist named %1 already exists. Choose it in the list above to add to it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -177,7 +177,7 @@ Category {
                                 font.pixelSize: 11
                                 font.bold: true
                                 color: root.isScanning ? "#ff9100" : "#00e676"
-                                text: root.isScanning ? qsTr("⟳ Scanning...") : qsTr("✔ Collection ready")
+                                text: root.isScanning ? qsTr("🔄 Scanning...") : qsTr("✔ Collection ready")
                             }
                         }
                     }
@@ -367,7 +367,7 @@ Category {
                             normalColor: "#ffffff"
                             font.bold: true
                             font.pixelSize: 11
-                            text: qsTr("⟳ Rescan music")
+                            text: qsTr("🔄 Rescan music")
                             enabled: !root.isScanning
                             onClicked: {
                                 if (Mixxx.Library && Mixxx.Library.rescanLibrary) {
@@ -595,14 +595,14 @@ Category {
                                     color: "#00e676"
                                 }
 
-                                Item { Layout.fillWidth: true }
-
+                                // Shortened to the space left next to the size
                                 Text {
                                     text: qsTr("Path: %1").arg(Mixxx.StreamingManager ? Mixxx.StreamingManager.cacheDirectory : "")
                                     font.pixelSize: 10
                                     color: "#607d8b"
                                     elide: Text.ElideMiddle
-                                    Layout.maximumWidth: 260
+                                    horizontalAlignment: Text.AlignRight
+                                    Layout.fillWidth: true
                                 }
                             }
                         }
@@ -996,9 +996,11 @@ Category {
                         Layout.fillWidth: true
                         spacing: 12
 
+                        // Both halves of the row
                         Skin.Button {
                             Layout.preferredHeight: 38
                             Layout.fillWidth: true
+                            Layout.preferredWidth: 1
                             activeColor: "#00e676"
                             backgroundColor: "#004d40"
                             normalColor: "#ffffff"
@@ -1014,13 +1016,14 @@ Category {
 
                         Skin.Button {
                             Layout.preferredHeight: 38
-                            Layout.preferredWidth: 180
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: 1
                             activeColor: "#ff9100"
                             backgroundColor: "#263238"
                             normalColor: "#ffe082"
                             font.bold: true
                             font.pixelSize: 11
-                            text: qsTr("⟳ Re-analyze the whole collection")
+                            text: qsTr("🔄 Re-analyze the whole collection")
                             onClicked: {
                                 if (Mixxx.MobileLibrary && Mixxx.MobileLibrary.analyzeAllTracks) {
                                     Mixxx.MobileLibrary.analyzeAllTracks();

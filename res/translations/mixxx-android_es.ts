@@ -1102,8 +1102,8 @@ Cue</translation>
         <translation>📁 Carpetas de Música Local</translation>
     </message>
     <message>
-        <source>⟳ Scanning...</source>
-        <translation>⟳ Escaneando...</translation>
+        <source>🔄 Scanning...</source>
+        <translation>🔄 Escaneando...</translation>
     </message>
     <message>
         <source>✔ Collection ready</source>
@@ -1154,8 +1154,8 @@ Cue</translation>
         <translation>📂 Explorar / Otra Carpeta...</translation>
     </message>
     <message>
-        <source>⟳ Rescan music</source>
-        <translation>⟳ Re-escanear Música</translation>
+        <source>🔄 Rescan music</source>
+        <translation>🔄 Re-escanear Música</translation>
     </message>
     <message>
         <source>🔍 Device folder browser:</source>
@@ -1290,8 +1290,8 @@ Cue</translation>
         <translation>⚡ Analizar Pistas sin BPM/Key</translation>
     </message>
     <message>
-        <source>⟳ Re-analyze the whole collection</source>
-        <translation>⟳ Re-analizar Toda la Colección</translation>
+        <source>🔄 Re-analyze the whole collection</source>
+        <translation>🔄 Re-analizar Toda la Colección</translation>
     </message>
     <message>
         <source>Scanning...</source>
@@ -1598,12 +1598,12 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation>● Online Libre</translation>
     </message>
     <message>
-        <source>⟳ Loading...</source>
-        <translation>⟳ Cargando...</translation>
+        <source>🔄 Loading...</source>
+        <translation>🔄 Cargando...</translation>
     </message>
     <message>
-        <source>⟳ Trending</source>
-        <translation>⟳ Tendencias</translation>
+        <source>🔄 Trending</source>
+        <translation>🔄 Tendencias</translation>
     </message>
     <message>
         <source>Search tracks, remixes, acapellas...</source>
@@ -2199,8 +2199,8 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation>Contraseña</translation>
     </message>
     <message>
-        <source>⟳ Connecting</source>
-        <translation>⟳ Conectando</translation>
+        <source>🔄 Connecting</source>
+        <translation>🔄 Conectando</translation>
     </message>
     <message>
         <source>✔ Connect</source>
@@ -2415,8 +2415,8 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation>CREAR</translation>
     </message>
     <message>
-        <source>A playlist named %1 already exists</source>
-        <translation>Ya existe una playlist llamada %1</translation>
+        <source>A playlist named %1 already exists. Choose it in the list above to add to it.</source>
+        <translation>Ya existe una lista llamada %1. Elígela en la lista de arriba para añadir a ella.</translation>
     </message>
     <message>
         <source>Copy the playlist to this device</source>
