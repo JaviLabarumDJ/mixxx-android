@@ -14,7 +14,7 @@ Este documento recopila de manera exhaustiva el estado actual del port de **Mixx
   - **Frontend**: Qt 6.8 / QML con interfaz táctil adaptada (`res/qml/`).
   - **Subsistema de Audio**: PortAudio con el backend Android Oboe (AAudio) y, para tarjetas de sonido USB que Android no puede usar, un driver USB propio de Mixxx (libusb, ver §6.6).
   - **Subsistema de Controladoras**: MIDI nativo de Android (AMidi), USB-MIDI propio para las tarjetas que maneja el driver USB, y USB Bulk/HID. PortMidi está desactivado en Android.
-- **Versión publicada**: `v1.4.0-android` (`versionCode 5`), ver §6.9.
+- **Versión publicada**: `v1.4.1-android` (`versionCode 6`), ver §6.9.
 - **Dispositivo objetivo de prueba**:
   - Tablet Lenovo Tab M11 (`TB331FC`), Android 13/14.
   - Conexión: ADB por Wi-Fi (depuración inalámbrica); la IP y el puerto cambian, se encuentran con `nmap -sn 192.168.0.0/24` y `nmap -p 30000-49999 <ip>`.
@@ -273,7 +273,7 @@ Nota: `make mixxx` por sí solo **no** actualiza el `.so` del proyecto Gradle; h
 - Errores del HAL de Qualcomm: `adb logcat | grep -E "PAL|AGM|AHAL"`.
 
 ### 6.9. Publicar una release
-1. Subir `android:versionCode` y `android:versionName` en `packaging/android/AndroidManifest.xml` (la v1.1.0 es `versionCode 2`, la v1.2.0 `versionCode 3`, la v1.3.0 `versionCode 4`, la v1.4.0 `versionCode 5`).
+1. Subir `android:versionCode` y `android:versionName` en `packaging/android/AndroidManifest.xml` (la v1.1.0 es `versionCode 2`, la v1.2.0 `versionCode 3`, la v1.3.0 `versionCode 4`, la v1.4.0 `versionCode 5`, la v1.4.1 `versionCode 6`).
 2. Actualizar las insignias y los enlaces de descarga del `README.md`.
 3. `make -C build-android -j12 apk`, firmar como `mixxx-android-vX.Y.Z.apk` y verificar con `apksigner verify` y `aapt2 dump badging`.
 4. Según `AGENTS.md`, el commit, la etiqueta (`vX.Y.Z-android`), el push y la publicación en GitHub los hace la persona, después de probar en un equipo de DJ real. El nombre del APK adjunto debe coincidir con el enlace del README.
@@ -339,5 +339,14 @@ La v1.4.0 fusiona `morpheasgr/android-stable` (ya incluía la v1.3.0, así que l
 - **Idioma:** `Mixxx.Language` guarda el cambio en disco al momento y el catálogo `mixxx-android` se carga en el primer arranque (antes `installAndroidTranslations()` no tenía todavía la configuración y la pantalla de inicio salía en inglés). El selector aplica el idioma después de cerrar la lista y avisa de que la biblioteca y los efectos cambian al reiniciar. En Ajustes → Audio, la opción del driver USB conserva su valor al cambiar de idioma.
 - **Sin cambios visuales no pedidos:** el botón del panel lateral y la fila seleccionada vuelven al aspecto anterior (se mantiene que el panel recuerda si estaba abierto).
 - **SHIFT+LOAD:** las notas `0x96 0x68` / `0x96 0x7A` que usa el fork para la DDJ-400 coinciden con la lista oficial de mensajes MIDI de la DDJ-400.
+
+> _Fin de la sección escrita por IA._
+
+### 6.15. Panel de rejilla de beats (v1.4.1)
+
+> _La siguiente sección la ha escrito un agente de IA (Claude Code)._
+
+- Aportado por morpheasgr (PR #2). Tocar la casilla de BPM de un deck (`Deck/+android/InfoBar.qml`) o el botón «Beatgrid»/«REJILLA» de su barra (`Deck/+android/Toolbar.qml`) abre `res/qml/Deck/BeatgridPopup.qml`, que usa los controles estándar `beats_translate_half`, `beats_translate_curpos`, `beats_translate_earlier/later`, `beats_set_halve/double`, `beats_translate_match_alignment`, `beats_undo_adjustment` y `bpmlock`. Los cambios se guardan en la pista.
+- Las flechas de ANTES/DESPUÉS son «‹ ›»: Android dibuja «◀ ▶» como emoji aunque lleven U+FE0E, y sus fuentes no tienen «◄ ▸» (salen como un cuadrado). Lo mismo con «⟳», sustituido por 🔄.
 
 > _Fin de la sección escrita por IA._
