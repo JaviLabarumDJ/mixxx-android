@@ -6,6 +6,9 @@ import QtQuick 2.12
 Item {
     id: root
 
+    // Several library views can exist at the same time (e.g. the LIB view
+    // and the one of the LOAD drawers). The parent disables the ones that
+    // aren't visible, so a controller button is handled only once.
     property alias focusWidget: focusedWidgetControl.value
 
     readonly property bool sidebarFocused: root.focusWidget == Skin.FocusedWidgetControl.WidgetKind.Sidebar
@@ -49,6 +52,8 @@ Item {
         group: "[Library]"
         key: "GoToItem"
         onValueChanged: (value) => {
+            if (!root.enabled)
+                return;
             if (value == 0)
                 return;
             if (root.sidebarFocused)
@@ -62,6 +67,8 @@ Item {
         group: "[Playlist]"
         key: "LoadSelectedIntoFirstStopped"
         onValueChanged: (value) => {
+            if (!root.enabled)
+                return;
             if (value != 0 && root.libraryFocused)
                 root.loadSelectedTrackIntoNextAvailableDeck(false);
         }
@@ -71,6 +78,8 @@ Item {
         group: "[Playlist]"
         key: "SelectTrackKnob"
         onValueChanged: (value) => {
+            if (!root.enabled)
+                return;
             if (value != 0) {
                 root.focusWidget = Skin.FocusedWidgetControl.WidgetKind.LibraryView;
                 root.moveVertical(value);
@@ -82,6 +91,8 @@ Item {
         group: "[Playlist]"
         key: "SelectPrevTrack"
         onValueChanged: (value) => {
+            if (!root.enabled)
+                return;
             if (value != 0) {
                 root.focusWidget = Skin.FocusedWidgetControl.WidgetKind.LibraryView;
                 root.moveVertical(-1);
@@ -93,6 +104,8 @@ Item {
         group: "[Playlist]"
         key: "SelectNextTrack"
         onValueChanged: (value) => {
+            if (!root.enabled)
+                return;
             if (value != 0) {
                 root.focusWidget = Skin.FocusedWidgetControl.WidgetKind.LibraryView;
                 root.moveVertical(1);
@@ -104,6 +117,8 @@ Item {
         group: "[Library]"
         key: "MoveVertical"
         onValueChanged: (value) => {
+            if (!root.enabled)
+                return;
             if (value != 0)
                 root.move(value);
         }
@@ -113,6 +128,8 @@ Item {
         group: "[Library]"
         key: "MoveUp"
         onValueChanged: (value) => {
+            if (!root.enabled)
+                return;
             if (value != 0)
                 root.move(-1);
         }
@@ -122,6 +139,8 @@ Item {
         group: "[Library]"
         key: "MoveDown"
         onValueChanged: (value) => {
+            if (!root.enabled)
+                return;
             if (value != 0)
                 root.move(1);
         }
@@ -131,6 +150,8 @@ Item {
         group: "[Library]"
         key: "MoveFocusForward"
         onValueChanged: (value) => {
+            if (!root.enabled)
+                return;
             if (value != 0)
                 root.moveFocus(true);
         }
@@ -140,6 +161,8 @@ Item {
         group: "[Library]"
         key: "MoveFocusBackward"
         onValueChanged: (value) => {
+            if (!root.enabled)
+                return;
             if (value != 0)
                 root.moveFocus(false);
         }
@@ -159,7 +182,7 @@ Item {
             required property int index
 
             group: "[Channel" + (index + 1) + "]"
-            enabled: root.libraryFocused
+            enabled: root.enabled && root.libraryFocused
             onLoadTrackRequested: (play) => {
                 root.loadSelectedTrack(this.group, play);
             }
@@ -180,7 +203,7 @@ Item {
             required property int index
 
             group: "[PreviewDeck" + (index + 1) + "]"
-            enabled: root.libraryFocused
+            enabled: root.enabled && root.libraryFocused
             onLoadTrackRequested: (play) => {
                 root.loadSelectedTrack(this.group, play);
             }
@@ -201,7 +224,7 @@ Item {
             required property int index
 
             group: "[Sampler" + (index + 1) + "]"
-            enabled: root.libraryFocused
+            enabled: root.enabled && root.libraryFocused
             onLoadTrackRequested: (play) => {
                 root.loadSelectedTrack(this.group, play);
             }

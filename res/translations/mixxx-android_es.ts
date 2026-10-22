@@ -644,12 +644,12 @@ Are you sure you want to load a new track?</source>
         <translation>Para leer las playlists de Rekordbox y Engine DJ de un USB, Android tiene que permitir a Mixxx el acceso a todos los archivos. Actívalo en la pantalla que se abre y vuelve a tocar la sección.</translation>
     </message>
     <message>
-        <source>AHORA NO</source>
-        <translation type="unfinished"></translation>
+        <source>NOT NOW</source>
+        <translation>AHORA NO</translation>
     </message>
     <message>
-        <source>DAR PERMISO</source>
-        <translation type="unfinished"></translation>
+        <source>GRANT PERMISSION</source>
+        <translation>DAR PERMISO</translation>
     </message>
     <message>
         <source>Music Library</source>
@@ -1697,8 +1697,8 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation>Nueva playlist</translation>
     </message>
     <message>
-        <source>CREAR</source>
-        <translation type="unfinished"></translation>
+        <source>CREATE</source>
+        <translation>CREAR</translation>
     </message>
     <message>
         <source>A playlist named %1 already exists</source>

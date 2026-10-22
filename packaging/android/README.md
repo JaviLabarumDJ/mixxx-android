@@ -45,21 +45,27 @@ handlers is what allows two decks to be operated at the same time:
 The upstream QML files in `res/qml/` are kept unmodified, so that merging
 `mixxxdj/mixxx` does not conflict. The Android versions live next to them in
 `+android/` folders, e.g. `res/qml/Settings/+android/Interface.qml` replaces
-`res/qml/Settings/Interface.qml`. This uses Qt's
-[QML file selectors](https://doc.qt.io/qt-6/qtquick-positioning-qml-file-selectors.html):
-the `android` selector is active automatically on Android, and the
-`QQmlApplicationEngine` applies it to the `assets:/` files.
+`res/qml/Settings/Interface.qml`.
+
+The replacement happens when the APK is built:
+`cmake/modules/apply_android_qml_overrides.cmake` copies each `+android` file
+over the upstream one in the package's assets and removes the `+android`
+folders. The app therefore sees the same files as if the upstream files had
+been edited. Qt's runtime
+[QML file selectors](https://doc.qt.io/qt-6/qtquick-positioning-qml-file-selectors.html)
+are deliberately not used: from Qt 6.12 on, relative imports inside a
+`+android` file (`import "."`, `import "../Theme"`) resolve against the
+`+android` folder and the UI would fail to load.
 
 Rules when changing the UI:
 
 * To change an upstream QML file for Android, copy it to the `+android/`
   folder next to it and edit the copy. Never edit the upstream file.
-* Relative imports and implicit same-folder types in an override resolve
-  against the original folder, not against `+android/`, so
-  `import "../Theme"` keeps working unchanged.
+* Write the copy as if it were in the original folder: its relative imports
+  are resolved from there once it is packaged.
 * Files that only exist in this fork (e.g. `res/qml/WaveDeckBar.qml`,
   `res/qml/Deck/TouchSpinny.qml`) are added as normal files, not into
-  `+android/`, so that other files can find them.
+  `+android/`.
 * QML compiled into the binary (`res/qml/Mixxx/...`) cannot be overridden this
   way; use a fork-owned copy instead, as `Deck/TouchSpinny.qml` does for
   `Mixxx.Controls.Spinny`.
@@ -67,8 +73,11 @@ Rules when changing the UI:
   override (`git diff <old-upstream> <new-upstream> -- res/qml`) and port the
   change into the override by hand if needed.
 
-To run the Android UI on a desktop build, start Mixxx with
-`QT_FILE_SELECTORS=android mixxx --new-ui`.
+To run the Android UI on a desktop build, apply the overrides to a copy of
+`res/qml`
+(`cmake -DQML_DIR=<copy> -P cmake/modules/apply_android_qml_overrides.cmake`)
+and start Mixxx with `--new-ui --resource-path` pointing at a resource folder
+that contains it.
 
 ### C++ and CMake
 

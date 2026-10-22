@@ -102,3 +102,16 @@ add_custom_target(
 )
 add_dependencies(mixxx-android-usb-device-filter copy-resource-android)
 add_dependencies(mixxx mixxx-android-usb-device-filter)
+
+# The Android versions of upstream QML files live in +android folders next
+# to them (see packaging/android/README.md). They replace the upstream files
+# in the package, after copy-resource-android copied res/ to the assets.
+add_custom_target(
+  mixxx-android-qml-overrides
+  COMMAND
+    ${CMAKE_COMMAND}
+    -DQML_DIR="${CMAKE_CURRENT_BINARY_DIR}/android-build/assets/qml"
+    -P ${CMAKE_SOURCE_DIR}/cmake/modules/apply_android_qml_overrides.cmake
+)
+add_dependencies(mixxx-android-qml-overrides copy-resource-android)
+add_dependencies(mixxx mixxx-android-qml-overrides)

@@ -41,7 +41,13 @@ Item {
     LibraryComponent.Control {
         id: libraryControl
 
+        // Only the library view that is on screen follows the controller
+        enabled: root.visible
+
         onFocusWidgetChanged: {
+            if (!root.visible) {
+                return;
+            }
             switch (focusWidget) {
             case Skin.FocusedWidgetControl.WidgetKind.LibraryView:
                 trackList.focusList();
@@ -313,7 +319,7 @@ Item {
                 Skin.Button {
                     Layout.preferredHeight: 44
                     Layout.preferredWidth: 110
-                    text: qsTr("AHORA NO")
+                    text: qsTr("NOT NOW")
                     onClicked: storageAccessPopup.close()
                 }
                 Skin.Button {
@@ -323,7 +329,7 @@ Item {
                     backgroundColor: "#1565c0"
                     normalColor: "#ffffff"
                     font.bold: true
-                    text: qsTr("DAR PERMISO")
+                    text: qsTr("GRANT PERMISSION")
                     onClicked: {
                         storageAccessPopup.close();
                         Mixxx.MobileLibrary.requestFullStorageAccess();

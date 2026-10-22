@@ -637,11 +637,11 @@ Are you sure you want to load a new track?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>AHORA NO</source>
+        <source>NOT NOW</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>DAR PERMISO</source>
+        <source>GRANT PERMISSION</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1690,7 +1690,7 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>CREAR</source>
+        <source>CREATE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

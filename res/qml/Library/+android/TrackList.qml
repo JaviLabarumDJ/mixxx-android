@@ -548,7 +548,7 @@ Rectangle {
                     backgroundColor: "#1565c0"
                     normalColor: "#ffffff"
                     font.bold: true
-                    text: qsTr("CREAR")
+                    text: qsTr("CREATE")
 
                     onClicked: {
                         const name = newPlaylistName.text.trim();
