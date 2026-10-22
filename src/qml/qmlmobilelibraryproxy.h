@@ -15,6 +15,10 @@ namespace qml {
 /// merging upstream Mixxx stays conflict-free.
 class QmlMobileLibraryProxy : public QObject {
     Q_OBJECT
+    /// Whether the sidebar (playlists, crates...) of the library is shown.
+    /// Remembered across restarts.
+    Q_PROPERTY(bool sidebarVisible READ sidebarVisible WRITE setSidebarVisible NOTIFY
+                    sidebarVisibleChanged)
     QML_NAMED_ELEMENT(MobileLibrary)
     QML_SINGLETON
 
@@ -22,6 +26,9 @@ class QmlMobileLibraryProxy : public QObject {
     explicit QmlMobileLibraryProxy(QObject* pParent = nullptr);
 
     static QmlMobileLibraryProxy* create(QQmlEngine* pQmlEngine, QJSEngine* pJsEngine);
+
+    bool sidebarVisible() const;
+    void setSidebarVisible(bool visible);
 
     /// The music directories as a list of {path, trackCount, totalSecond}
     Q_INVOKABLE QVariantList getSourcesList() const;
@@ -49,6 +56,7 @@ class QmlMobileLibraryProxy : public QObject {
 
   signals:
     void sourcesChanged();
+    void sidebarVisibleChanged();
 
   private:
     void analyzeTracksMatching(const QString& sqlQuery) const;

@@ -11,6 +11,7 @@
 #include "library/trackcollection.h"
 #include "library/trackcollectionmanager.h"
 #include "moc_qmlmobilelibraryproxy.cpp"
+#include "qml/qmlconfigproxy.h"
 #include "qml/qmllibraryproxy.h"
 #include "track/track.h"
 #include "util/assert.h"
@@ -24,6 +25,9 @@ namespace mixxx {
 namespace qml {
 
 namespace {
+
+const ConfigKey kSidebarVisibleKey(
+        QStringLiteral("[Library]"), QStringLiteral("AndroidShowSidebar"));
 
 TrackCollectionManager* trackCollectionManager() {
     Library* pLibrary = QmlLibraryProxy::get();
@@ -47,6 +51,20 @@ QmlMobileLibraryProxy::QmlMobileLibraryProxy(QObject* pParent)
 // static
 QmlMobileLibraryProxy* QmlMobileLibraryProxy::create(QQmlEngine* pQmlEngine, QJSEngine*) {
     return new QmlMobileLibraryProxy(pQmlEngine);
+}
+
+bool QmlMobileLibraryProxy::sidebarVisible() const {
+    const UserSettingsPointer pConfig = QmlConfigProxy::get();
+    return pConfig ? pConfig->getValue(kSidebarVisibleKey, true) : true;
+}
+
+void QmlMobileLibraryProxy::setSidebarVisible(bool visible) {
+    const UserSettingsPointer pConfig = QmlConfigProxy::get();
+    if (!pConfig || visible == sidebarVisible()) {
+        return;
+    }
+    pConfig->setValue(kSidebarVisibleKey, visible);
+    emit sidebarVisibleChanged();
 }
 
 QVariantList QmlMobileLibraryProxy::getSourcesList() const {

@@ -16,7 +16,8 @@ Item {
 
     property var sidebar: librarySources.sidebar()
     property int librarySourceMode: 0 // 0: Local, 1: Streaming Hub
-    property bool showSidebar: true
+    // Remembered across restarts, see Mixxx.MobileLibrary
+    readonly property bool showSidebar: Mixxx.MobileLibrary.sidebarVisible
 
     function applySearch() {
         if (root.sidebar && root.sidebar.tracklist && root.librarySourceMode === 0) {
@@ -47,7 +48,7 @@ Item {
                 break;
             case Skin.FocusedWidgetControl.WidgetKind.Sidebar:
                 root.librarySourceMode = 0;
-                root.showSidebar = true;
+                Mixxx.MobileLibrary.sidebarVisible = true;
                 if (browser.currentRow() < 0) {
                     browser.selectRow(0);
                 }
@@ -125,20 +126,23 @@ Item {
                 onClicked: root.librarySourceMode = 1
             }
 
+            Item { Layout.fillWidth: true }
+
+            // Shows or hides the sidebar (playlists, crates, history...).
+            // A toggle rather than a tab: always the same label, lit while
+            // the sidebar is shown.
             Skin.Button {
                 visible: root.librarySourceMode === 0
                 Layout.fillHeight: true
-                Layout.preferredWidth: 92
-                activeColor: Theme.accentColor
-                checkable: true
-                checked: root.showSidebar
+                Layout.preferredWidth: 130
+                activeColor: "#ffffff"
+                normalColor: "#90a4ae"
+                highlight: root.showSidebar
                 font.bold: true
                 font.pixelSize: 10
-                text: root.showSidebar ? qsTr("HIDE") : qsTr("PLAYLISTS")
-                onClicked: root.showSidebar = !root.showSidebar
+                text: qsTr("SIDEBAR")
+                onClicked: Mixxx.MobileLibrary.sidebarVisible = !Mixxx.MobileLibrary.sidebarVisible
             }
-
-            Item { Layout.fillWidth: true }
         }
     }
 

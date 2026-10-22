@@ -628,12 +628,8 @@ Are you sure you want to load a new track?</source>
         <translation>MÚSICA LOCAL</translation>
     </message>
     <message>
-        <source>HIDE</source>
-        <translation>OCULTAR</translation>
-    </message>
-    <message>
-        <source>PLAYLISTS</source>
-        <translation>PLAYLISTS</translation>
+        <source>SIDEBAR</source>
+        <translation>PANEL LATERAL</translation>
     </message>
     <message>
         <source>Search your local collection...</source>
