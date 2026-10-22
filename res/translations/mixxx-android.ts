@@ -262,11 +262,11 @@ Use the advanced mode to view them</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>◀ EARLIER</source>
+        <source>‹ EARLIER</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>LATER ▶</source>
+        <source>LATER ›</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

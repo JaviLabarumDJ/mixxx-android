@@ -273,12 +273,12 @@ Usa el modo avanzado para verla</translation>
         <translation>PRIMER TIEMPO AQUÍ</translation>
     </message>
     <message>
-        <source>◀ EARLIER</source>
-        <translation>◀ ANTES</translation>
+        <source>‹ EARLIER</source>
+        <translation>‹ ANTES</translation>
     </message>
     <message>
-        <source>LATER ▶</source>
-        <translation>DESPUÉS ▶</translation>
+        <source>LATER ›</source>
+        <translation>DESPUÉS ›</translation>
     </message>
     <message>
         <source>BPM ÷2</source>
