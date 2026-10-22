@@ -1,4 +1,5 @@
 import ".." as Skin
+import "." as DeckComponent
 import Mixxx 1.0 as Mixxx
 import QtQuick 2.12
 import QtQuick.Layouts
@@ -144,11 +145,12 @@ Rectangle {
         }
 
         // ================= 4. BPM & PITCH PILL (PROMINENT) =================
+        // Tapping it opens the beatgrid corrections
         Rectangle {
             Layout.preferredHeight: root.minimized ? 22 : 36
             Layout.preferredWidth: bpmCol.implicitWidth + 10
             radius: 4
-            color: "#12151c"
+            color: bpmMouseArea.pressed ? "#263043" : "#12151c"
             border.color: root.deckColor
             border.width: 1
 
@@ -177,6 +179,19 @@ Rectangle {
                         return (p > 0 ? "+" : "") + p.toFixed(1) + "%";
                     }
                 }
+            }
+
+            MouseArea {
+                id: bpmMouseArea
+
+                anchors.fill: parent
+                enabled: bpmControl.value > 0 && !root.editMode
+                onClicked: beatgridPopup.open()
+            }
+            DeckComponent.BeatgridPopup {
+                id: beatgridPopup
+
+                group: root.group
             }
         }
 
