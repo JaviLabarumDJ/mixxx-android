@@ -56,6 +56,19 @@ mappings map SHIFT+LOAD (`0x96 0x68`/`0x7A`, measured on a DDJ-FLX4) to
 
 > _End of AI-written section._
 
+## Date added of the first scan
+
+> _The following section was written by an AI agent (Claude Code)._
+
+The scanner adds files alphabetically, folder by folder, so the "date added"
+of a whole collection would follow the file names. After the very first scan
+(the library was empty when it started), `src/library/androidfirstscanorder.cpp`
+hands out that scan's "date added" values again in the order of the file
+dates, oldest file first. The values stay times of that scan; tracks added
+later get their own time as in upstream Mixxx.
+
+> _End of AI-written section._
+
 ## Merging upstream Mixxx
 
 ### QML overrides

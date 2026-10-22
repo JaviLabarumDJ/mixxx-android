@@ -807,22 +807,6 @@ Are you sure you want to load a new track?</source>
         <translation>Restaurar</translation>
     </message>
     <message>
-        <source>📅 Date added</source>
-        <translation>📅 Fecha de añadido</translation>
-    </message>
-    <message>
-        <source>New tracks get the date of their file as &quot;Added&quot; date, so they can be sorted by when they were downloaded or copied. Tracks scanned before all have the date of that scan; this converts them too. It can&apos;t be undone, back up the library first if unsure.</source>
-        <translation>Las pistas nuevas reciben la fecha de su archivo como fecha de añadido, así se pueden ordenar por cuándo se descargaron o copiaron. Las pistas escaneadas antes tienen todas la fecha de ese escaneo; esto también las convierte. No se puede deshacer: si tienes dudas, haz antes una copia de la librería.</translation>
-    </message>
-    <message>
-        <source>Tap again to confirm</source>
-        <translation>Toca de nuevo para confirmar</translation>
-    </message>
-    <message>
-        <source>📅 Use file dates</source>
-        <translation>📅 Usar fechas de archivo</translation>
-    </message>
-    <message>
         <source>🔍 Search &amp; organization</source>
         <translation>🔍 Búsqueda y Organización</translation>
     </message>
@@ -2059,14 +2043,6 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>Mixxx closes now. Open it again to finish restoring %1.</source>
         <translation>Mixxx se cierra ahora. Ábrelo de nuevo para terminar de restaurar %1.</translation>
-    </message>
-    <message>
-        <source>Could not update the dates.</source>
-        <translation>No se han podido actualizar las fechas.</translation>
-    </message>
-    <message>
-        <source>Updated the dates of %1 tracks. Mixxx closes now, open it again to see them.</source>
-        <translation>Fechas actualizadas en %1 pistas. Mixxx se cierra ahora; ábrelo de nuevo para verlas.</translation>
     </message>
 </context>
 <context>

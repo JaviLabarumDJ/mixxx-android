@@ -10,8 +10,8 @@ target_sources(
   mixxx-lib
   PRIVATE
     src/controllers/mappingmatcher.cpp
-    src/library/androidtrackdates.cpp
     src/soundio/soundmanagerandroid.cpp
+    src/library/androidfirstscanorder.cpp
     src/util/androidbackup.cpp
     src/util/androidpermissions.cpp
     src/util/removablestorage.cpp
