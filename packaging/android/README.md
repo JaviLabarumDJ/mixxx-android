@@ -103,7 +103,10 @@ files, and upstream files only get small hooks.
 
 The UI language is chosen in *Settings → Interface → Language* and is applied
 immediately. It is stored in the same `[Config],Locale` key as the desktop
-preferences; "System default" follows the Android language.
+preferences; "System default" follows the Android language. The selector only
+lists the languages that have a `mixxx-android_<lang>` catalog (plus English):
+the upstream catalogs don't cover the QML UI, so other languages would still
+show it in English.
 
 The source language of all UI strings is English (`qsTr("...")`). Strings of
 the QML UI and of the Android-only C++ code are kept in their own catalogs,

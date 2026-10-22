@@ -21,8 +21,9 @@ class QmlLanguageProxy : public QObject {
     /// The locale stored as [Config],Locale. An empty string means the
     /// system language.
     Q_PROPERTY(QString locale READ locale WRITE setLocale NOTIFY localeChanged)
-    /// The languages a translation is shipped for, as a list of
-    /// {locale, name, nativeName} maps sorted by name.
+    /// The languages the Android UI is translated to (those with a
+    /// res/translations/mixxx-android_<lang>.qm) plus English, as a list
+    /// of {locale, name, nativeName} maps sorted by name.
     Q_PROPERTY(QVariantList availableLocales READ availableLocales CONSTANT)
 
   public:

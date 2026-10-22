@@ -113,8 +113,11 @@ QVariantList QmlLanguageProxy::availableLocales() const {
         return {};
     }
     const QDir translationsDir(translationsPath(pConfig));
-    const QStringList fileNames = translationsDir.entryList(
-            {QStringLiteral("mixxx_*.qm"), kAndroidTranslationsPrefix + QStringLiteral("_*.qm")});
+    // Only the languages the Android UI is translated to. The upstream
+    // catalogs (mixxx_*.qm) don't cover the QML UI, so the other languages
+    // would show the UI in English anyway.
+    const QStringList fileNames =
+            translationsDir.entryList({kAndroidTranslationsPrefix + QStringLiteral("_*.qm")});
     // Source language
     QStringList localeNames{QStringLiteral("en_US")};
     for (const auto& fileName : fileNames) {
@@ -135,9 +138,17 @@ QVariantList QmlLanguageProxy::availableLocales() const {
         }
         QString name = QLocale::languageToString(locale.language());
         QString nativeName = locale.nativeLanguageName();
-        if (localeName.contains('_')) {
+        if (locale.language() == QLocale::English) {
+            // The source language, stored as "en_US" like in the desktop
+            // preferences
+            nativeName = name;
+        } else if (localeName.contains('_')) {
             name += QStringLiteral(" (") + QLocale::territoryToString(locale.territory()) + ')';
             nativeName += QStringLiteral(" (") + locale.nativeTerritoryName() + ')';
+        }
+        if (!nativeName.isEmpty()) {
+            // e.g. "español" -> "Español"
+            nativeName = locale.toUpper(nativeName.left(1)) + nativeName.mid(1);
         }
         locales.append(QVariantMap{
                 {QStringLiteral("locale"), localeName},
