@@ -900,6 +900,85 @@ Item {
         }
     }
 
+    // ================= CONTROLLER ACCESS TO THE SCREENS =================
+    // [Skin] controls that controller mappings can use:
+    // - mobile_library_toggle: shows the LIB view, or returns to the previous
+    //   view if it is shown (SHIFT+LOAD on the DDJ-400 and DDJ-FLX4)
+    // - mobile_loader_deck1/2: opens the deck loader of deck 1/2
+    // Besides, LOAD 1/2 open the deck loader when no library is on screen,
+    // instead of loading the track selected in a library that can't be seen.
+    property int viewModeBeforeLibrary: 1
+
+    function toggleLibraryView() {
+        if (root.viewMode === 2) {
+            root.viewMode = root.viewModeBeforeLibrary === 2 ? 1 : root.viewModeBeforeLibrary;
+        } else {
+            root.viewModeBeforeLibrary = root.viewMode;
+            root.viewMode = 2;
+        }
+    }
+
+    Mixxx.SkinControlCreator {
+        group: "[Skin]"
+        key: "mobile_library_toggle"
+    }
+
+    Mixxx.ControlProxy {
+        group: "[Skin]"
+        key: "mobile_library_toggle"
+        onValueChanged: value => {
+            if (value > 0) {
+                quickLoadDrawer.close();
+                root.toggleLibraryView();
+            }
+        }
+    }
+
+    Repeater {
+        model: 2
+
+        Item {
+            id: deckLoaderAccess
+
+            required property int index
+            readonly property string group: `[Channel${index + 1}]`
+
+            Mixxx.SkinControlCreator {
+                group: "[Skin]"
+                key: `mobile_loader_deck${deckLoaderAccess.index + 1}`
+            }
+
+            Mixxx.ControlProxy {
+                group: "[Skin]"
+                key: `mobile_loader_deck${deckLoaderAccess.index + 1}`
+                onValueChanged: value => {
+                    if (value > 0) {
+                        root.openQuickLoad(deckLoaderAccess.group);
+                    }
+                }
+            }
+
+            Mixxx.ControlProxy {
+                group: deckLoaderAccess.group
+                key: "LoadSelectedTrack"
+                onValueChanged: value => {
+                    if (value <= 0) {
+                        return;
+                    }
+                    if (quickLoadDrawer.opened) {
+                        // The library of the deck loader loads the track,
+                        // close it afterwards
+                        Qt.callLater(quickLoadDrawer.close);
+                    } else if (!library.visible) {
+                        // Deferred, so the library of the deck loader doesn't
+                        // also handle this press and load a track right away
+                        Qt.callLater(root.openQuickLoad, deckLoaderAccess.group);
+                    }
+                }
+            }
+        }
+    }
+
     Skin.QuickLoadDrawer {
         id: quickLoadDrawer
 

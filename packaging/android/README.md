@@ -36,6 +36,25 @@ handlers is what allows two decks to be operated at the same time:
 | Drag on a knob or fader          | Change the value                           |
 | Long press on a hotcue           | Open the hotcue popup (right click on desktop) |
 
+## Controllers and the screens
+
+> _The following section was written by an AI agent (Claude Code)._
+
+The Android UI creates `[Skin]` controls that controller mappings can use
+(see `res/qml/+android/MainWindow.qml`):
+
+| Control | Action |
+| ------- | ------ |
+| `[Skin],mobile_library_toggle` | Shows the LIB view, or returns to the previous view |
+| `[Skin],mobile_loader_deck1`, `[Skin],mobile_loader_deck2` | Opens the deck loader of deck 1/2 |
+
+`[ChannelN],LoadSelectedTrack` (LOAD) opens the deck loader of deck 1/2 when
+no library is on screen; with a library on screen it loads the selected
+track, and closes the deck loader if it was used. The DDJ-400 and DDJ-FLX4
+mappings map SHIFT+LOAD to `mobile_library_toggle`.
+
+> _End of AI-written section._
+
 ## Merging upstream Mixxx
 
 ### QML overrides
