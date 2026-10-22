@@ -9,7 +9,7 @@ import "../Theme"
 Category {
     id: root
 
-    label: "Acerca de"
+    label: qsTr("About")
     selectedIndex: 0
 
     Flickable {
@@ -86,7 +86,7 @@ Category {
                                 width: 56
                                 Text {
                                     anchors.centerIn: parent
-                                    text: "DJ / CREATOR"
+                                    text: qsTr("DJ / CREATOR")
                                     font.pixelSize: 7
                                     font.bold: true
                                     color: "#00e5ff"
@@ -107,7 +107,7 @@ Category {
                             font.pixelSize: 10
                             color: "#b0bec5"
                             lineHeight: 1.2
-                            text: "DJ, productor y apasionado del audio digital. Llevando la experiencia de mezcla profesional y tactilidad real a dispositivos Android."
+                            text: qsTr("DJ, producer and app developer. Bringing a professional mixing experience and real touch control to Android devices.")
                         }
                     }
                 }
@@ -135,7 +135,7 @@ Category {
                             font.pixelSize: 15
                         }
                         Text {
-                            text: "¿POR QUÉ ESTA APLICACIÓN?"
+                            text: qsTr("WHY THIS APP?")
                             font.bold: true
                             font.pixelSize: 12
                             color: "#00e5ff"
@@ -155,12 +155,12 @@ Category {
                         font.pixelSize: 11
                         lineHeight: 1.3
                         color: "#cfd8dc"
-                        text: "Durante mucho tiempo, las opciones de software DJ en móviles han estado limitadas por suscripciones caras, latencias inaceptables o interfaces poco profesionales.\n\n" +
-                              "Esta edición de Mixxx para Android nace de una necesidad personal como DJ: tener una cabina completa, libre, potente y ultra-estable en el bolsillo.\n\n" +
-                              "• Motor de audio profesional en tiempo real C++ sin cortes.\n" +
-                              "• Soporte para controladoras DJ USB externas (plug & play por OTG).\n" +
-                              "• Doble deck táctil con faders de pitch independientes, beatloops, hotcues y EQ completa.\n" +
-                              "• Creada de forma independiente con pasión por la música y para la comunidad DJ."
+                        text: qsTr("For a long time, mobile DJ software has been held back by expensive subscriptions, unacceptable latency or unprofessional interfaces.") + "\n\n" +
+                              qsTr("This Android edition of Mixxx was born from a personal need as a DJ: a complete, free, powerful and ultra-stable booth in your pocket.") + "\n\n" +
+                              qsTr("• Professional real-time C++ audio engine with no dropouts.") + "\n" +
+                              qsTr("• Support for external USB DJ controllers (plug & play via OTG).") + "\n" +
+                              qsTr("• Dual touch decks with independent pitch faders, beatloops, hotcues and full EQ.") + "\n" +
+                              qsTr("• Independently made with a passion for music, for the DJ community.")
                     }
                 }
             }
@@ -187,7 +187,7 @@ Category {
                             font.pixelSize: 15
                         }
                         Text {
-                            text: "SÍGUEME EN MIS REDES SOCIALES"
+                            text: qsTr("FOLLOW ME ON SOCIAL MEDIA")
                             font.bold: true
                             font.pixelSize: 12
                             color: "#ff9100"
@@ -196,7 +196,7 @@ Category {
                     }
 
                     Text {
-                        text: "Toca cualquier red para abrir el perfil y ver sesiones, trucos, novedades y actualizaciones:"
+                        text: qsTr("Tap any network to open the profile and see sets, tips, news and updates:")
                         font.pixelSize: 10
                         color: "#90a4ae"
                     }
@@ -260,14 +260,14 @@ Category {
                         }
                         Item { Layout.fillWidth: true }
                         Text {
-                            text: "v2.6-mobile (ARM64)"
+                            text: `v${Mixxx.Application.packageVersion} (Mixxx ${Mixxx.Application.version})`
                             font.pixelSize: 10
                             color: "#78909c"
                         }
                     }
 
                     Text {
-                        text: "Basado en el proyecto Open Source Mixxx. Adaptación móvil por JaviLabarum."
+                        text: qsTr("Based on the open source Mixxx project. Mobile adaptation by JaviLabarum.")
                         font.pixelSize: 9
                         color: "#546e7a"
                     }

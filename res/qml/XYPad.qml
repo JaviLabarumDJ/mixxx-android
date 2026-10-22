@@ -164,7 +164,7 @@ Rectangle {
             spacing: 8
 
             Text {
-                text: "⚡ XY TOUCH PAD"
+                text: qsTr("⚡ XY TOUCH PAD")
                 font.bold: true
                 font.pixelSize: 13
                 font.letterSpacing: 1
@@ -252,7 +252,7 @@ Rectangle {
 
                 Text {
                     anchors.centerIn: parent
-                    text: "RESET"
+                    text: qsTr("RESET")
                     font.bold: true
                     font.pixelSize: 10
                     color: "#cfd8dc"
@@ -341,7 +341,7 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.leftMargin: 10
                 anchors.verticalCenter: parent.verticalCenter
-                text: "◀ LOW PASS"
+                text: qsTr("◀ LOW PASS")
                 font.bold: true
                 font.pixelSize: 11
                 color: "#00b0ff66"
@@ -351,7 +351,7 @@ Rectangle {
                 anchors.right: parent.right
                 anchors.rightMargin: 10
                 anchors.verticalCenter: parent.verticalCenter
-                text: "HIGH PASS ▶"
+                text: qsTr("HIGH PASS ▶")
                 font.bold: true
                 font.pixelSize: 11
                 color: "#ff6d0066"
@@ -487,9 +487,9 @@ Rectangle {
             Text {
                 text: {
                     var f = (root.currentX - 0.5) * 200;
-                    if (Math.abs(f) < 2) return "FILTER: NEUTRAL";
-                    if (f < 0) return "FILTER: LPF " + Math.round(Math.abs(f)) + "%";
-                    return "FILTER: HPF " + Math.round(f) + "%";
+                    if (Math.abs(f) < 2) return qsTr("FILTER: NEUTRAL");
+                    if (f < 0) return qsTr("FILTER: LPF %1%").arg(Math.round(Math.abs(f)));
+                    return qsTr("FILTER: HPF %1%").arg(Math.round(f));
                 }
                 font.bold: true
                 font.pixelSize: 11
@@ -499,7 +499,7 @@ Rectangle {
             Item { Layout.fillWidth: true }
 
             Text {
-                text: "FX DEPTH: " + Math.round(root.currentY * 100) + "%"
+                text: qsTr("FX DEPTH: %1%").arg(Math.round(root.currentY * 100))
                 font.bold: true
                 font.pixelSize: 11
                 color: root.currentY > 0.05 ? "#e040fb" : "#90a4ae"

@@ -76,7 +76,7 @@ Popup {
                     Layout.preferredWidth: 105
                     activeColor: Theme.accentColor
                     font.bold: true
-                    text: "← Volver"
+                    text: qsTr("← Back")
                     onClicked: root.close()
                 }
 
@@ -86,7 +86,7 @@ Popup {
                     font.bold: true
                     font.pixelSize: 15
                     horizontalAlignment: Text.AlignHCenter
-                    text: "⚙️ Preferencias / Settings"
+                    text: qsTr("⚙️ Settings")
                 }
 
                 Skin.Button {
@@ -137,7 +137,7 @@ Popup {
                             anchors.verticalCenter: parent.verticalCenter
                             color: "#9e9e9e"
                             font.pixelSize: 12
-                            text: "🔍 Buscar ajuste..."
+                            text: qsTr("🔍 Search setting...")
                             visible: !parent.active && searchInput.text.length === 0
                         }
 
@@ -451,34 +451,34 @@ Popup {
         id: sectionProperties
 
         ListElement {
-            label: "Audio & Salidas"
+            label: qsTr("Audio & Outputs")
             iconGlyph: "🎧"
-            subtext: "Master, Auriculares, Latencia"
+            subtext: qsTr("Master, Headphones, Latency")
         }
         ListElement {
-            label: "Controladoras DJ"
+            label: qsTr("DJ Controllers")
             iconGlyph: "🎛️"
             subtext: "MIDI / HID USB"
         }
         ListElement {
-            label: "Librería Musical"
+            label: qsTr("Music Library")
             iconGlyph: "📁"
-            subtext: "Carpetas, Escaneo de pistas"
+            subtext: qsTr("Folders, Track Scanning")
         }
         ListElement {
-            label: "Formas de Onda"
+            label: qsTr("Waveforms")
             iconGlyph: "〰️"
-            subtext: "FPS, Colores RGB/HSV, Zoom"
+            subtext: qsTr("FPS, RGB/HSV Colors, Zoom")
         }
         ListElement {
-            label: "Interfaz"
+            label: qsTr("Interface")
             iconGlyph: "📱"
-            subtext: "Tema, Decks, Visualización"
+            subtext: qsTr("Theme, Decks, Display")
         }
         ListElement {
-            label: "Acerca de"
+            label: qsTr("About")
             iconGlyph: "✨"
-            subtext: "JaviLabarum, RRSS & Info"
+            subtext: qsTr("JaviLabarum, Socials & Info")
         }
     }
 }

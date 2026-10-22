@@ -1,5 +1,8 @@
 #include "qml/qmlconfigproxy.h"
 
+#include <QCoreApplication>
+#include <QLocale>
+#include <QQmlEngine>
 #include <Qt>
 #include <algorithm>
 
@@ -11,6 +14,7 @@
 #include "preferences/colorpalettesettings.h"
 #include "preferences/constants.h"
 #include "util/color/predefinedcolorpalettes.h"
+#include "util/translations.h"
 #include "waveform/waveformwidgetfactory.h"
 
 #define PROPERTY_IMPL_GETTER(GROUP, KEY, TYPE, NAME, DEFAULT) \
@@ -273,6 +277,33 @@ QStringList QmlConfigProxy::paletteNames() const {
         palettes.append(palette.getName());
     }
     return palettes;
+}
+
+QString QmlConfigProxy::uiLanguage() const {
+    return m_pConfig->getValue(ConfigKey("[Config]", "Locale"), QString());
+}
+
+void QmlConfigProxy::setUiLanguage(const QString& language) {
+    if (language == uiLanguage()) {
+        return;
+    }
+    emit uiLanguageAboutToChange();
+    if (language.isEmpty()) {
+        m_pConfig->remove(ConfigKey("[Config]", "Locale"));
+        QLocale::setDefault(QLocale::system());
+    } else {
+        m_pConfig->setValue(ConfigKey("[Config]", "Locale"), language);
+    }
+    m_pConfig->save();
+    mixxx::Translations::initializeTranslations(
+            m_pConfig, QCoreApplication::instance(), QString());
+    // Texts already created by C++ (library section names, column headers)
+    // keep the old language until the next start.
+    auto* pQmlEngine = qobject_cast<QQmlEngine*>(parent());
+    if (pQmlEngine) {
+        pQmlEngine->retranslate();
+    }
+    emit uiLanguageChanged();
 }
 
 PROPERTY_IMPL(kPreferencesGroup,

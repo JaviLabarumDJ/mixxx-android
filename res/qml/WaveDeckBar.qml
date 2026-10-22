@@ -129,7 +129,7 @@ Item {
                     Layout.fillWidth: true
                     elide: Text.ElideRight
                     text: {
-                        if (!card.isLoaded) return "Sin pista - Cargar";
+                        if (!card.isLoaded) return qsTr("No track - Load");
                         var t = card.currentTrack?.title || "";
                         var a = card.currentTrack?.artist || "";
                         return a.length > 0 ? (a + " - " + t) : t;
@@ -207,7 +207,7 @@ Item {
                         spacing: 4
 
                         Text {
-                            text: card.timeDisplayMode === 0 ? "REMAIN" : "TIME"
+                            text: card.timeDisplayMode === 0 ? qsTr("REMAIN") : qsTr("TIME")
                             font.bold: true
                             font.pixelSize: 8
                             color: card.accentColor

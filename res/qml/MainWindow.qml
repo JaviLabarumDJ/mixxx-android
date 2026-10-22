@@ -246,7 +246,7 @@ Item {
                                 activeColor: Theme.accentColor
                                 backgroundColor: root.viewMode === 3 ? Theme.accentColor : "transparent"
                                 normalColor: root.viewMode === 3 ? "#ffffff" : "#90a4ae"
-                                text: "WAVE"
+                                text: qsTr("WAVE")
                                 font.bold: true
                                 font.pixelSize: 10
                                 onClicked: root.viewMode = 3
@@ -258,7 +258,7 @@ Item {
                                 activeColor: Theme.accentColor
                                 backgroundColor: root.viewMode === 2 ? Theme.accentColor : "transparent"
                                 normalColor: root.viewMode === 2 ? "#ffffff" : "#90a4ae"
-                                text: "LIB"
+                                text: qsTr("LIB")
                                 font.bold: true
                                 font.pixelSize: 10
                                 onClicked: root.viewMode = 2
@@ -270,7 +270,7 @@ Item {
                                 activeColor: Theme.accentColor
                                 backgroundColor: root.viewMode === 0 ? Theme.accentColor : "transparent"
                                 normalColor: root.viewMode === 0 ? "#ffffff" : "#90a4ae"
-                                text: "CTL"
+                                text: qsTr("CTL")
                                 font.bold: true
                                 font.pixelSize: 10
                                 onClicked: root.viewMode = 0
@@ -287,7 +287,7 @@ Item {
                         normalColor: "#ffffff"
                         font.bold: true
                         font.pixelSize: 10
-                        text: "LOAD 1"
+                        text: qsTr("LOAD %1").arg(1)
                         onClicked: root.openQuickLoad("[Channel1]")
                     }
 
@@ -300,7 +300,7 @@ Item {
                         normalColor: "#ffffff"
                         font.bold: true
                         font.pixelSize: 10
-                        text: "LOAD 2"
+                        text: qsTr("LOAD %1").arg(2)
                         onClicked: root.openQuickLoad("[Channel2]")
                     }
 
@@ -394,7 +394,7 @@ Item {
                         Layout.preferredWidth: 42
                         activeColor: Theme.white
                         checkable: true
-                        text: "Edit"
+                        text: qsTr("Edit")
                         visible: !root.applicationWindow.isMobile
                     }
 

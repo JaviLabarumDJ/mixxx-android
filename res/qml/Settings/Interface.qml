@@ -131,9 +131,9 @@ Category {
         loadInterface();
     }
 
-    label: "Interface"
+    label: qsTr("Interface")
     selectedIndex: 0
-    tabs: ["Apariencia & Colores", "Decks & Reproducción"]
+    tabs: [qsTr("Appearance & Colors"), qsTr("Decks & Playback")]
 
     Component.onCompleted: {
         root.load();
@@ -206,7 +206,7 @@ Category {
                             spacing: 10
 
                             Text {
-                                text: "🎨 APARIENCIA & PANTALLA"
+                                text: qsTr("🎨 APPEARANCE & SCREEN")
                                 font.bold: true
                                 font.pixelSize: 13
                                 color: "#00e5ff"
@@ -214,40 +214,73 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Skin / Piel visual"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Language"); color: Theme.white; font.pixelSize: 13 }
+                                Skin.ComboBox {
+                                    id: languageInput
+                                    // Language names stay in their own language
+                                    readonly property var locales: ["", "en_US", "es_ES"]
+                                    Layout.preferredWidth: 180
+                                    model: [qsTr("System"), "English", "Español"]
+                                    currentIndex: Math.max(0, locales.indexOf(Mixxx.Config.uiLanguage))
+                                    // Applied right away, not with the save button. Wait
+                                    // for the popup to close: the texts of its items are
+                                    // rebuilt by the change.
+                                    onActivated: index => Qt.callLater(() => {
+                                        if (Mixxx.Config.uiLanguage !== locales[index]) {
+                                            languageRestartHint.visible = true;
+                                        }
+                                        Mixxx.Config.uiLanguage = locales[index];
+                                    })
+                                }
+                            }
+
+                            Text {
+                                id: languageRestartHint
+
+                                Layout.fillWidth: true
+                                visible: false
+                                text: qsTr("Library and effect names change after restarting Mixxx.")
+                                color: "#ffb74d"
+                                font.pixelSize: 11
+                                wrapMode: Text.WordWrap
+                            }
+
+                            RowLayout {
+                                Layout.fillWidth: true
+                                Text { Layout.fillWidth: true; text: qsTr("Skin"); color: Theme.white; font.pixelSize: 13 }
                                 Skin.ComboBox {
                                     id: skinInput
                                     Layout.preferredWidth: 180
-                                    model: ["Unnamed"]
+                                    model: [qsTr("Unnamed")]
                                     onCurrentIndexChanged: themeColorTab.dirty = true
                                 }
                             }
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Color del tema"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Theme color"); color: Theme.white; font.pixelSize: 13 }
                                 Skin.ComboBox {
                                     id: colorInput
                                     Layout.preferredWidth: 180
-                                    model: ["Dark", "Light"]
+                                    model: [qsTr("Dark"), qsTr("Light")]
                                     onCurrentIndexChanged: themeColorTab.dirty = true
                                 }
                             }
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Disposición / Layout"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Layout"); color: Theme.white; font.pixelSize: 13 }
                                 Skin.ComboBox {
                                     id: layoutInput
                                     Layout.preferredWidth: 180
-                                    model: ["Performance", "Broadcast"]
+                                    model: [qsTr("Performance"), qsTr("Broadcast")]
                                     onCurrentIndexChanged: themeColorTab.dirty = true
                                 }
                             }
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Consejos / Tooltips"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Tooltips"); color: Theme.white; font.pixelSize: 13 }
                                 RatioChoice {
                                     id: tooltipsInput
                                     options: ["off", "library", "all"]
@@ -257,7 +290,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Mantener pantalla encendida (Salvapantallas)"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Keep screen on (Screensaver)"); color: Theme.white; font.pixelSize: 13 }
                                 RatioChoice {
                                     id: disableScreensaverInput
                                     options: ["no", "while running", "while playing"]
@@ -267,7 +300,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Iniciar en pantalla completa"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Start in fullscreen"); color: Theme.white; font.pixelSize: 13 }
                                 RatioChoice {
                                     id: startFullscreenInput
                                     options: ["on", "off"]
@@ -277,7 +310,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Auto-ocultar barra superior"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Auto-hide top bar"); color: Theme.white; font.pixelSize: 13 }
                                 RatioChoice {
                                     id: autoHideMenuBarInput
                                     options: ["on", "off"]
@@ -303,7 +336,7 @@ Category {
                             spacing: 10
 
                             Text {
-                                text: "📁 BIBLIOTECA & COLECCIÓN"
+                                text: qsTr("📁 LIBRARY & COLLECTION")
                                 font.bold: true
                                 font.pixelSize: 13
                                 color: "#80d8ff"
@@ -311,7 +344,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Autocompletar búsquedas"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Search autocomplete"); color: Theme.white; font.pixelSize: 13 }
                                 RatioChoice {
                                     id: searchCompletionInput
                                     options: ["on", "off"]
@@ -321,7 +354,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Historial de búsquedas"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Search history"); color: Theme.white; font.pixelSize: 13 }
                                 RatioChoice {
                                     id: searchHistoryKeyboardInput
                                     options: ["on", "off"]
@@ -331,7 +364,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Decimales en columna BPM"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("BPM column decimals"); color: Theme.white; font.pixelSize: 13 }
                                 SettingComponents.SpinBox {
                                     id: bpmPrecisionInput
                                     Layout.preferredWidth: 140
@@ -346,7 +379,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Altura de fila en canciones"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Track row height"); color: Theme.white; font.pixelSize: 13 }
                                 SettingComponents.Slider {
                                     id: libraryRowHeightInput
                                     Layout.preferredWidth: 200
@@ -383,7 +416,7 @@ Category {
                             spacing: 10
 
                             Text {
-                                text: "🌈 PALETAS DE COLOR"
+                                text: qsTr("🌈 COLOR PALETTES")
                                 font.bold: true
                                 font.pixelSize: 13
                                 color: "#ea80fc"
@@ -391,7 +424,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Paleta de pistas"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Track palette"); color: Theme.white; font.pixelSize: 13 }
                                 ColorPaletteComboBox {
                                     id: trackPaletteComboBox
                                     Layout.preferredWidth: 220
@@ -401,7 +434,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Paleta de Hotcues"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Hotcue palette"); color: Theme.white; font.pixelSize: 13 }
                                 ColorPaletteComboBox {
                                     id: hotcuePaletteComboBox
                                     Layout.preferredWidth: 220
@@ -411,7 +444,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Color predeterminado Hotcue"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Default hotcue color"); color: Theme.white; font.pixelSize: 13 }
                                 DefaultColorSelector {
                                     id: hotcuePaletteInput
                                     Layout.preferredWidth: colorPane.defaultPalette.length * 18
@@ -423,7 +456,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Color predeterminado Loops"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Default loop color"); color: Theme.white; font.pixelSize: 13 }
                                 DefaultColorSelector {
                                     id: loopPaletteInput
                                     Layout.preferredWidth: colorPane.defaultPalette.length * 18
@@ -435,7 +468,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Color predeterminado Saltos / Beatjump"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Default beatjump color"); color: Theme.white; font.pixelSize: 13 }
                                 DefaultColorSelector {
                                     id: jumpPaletteInput
                                     Layout.preferredWidth: colorPane.defaultPalette.length * 18
@@ -447,7 +480,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Colores según tonalidad (Key)"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Key-based colors"); color: Theme.white; font.pixelSize: 13 }
                                 RatioChoice {
                                     id: keyPaletteInput
                                     options: ["on", "off"]
@@ -458,7 +491,7 @@ Category {
                             RowLayout {
                                 Layout.fillWidth: true
                                 visible: keyPaletteInput.selected === "on"
-                                Text { Layout.fillWidth: true; text: "Paleta de tonos (Key Palette)"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Key palette"); color: Theme.white; font.pixelSize: 13 }
                                 ColorPaletteComboBox {
                                     id: keyPaletteComboBox
                                     Layout.preferredWidth: 220
@@ -504,7 +537,7 @@ Category {
                             spacing: 10
 
                             Text {
-                                text: "🎛️ MODOS CUE & COMPORTAMIENTO DE CARGA"
+                                text: qsTr("🎛️ CUE MODES & LOAD BEHAVIOR")
                                 font.bold: true
                                 font.pixelSize: 13
                                 color: "#00e5ff"
@@ -512,29 +545,29 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Modo CUE"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("CUE mode"); color: Theme.white; font.pixelSize: 13 }
                                 Skin.ComboBox {
                                     id: cueModeInput
                                     Layout.preferredWidth: 190
-                                    model: ["Mixxx", "Mixxx (sin parpadeo)", "Pioneer", "Denon", "Numark", "CUP"]
+                                    model: ["Mixxx", qsTr("Mixxx (no blinking)"), "Pioneer", "Denon", "Numark", "CUP"]
                                     onCurrentIndexChanged: decksTab.dirty = true
                                 }
                             }
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Punto de inicio al cargar pista"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Start point on track load"); color: Theme.white; font.pixelSize: 13 }
                                 Skin.ComboBox {
                                     id: trackLoadPointInput
                                     Layout.preferredWidth: 190
-                                    model: ["CUE principal", "Inicio de la pista", "Primer sonido audible", "Inicio de intro", "Primer Hotcue"]
+                                    model: [qsTr("Main CUE"), qsTr("Track start"), qsTr("First audible sound"), qsTr("Intro start"), qsTr("First hotcue")]
                                     onCurrentIndexChanged: decksTab.dirty = true
                                 }
                             }
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Asignar inicio de intro al CUE principal"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Set intro start to main CUE"); color: Theme.white; font.pixelSize: 13 }
                                 RatioChoice {
                                     id: setIntroStartToMainCueInput
                                     options: ["on", "off"]
@@ -544,7 +577,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Cargar pista en plato reproduciendo"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Load track into playing deck"); color: Theme.white; font.pixelSize: 13 }
                                 RatioChoice {
                                     id: loadingTrackWhenPlayingInput
                                     options: ["reject", "allow", "when stopped"]
@@ -554,7 +587,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Doble toque en CARGAR para clonar plato"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Double-tap LOAD to clone deck"); color: Theme.white; font.pixelSize: 13 }
                                 RatioChoice {
                                     id: doublePressLoadToCloneInput
                                     options: ["on", "off"]
@@ -580,7 +613,7 @@ Category {
                             spacing: 10
 
                             Text {
-                                text: "⏱️ FORMATO DE TIEMPO & VISUALIZACIÓN"
+                                text: qsTr("⏱️ TIME FORMAT & DISPLAY")
                                 font.bold: true
                                 font.pixelSize: 13
                                 color: "#80d8ff"
@@ -588,7 +621,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Formato de tiempo"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Time format"); color: Theme.white; font.pixelSize: 13 }
                                 Skin.ComboBox {
                                     id: timeMode
                                     Layout.preferredWidth: 200
@@ -612,7 +645,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Visualización de tiempo en pantalla"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("On-screen time display"); color: Theme.white; font.pixelSize: 13 }
                                 RatioChoice {
                                     id: trackTimeDisplayInput
                                     options: ["elapsed", "remaining", "both"]
@@ -638,7 +671,7 @@ Category {
                             spacing: 10
 
                             Text {
-                                text: "🎚️ PITCH, VELOCIDAD & SINCRONIZACIÓN"
+                                text: qsTr("🎚️ PITCH, TEMPO & SYNC")
                                 font.bold: true
                                 font.pixelSize: 13
                                 color: "#ffb74d"
@@ -646,19 +679,19 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Rango del control de Pitch"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Pitch control range"); color: Theme.white; font.pixelSize: 13 }
                                 Skin.ComboBox {
                                     id: sliderRangeInput
                                     readonly property list<int> values: [4, 6, 8, 10, 16, 24, 50, 90]
                                     Layout.preferredWidth: 200
-                                    model: ["4%", "6% (semitono)", "8% (Technics)", "10%", "16%", "24%", "50%", "90%"]
+                                    model: ["4%", qsTr("6% (semitone)"), "8% (Technics)", "10%", "16%", "24%", "50%", "90%"]
                                     onCurrentIndexChanged: decksTab.dirty = true
                                 }
                             }
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Orientación del fader de pitch"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Pitch fader direction"); color: Theme.white; font.pixelSize: 13 }
                                 RatioChoice {
                                     id: sliderOrientationInput
                                     options: ["down", "up"]
@@ -668,7 +701,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Algoritmo de sincronización BPM"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("BPM sync algorithm"); color: Theme.white; font.pixelSize: 13 }
                                 RatioChoice {
                                     id: syncModeInput
                                     options: ["follow soft leader", "use steady"]
@@ -678,7 +711,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Restablecer velocidad al cargar pista"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Reset speed on track load"); color: Theme.white; font.pixelSize: 13 }
                                 RatioChoice {
                                     id: resetOnTrackLoadInput
                                     options: ["none", "key", "both", "tempo"]
@@ -688,7 +721,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Modo Keylock (Tono musical)"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Keylock mode (musical key)"); color: Theme.white; font.pixelSize: 13 }
                                 RatioChoice {
                                     id: keylockModeInput
                                     options: ["original key", "current key"]
@@ -698,7 +731,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Desactivar Keylock"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Disable Keylock"); color: Theme.white; font.pixelSize: 13 }
                                 RatioChoice {
                                     id: keyunlockModeInput
                                     options: ["reset key", "keep key"]
@@ -708,7 +741,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Comportamiento de Pitch Bend"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Pitch bend behavior"); color: Theme.white; font.pixelSize: 13 }
                                 RatioChoice {
                                     id: pitchBendBehaviourInput
                                     options: ["abrupt jump", "smooth ramping"]
@@ -718,7 +751,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Sensibilidad de rampa de velocidad"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Speed ramp sensitivity"); color: Theme.white; font.pixelSize: 13 }
                                 SettingComponents.Slider {
                                     id: rampingSensitivityInput
                                     Layout.preferredWidth: 200
@@ -748,7 +781,7 @@ Category {
                             spacing: 10
 
                             Text {
-                                text: "⚡ PASOS DE BOTONES DE VELOCIDAD / PITCH BEND"
+                                text: qsTr("⚡ SPEED / PITCH BEND BUTTON STEPS")
                                 font.bold: true
                                 font.pixelSize: 13
                                 color: "#b0bec5"
@@ -756,7 +789,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Temporal Fino (%)"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Temporary Fine (%)"); color: Theme.white; font.pixelSize: 13 }
                                 SettingComponents.SpinBox {
                                     id: adjustmentButtonsTemporaryFineInput
                                     Layout.preferredWidth: 140
@@ -771,7 +804,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Temporal Grueso (%)"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Temporary Coarse (%)"); color: Theme.white; font.pixelSize: 13 }
                                 SettingComponents.SpinBox {
                                     id: adjustmentButtonsTemporaryCoarseInput
                                     Layout.preferredWidth: 140
@@ -786,7 +819,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Permanente Fino (%)"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Permanent Fine (%)"); color: Theme.white; font.pixelSize: 13 }
                                 SettingComponents.SpinBox {
                                     id: adjustmentButtonsPermanentFineInput
                                     Layout.preferredWidth: 140
@@ -801,7 +834,7 @@ Category {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Text { Layout.fillWidth: true; text: "Permanente Grueso (%)"; color: Theme.white; font.pixelSize: 13 }
+                                Text { Layout.fillWidth: true; text: qsTr("Permanent Coarse (%)"); color: Theme.white; font.pixelSize: 13 }
                                 SettingComponents.SpinBox {
                                     id: adjustmentButtonsPermanentCoarseInput
                                     Layout.preferredWidth: 140
@@ -859,7 +892,7 @@ Category {
                         color: buttonActions.hasChanges ? "#ffb300" : "#00e676"
                     }
                     Text {
-                        text: buttonActions.hasChanges ? qsTr("Cambios pendientes") : qsTr("Interfaz configurada")
+                        text: buttonActions.hasChanges ? qsTr("Pending changes") : qsTr("Interface configured")
                         font.bold: true
                         font.pixelSize: 12
                         color: buttonActions.hasChanges ? "#ffe082" : "#b9f6ca"
@@ -893,7 +926,7 @@ Category {
                     spacing: 6
                     Text { text: "↺"; color: "#ff8a80"; font.pixelSize: 14 }
                     Text {
-                        text: qsTr("Restablecer")
+                        text: qsTr("Reset")
                         font.bold: true
                         font.pixelSize: 12
                         color: "#ffcdd2"
@@ -930,7 +963,7 @@ Category {
 
                 Text {
                     anchors.centerIn: parent
-                    text: qsTr("Descartar")
+                    text: qsTr("Discard")
                     font.bold: true
                     font.pixelSize: 13
                     color: "#e0e0e0"
@@ -977,7 +1010,7 @@ Category {
                     }
 
                     Text {
-                        text: buttonActions.hasChanges ? qsTr("Guardar Interfaz") : qsTr("Guardado")
+                        text: buttonActions.hasChanges ? qsTr("Save Interface") : qsTr("Saved")
                         font.bold: true
                         font.pixelSize: 13
                         color: "#ffffff"
@@ -1015,18 +1048,18 @@ Category {
             text: {
                 switch (parent.mode) {
                 case DeckComponents.TrackTime.Mode.TraditionalCoarse:
-                    return "Traditional (Coarse)";
+                    return qsTr("Traditional (Coarse)");
                 case DeckComponents.TrackTime.Mode.Seconds:
-                    return "Seconds";
+                    return qsTr("Seconds");
                 case DeckComponents.TrackTime.Mode.SecondsLong:
-                    return "Seconds (Long)";
+                    return qsTr("Seconds (Long)");
                 case DeckComponents.TrackTime.Mode.KiloSeconds:
-                    return "Kiloseconds";
+                    return qsTr("Kiloseconds");
                 case DeckComponents.TrackTime.Mode.HectoSeconds:
-                    return "Hectoseconds";
+                    return qsTr("Hectoseconds");
                 default:
                 case DeckComponents.TrackTime.Mode.Traditional:
-                    return "Traditional";
+                    return qsTr("Traditional");
                 }
             }
             verticalAlignment: Text.AlignVCenter

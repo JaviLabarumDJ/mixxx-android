@@ -3,6 +3,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Shapes
 import Qt5Compat.GraphicalEffects
+import Mixxx 1.0 as Mixxx
 import "Theme"
 
 ComboBox {
@@ -14,6 +15,24 @@ ComboBox {
     property alias popupWidth: popupItem.width
 
     signal activateFooter(int index)
+
+    // Models made of qsTr() texts are rebuilt when the language changes,
+    // which resets the selection: restore it afterwards.
+    property int indexBeforeRetranslation: -1
+
+    Connections {
+        target: Mixxx.Config
+
+        function onUiLanguageAboutToChange() {
+            root.indexBeforeRetranslation = root.currentIndex;
+        }
+        function onUiLanguageChanged() {
+            if (root.indexBeforeRetranslation >= 0 && root.indexBeforeRetranslation < root.count) {
+                root.currentIndex = root.indexBeforeRetranslation;
+            }
+            root.indexBeforeRetranslation = -1;
+        }
+    }
 
     indicator.width: 20
 
@@ -144,6 +163,8 @@ ComboBox {
             return root.height + 2;
         }
 
+        onOpened: Qt.callLater(() => popupListView.positionViewAtIndex(Math.max(0, root.currentIndex), ListView.Contain))
+
         Overlay.modal: MouseArea {
             anchors.fill: parent
             preventStealing: true
@@ -172,10 +193,16 @@ ComboBox {
                 id: popupListView
                 anchors.fill: parent
                 clip: true
-                currentIndex: root.highlightedIndex
+                // Not bound to highlightedIndex: touching an item while
+                // flicking would make the list jump to it.
+                highlightFollowsCurrentItem: false
                 model: root.popup.visible ? root.delegateModel : null
                 interactive: true
                 boundsBehavior: Flickable.StopAtBounds
+                pixelAligned: true
+                pressDelay: 60
+                flickDeceleration: 2500
+                maximumFlickVelocity: 6000
 
                 ScrollBar.vertical: ScrollBar {
                     id: popupScrollBar

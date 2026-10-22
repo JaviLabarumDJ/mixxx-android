@@ -1,16 +1,31 @@
 #include "qml/qmlchainpresetmodel.h"
 
+#include <QCoreApplication>
+#include <QLocale>
 #include <QModelIndex>
+#include <QTranslator>
 
 #include "effects/backends/effectmanifest.h"
 #include "effects/effectsmanager.h"
 #include "effects/presets/effectchainpreset.h"
 #include "effects/presets/effectpreset.h"
 #include "moc_qmlchainpresetmodel.cpp"
+#include "util/translations.h"
 
 namespace mixxx {
 namespace qml {
 namespace {
+// The Android user interface is available in English and Spanish
+const QTranslator& spanishTranslator() {
+    static QTranslator s_translator;
+    static const bool s_loaded = s_translator.load(QLocale(QLocale::Spanish),
+            QStringLiteral("mixxx"),
+            QStringLiteral("_"),
+            mixxx::Translations::translationsDirectory());
+    Q_UNUSED(s_loaded);
+    return s_translator;
+}
+
 const QHash<int, QByteArray> kRoleNames = {
         {Qt::DisplayRole, "display"},
         {Qt::ToolTipRole, "tooltip"},
@@ -57,10 +72,11 @@ QVariant QmlChainPresetModel::data(const QModelIndex& index, int role) const {
 
     const EffectChainPresetPointer pPreset = m_effectChainPresets.at(index.row());
     switch (role) {
-    case Qt::DisplayRole:
     case NameRole:
-    case PresetDisplayRole:
         return pPreset->name();
+    case Qt::DisplayRole:
+    case PresetDisplayRole:
+        return displayName(pPreset);
     case ReadOnlyRole:
         return pPreset->isReadOnly();
     case Qt::ToolTipRole: {
@@ -75,7 +91,7 @@ QVariant QmlChainPresetModel::data(const QModelIndex& index, int role) const {
                 effectNames.append(pManifest->name());
             }
         }
-        QString tooltip = QStringLiteral("<b>%1</b>").arg(pPreset->name().toHtmlEscaped());
+        QString tooltip = QStringLiteral("<b>%1</b>").arg(displayName(pPreset).toHtmlEscaped());
         if (effectNames.size() > 1) {
             tooltip.append(QStringLiteral("<br/>"));
             tooltip.append(effectNames.join(QStringLiteral("<br/>")));
@@ -85,6 +101,39 @@ QVariant QmlChainPresetModel::data(const QModelIndex& index, int role) const {
     default:
         return QVariant();
     }
+}
+
+QString QmlChainPresetModel::displayName(const EffectChainPresetPointer& pPreset) const {
+    const QString name = pPreset->name();
+    EffectManifestPointer pManifest;
+    for (const auto& pEffectPreset : pPreset->effectPresets()) {
+        if (pEffectPreset->isEmpty()) {
+            continue;
+        }
+        if (pManifest) {
+            // Several effects: made by the user
+            return name;
+        }
+        pManifest = m_pEffectsManager->getBackendManager()->getManifest(pEffectPreset);
+        if (!pManifest) {
+            return name;
+        }
+    }
+    if (!pManifest) {
+        return name;
+    }
+    // QuickEffect presets are generated on the first run, named after their
+    // effect in the language used then. Show them in the current language.
+    const QString effectName = pManifest->displayName();
+    if (name == effectName) {
+        return name;
+    }
+    if (QCoreApplication::translate("QObject", name.toUtf8().constData()) == effectName ||
+            spanishTranslator().translate("QObject", effectName.toUtf8().constData()) ==
+                    name) {
+        return effectName;
+    }
+    return name;
 }
 
 int QmlChainPresetModel::rowCount(const QModelIndex& parent) const {

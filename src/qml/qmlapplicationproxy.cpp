@@ -1,6 +1,10 @@
 #include "qml/qmlapplicationproxy.h"
 
 #include <QDir>
+#ifdef Q_OS_ANDROID
+#include <QCoreApplication>
+#include <QJniObject>
+#endif
 
 #include "config.h"
 #include "controllers/keyboard/keyboardeventfilter.h"
@@ -96,6 +100,27 @@ QString QmlApplicationProxy::version() const {
 
 QString QmlApplicationProxy::platform() const {
     return VersionStore::platform();
+}
+
+QString QmlApplicationProxy::packageVersion() const {
+#ifdef Q_OS_ANDROID
+    QJniObject context = QNativeInterface::QAndroidApplication::context();
+    QJniObject packageManager = context.callObjectMethod(
+            "getPackageManager", "()Landroid/content/pm/PackageManager;");
+    QJniObject packageName = context.callObjectMethod("getPackageName", "()Ljava/lang/String;");
+    QJniObject packageInfo = packageManager.callObjectMethod("getPackageInfo",
+            "(Ljava/lang/String;I)Landroid/content/pm/PackageInfo;",
+            packageName.object<jstring>(),
+            jint(0));
+    if (packageInfo.isValid()) {
+        const QString versionName =
+                packageInfo.getObjectField<jstring>("versionName").toString();
+        if (!versionName.isEmpty()) {
+            return versionName;
+        }
+    }
+#endif
+    return VersionStore::version();
 }
 
 bool QmlApplicationProxy::vinylControlAvailable() const {

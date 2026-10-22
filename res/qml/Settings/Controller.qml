@@ -51,7 +51,7 @@ Category {
         }
     }
 
-    label: "Controladoras"
+    label: qsTr("Controllers")
 
     Component.onCompleted: {
         load();
@@ -114,18 +114,18 @@ Category {
                             spacing: 2
 
                             Text {
-                                text: qsTr("Controladoras DJ & Dispositivos USB / MIDI")
+                                text: qsTr("DJ Controllers & USB / MIDI Devices")
                                 font.pixelSize: 16
                                 font.bold: true
                                 color: "#ffffff"
                             }
                             Text {
                                 text: root.activeDevices.length > 0
-                                      ? qsTr("✓ %1 controladora(s) con mapeo").arg(root.activeDevices.length)
-                                        + (root.unmappedDevices.length > 0 ? qsTr(" · %1 sin mapear").arg(root.unmappedDevices.length) : "")
+                                      ? qsTr("✓ %1 mapped controller(s)").arg(root.activeDevices.length)
+                                        + (root.unmappedDevices.length > 0 ? qsTr(" · %1 unmapped").arg(root.unmappedDevices.length) : "")
                                       : (root.unmappedDevices.length > 0
-                                         ? qsTr("%1 dispositivo(s) detectado(s) sin mapeo").arg(root.unmappedDevices.length)
-                                         : qsTr("No hay ninguna controladora USB detectada actualmente"))
+                                         ? qsTr("%1 device(s) detected without mapping").arg(root.unmappedDevices.length)
+                                         : qsTr("No USB controller currently detected"))
                                 font.pixelSize: 12
                                 color: root.activeDevices.length > 0 ? "#4caf50" : (root.unmappedDevices.length > 0 ? "#ffb74d" : "#9e9e9e")
                             }
@@ -183,7 +183,7 @@ Category {
                                 }
 
                                 Text {
-                                    text: root.isRescanning ? qsTr("Buscando...") : qsTr("Buscar Dispositivos USB")
+                                    text: root.isRescanning ? qsTr("Searching...") : qsTr("Scan USB Devices")
                                     font.pixelSize: 13
                                     font.bold: true
                                     color: "#ffffff"
@@ -227,7 +227,7 @@ Category {
                         Layout.fillWidth: true
 
                         Text {
-                            text: "💡 ¿Cómo conectar tu controladora DJ a Android y que funcione bien?"
+                            text: qsTr("💡 How do I connect my DJ controller to Android and get it working?")
                             font.pixelSize: 14
                             font.bold: true
                             color: "#90caf9"
@@ -245,7 +245,7 @@ Category {
 
                             Text {
                                 anchors.centerIn: parent
-                                text: root.showGuide ? qsTr("Ocultar") : qsTr("Ver guía")
+                                text: root.showGuide ? qsTr("Hide") : qsTr("Show guide")
                                 font.pixelSize: 11
                                 color: "#b0bec5"
                             }
@@ -289,13 +289,13 @@ Category {
                                 Layout.fillWidth: true
                                 spacing: 1
                                 Text {
-                                    text: qsTr("Adaptador USB OTG Type-C")
+                                    text: qsTr("USB OTG Type-C Adapter")
                                     font.pixelSize: 13
                                     font.bold: true
                                     color: "#ffffff"
                                 }
                                 Text {
-                                    text: qsTr("Usa un adaptador o cable USB-C a USB-B/A compatible con OTG directo al móvil.")
+                                    text: qsTr("Use an OTG-compatible USB-C to USB-B/A adapter or cable connected directly to the device.")
                                     font.pixelSize: 11
                                     color: "#b0bec5"
                                 }
@@ -325,13 +325,13 @@ Category {
                                 Layout.fillWidth: true
                                 spacing: 2
                                 Text {
-                                    text: qsTr("⚡ Alimentación Eléctrica: Conexión mediante HUB USB-C")
+                                    text: qsTr("⚡ Power Supply: Connect through a USB-C HUB")
                                     font.pixelSize: 13
                                     font.bold: true
                                     color: "#ffa726"
                                 }
                                 Text {
-                                    text: qsTr("Las tablets solo dan ~500mA de energía. Para que tu mesa (Pioneer DDJ-400, etc.) no parpadee ni se desconecte, conecta el cargador de la tablet al puerto USB-C PD del HUB, la mesa a un puerto USB del HUB, y el cable del HUB a la tablet.")
+                                    text: qsTr("Tablets only supply ~500mA of power. To keep your controller (Pioneer DDJ-400, etc.) from flickering or disconnecting, plug the tablet charger into the HUB's USB-C PD port, the controller into a USB port on the HUB, and the HUB cable into the tablet.")
                                     font.pixelSize: 11
                                     color: "#cfd8dc"
                                     wrapMode: Text.WordWrap
@@ -363,13 +363,13 @@ Category {
                                 Layout.fillWidth: true
                                 spacing: 2
                                 Text {
-                                    text: qsTr("Permiso USB en Android")
+                                    text: qsTr("USB Permission on Android")
                                     font.pixelSize: 13
                                     font.bold: true
                                     color: "#ffffff"
                                 }
                                 Text {
-                                    text: qsTr("Las controladoras MIDI (como la DDJ-400) no necesitan permiso. Si Android pregunta '¿Permitir a Mixxx acceder al dispositivo USB?' (controladoras HID), marca 'Usar siempre para este dispositivo' y pulsa ACEPTAR.")
+                                    text: qsTr("MIDI controllers (like the DDJ-400) don't need permission. If Android asks 'Allow Mixxx to access the USB device?' (HID controllers), check 'Always use for this device' and tap OK.")
                                     font.pixelSize: 11
                                     color: "#b0bec5"
                                     wrapMode: Text.WordWrap
@@ -401,13 +401,13 @@ Category {
                                 Layout.fillWidth: true
                                 spacing: 3
                                 Text {
-                                    text: qsTr("Activar Audio en Controladora (Master + Auriculares CUE)")
+                                    text: qsTr("Enable Controller Audio (Master + CUE Headphones)")
                                     font.pixelSize: 13
                                     font.bold: true
                                     color: "#ffffff"
                                 }
                                 Text {
-                                    text: qsTr("• <b>Cabina DJ Completa</b>: Altavoces a las salidas RCA de la mesa y cascos al frontal. Selecciona el perfil 'Controladora DJ'.<br>• <b>Modo Híbrido</b>: Si no tienes altavoces externos, selecciona 'Tablet + Auriculares Mesa' para que la música suene por la tablet y la preescucha por los cascos.")
+                                    text: qsTr("• <b>Full DJ Booth</b>: Speakers on the controller's RCA outputs and headphones on the front. Select the 'DJ Controller' profile.<br>• <b>Hybrid Mode</b>: If you have no external speakers, select 'Tablet + Controller Headphones' so the music plays through the tablet and the pre-listen through the headphones.")
                                     font.pixelSize: 11
                                     color: "#b0bec5"
                                     wrapMode: Text.WordWrap
@@ -421,7 +421,7 @@ Category {
                                     color: audioBtnMouse.pressed ? "#6a1b9a" : (audioBtnMouse.containsMouse ? "#8e24aa" : "#7b1fa2")
                                     Text {
                                         anchors.centerIn: parent
-                                        text: "🎧 Ir a Salidas de Audio y Perfiles"
+                                        text: qsTr("🎧 Go to Audio Outputs & Profiles")
                                         font.bold: true
                                         font.pixelSize: 11
                                         color: "#ffffff"
@@ -460,13 +460,13 @@ Category {
                                 Layout.fillWidth: true
                                 spacing: 4
                                 Text {
-                                    text: qsTr("Mapeos DJ (.midi.xml / .js)")
+                                    text: qsTr("DJ Mappings (.midi.xml / .js)")
                                     font.pixelSize: 13
                                     font.bold: true
                                     color: "#80d8ff"
                                 }
                                 Text {
-                                    text: qsTr("✓ <b>Pioneer DDJ-400</b>, FLX4, Inpulse y +100 mesas traen su mapeo oficial: al conectarlas por primera vez se les asigna y activa automáticamente.<br>Si quieres añadir un mapeo nuevo o modificado, cópialo a la carpeta pública de Mixxx y pulsa 'Buscar Dispositivos USB':")
+                                    text: qsTr("✓ <b>Pioneer DDJ-400</b>, FLX4, Inpulse and 100+ controllers ship with an official mapping: it is assigned and enabled automatically the first time you connect them.<br>To add a new or modified mapping, copy it to the public Mixxx folder and tap 'Scan USB Devices':")
                                     font.pixelSize: 11
                                     color: "#b0bec5"
                                     wrapMode: Text.WordWrap
@@ -507,7 +507,7 @@ Category {
 
                                         Text {
                                             anchors.centerIn: parent
-                                            text: copyTimer.running ? "✓ ¡Copiado!" : "📋 Copiar ruta"
+                                            text: copyTimer.running ? qsTr("✓ Copied!") : qsTr("📋 Copy path")
                                             font.pixelSize: 11
                                             font.bold: true
                                             color: "#ffffff"
@@ -543,7 +543,7 @@ Category {
 
                             Text {
                                 anchors.centerIn: parent
-                                text: "✨ Compatible con Pioneer DDJ (FLX4, 400, SB3, 200), Hercules Inpulse, Traktor S2/S4, Numark, Reloop y +100 controladores."
+                                text: qsTr("✨ Compatible with Pioneer DDJ (FLX4, 400, SB3, 200), Hercules Inpulse, Traktor S2/S4, Numark, Reloop and 100+ controllers.")
                                 font.pixelSize: 11
                                 color: "#81c784"
                             }
@@ -574,7 +574,7 @@ Category {
 
                     Text {
                         Layout.alignment: Qt.AlignHCenter
-                        text: qsTr("No se ha detectado ninguna controladora DJ conectada")
+                        text: qsTr("No connected DJ controller detected")
                         font.pixelSize: 14
                         font.bold: true
                         color: "#9e9e9e"
@@ -582,7 +582,7 @@ Category {
 
                     Text {
                         Layout.alignment: Qt.AlignHCenter
-                        text: qsTr("Conecta tu controladora por USB OTG y pulsa 'Buscar Dispositivos USB'")
+                        text: qsTr("Connect your controller via USB OTG and tap 'Scan USB Devices'")
                         font.pixelSize: 12
                         color: "#616161"
                     }
@@ -613,15 +613,15 @@ Category {
                         Layout.fillWidth: true
                         spacing: 1
                         Text {
-                            text: qsTr("Configurando: %1").arg(root.selectedController?.name || "")
+                            text: qsTr("Configuring: %1").arg(root.selectedController?.name || "")
                             font.bold: true
                             font.pixelSize: 13
                             color: "#ffffff"
                         }
                         Text {
                             text: root.selectedController?.mapping 
-                                  ? qsTr("Mapeo asignado: %1 (%2)").arg(root.selectedController.mapping.name).arg(root.selectedController.enabled ? "Habilitado" : "Deshabilitado")
-                                  : qsTr("Selecciona su mapeo en la lista desplegable y pulsa Guardar")
+                                  ? qsTr("Assigned mapping: %1 (%2)").arg(root.selectedController.mapping.name).arg(root.selectedController.enabled ? qsTr("Enabled") : qsTr("Disabled"))
+                                  : qsTr("Select its mapping from the drop-down list and tap Save")
                             font.pixelSize: 11
                             color: root.selectedController?.mapping ? "#a7ffeb" : "#ffe082"
                         }
@@ -638,7 +638,7 @@ Category {
 
                         Text {
                             anchors.centerIn: parent
-                            text: qsTr("🎧 Salidas Audio")
+                            text: qsTr("🎧 Audio Outputs")
                             font.pixelSize: 11
                             font.bold: true
                             color: "#ffffff"
@@ -663,7 +663,7 @@ Category {
 
                         Text {
                             anchors.centerIn: parent
-                            text: qsTr("Ver todas")
+                            text: qsTr("Show all")
                             font.pixelSize: 11
                             font.bold: true
                             color: "#ffffff"
@@ -800,7 +800,7 @@ Category {
                         }
                         Skin.FormButton {
                             activeColor: "#1e88e5"
-                            text: qsTr("Configurar Mapeo")
+                            text: qsTr("Configure Mapping")
                             visible: true
 
                             onPressed: {
@@ -831,7 +831,7 @@ Category {
                         color: '#FFFFFF'
                         font.pixelSize: 15
                         font.weight: Font.DemiBold
-                        text: qsTr("Otros dispositivos USB detectados sin mapear")
+                        text: qsTr("Other detected USB devices without mapping")
                     }
                 }
             }
@@ -876,10 +876,10 @@ Category {
                     }
                     Text {
                         text: root.dirty 
-                              ? qsTr("Cambios pendientes") 
+                              ? qsTr("Unsaved changes") 
                               : (root.selectedController 
-                                 ? qsTr("Editando controladora") 
-                                 : (root.activeDevices.length > 0 ? qsTr("Controladora lista") : qsTr("USB MIDI")))
+                                 ? qsTr("Editing controller") 
+                                 : (root.activeDevices.length > 0 ? qsTr("Controller ready") : qsTr("USB MIDI")))
                         font.bold: true
                         font.pixelSize: 12
                         color: root.dirty ? "#ffe082" : (root.activeDevices.length > 0 ? "#b9f6ca" : "#bbdefb")
@@ -914,7 +914,7 @@ Category {
                     spacing: 6
                     Text { text: "↺"; color: "#ff8a80"; font.pixelSize: 14 }
                     Text {
-                        text: qsTr("Restablecer")
+                        text: qsTr("Reset")
                         font.bold: true
                         font.pixelSize: 12
                         color: "#ffcdd2"
@@ -945,7 +945,7 @@ Category {
 
                 Text {
                     anchors.centerIn: parent
-                    text: root.selectedController ? qsTr("Volver / Lista") : qsTr("Descartar")
+                    text: root.selectedController ? qsTr("Back / List") : qsTr("Discard")
                     font.bold: true
                     font.pixelSize: 13
                     color: "#e0e0e0"
@@ -986,7 +986,7 @@ Category {
                     }
 
                     Text {
-                        text: root.dirty ? qsTr("Guardar Cambios") : qsTr("Guardado")
+                        text: root.dirty ? qsTr("Save Changes") : qsTr("Saved")
                         font.bold: true
                         font.pixelSize: 13
                         color: "#ffffff"

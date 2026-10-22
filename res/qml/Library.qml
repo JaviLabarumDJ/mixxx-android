@@ -109,7 +109,7 @@ Item {
                 normalColor: root.librarySourceMode === 0 ? "#00e5ff" : "#90a4ae"
                 font.bold: true
                 font.pixelSize: 11
-                text: "MÚSICA LOCAL"
+                text: qsTr("LOCAL MUSIC")
                 onClicked: root.librarySourceMode = 0
             }
 
@@ -121,7 +121,7 @@ Item {
                 normalColor: root.librarySourceMode === 1 ? "#00ffff" : "#80deea"
                 font.bold: true
                 font.pixelSize: 11
-                text: "STREAMING HUB"
+                text: qsTr("STREAMING HUB")
                 onClicked: root.librarySourceMode = 1
             }
 
@@ -134,7 +134,7 @@ Item {
                 checked: root.showSidebar
                 font.bold: true
                 font.pixelSize: 10
-                text: root.showSidebar ? "OCULTAR" : "PLAYLISTS"
+                text: root.showSidebar ? qsTr("HIDE") : qsTr("PLAYLISTS")
                 onClicked: root.showSidebar = !root.showSidebar
             }
 
@@ -161,7 +161,7 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.top: parent.top
-                placeholderText: qsTranslate("WSearchLineEdit", "Buscar en tu colección local...")
+                placeholderText: qsTr("Search your local collection...")
                 onTextChanged: root.applySearch()
             }
 
@@ -293,13 +293,13 @@ Item {
                 color: Theme.white
                 font.bold: true
                 font.pixelSize: 15
-                text: qsTr("Permiso para leer USB")
+                text: qsTr("USB read permission")
             }
             Text {
                 Layout.fillWidth: true
                 color: Theme.textColor
                 font.pixelSize: 13
-                text: qsTr("Para leer las playlists de Rekordbox y Engine DJ de un USB, Android tiene que permitir a Mixxx el acceso a todos los archivos. Actívalo en la pantalla que se abre y vuelve a tocar la sección.")
+                text: qsTr("To read Rekordbox and Engine DJ playlists from a USB drive, Android must allow Mixxx to access all files. Enable it on the screen that opens and tap the section again.")
                 wrapMode: Text.WordWrap
             }
             RowLayout {
@@ -309,7 +309,7 @@ Item {
                 Skin.Button {
                     Layout.preferredHeight: 44
                     Layout.preferredWidth: 110
-                    text: qsTr("AHORA NO")
+                    text: qsTr("NOT NOW")
                     onClicked: storageAccessPopup.close()
                 }
                 Skin.Button {
@@ -319,7 +319,7 @@ Item {
                     backgroundColor: "#1565c0"
                     normalColor: "#ffffff"
                     font.bold: true
-                    text: qsTr("DAR PERMISO")
+                    text: qsTr("GRANT ACCESS")
                     onClicked: {
                         storageAccessPopup.close();
                         Mixxx.Library.requestFullStorageAccess();

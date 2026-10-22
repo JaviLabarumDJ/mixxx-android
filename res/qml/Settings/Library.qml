@@ -86,7 +86,7 @@ Category {
         root.dirty = false;
     }
 
-    label: qsTr("Librería Musical")
+    label: qsTr("Music Library")
 
     Component.onCompleted: {
         root.load();
@@ -139,7 +139,7 @@ Category {
                         spacing: 8
 
                         Text {
-                            text: "📁 Carpetas de Música Local"
+                            text: qsTr("📁 Local Music Folders")
                             font.bold: true
                             font.pixelSize: 15
                             color: Theme.white
@@ -160,13 +160,13 @@ Category {
                                 font.pixelSize: 11
                                 font.bold: true
                                 color: root.isScanning ? "#ff9100" : "#00e676"
-                                text: root.isScanning ? "⟳ Escaneando..." : "✔ Colección lista"
+                                text: root.isScanning ? qsTr("⟳ Scanning...") : qsTr("✔ Collection ready")
                             }
                         }
                     }
 
                     Text {
-                        text: "Elige las carpetas de tu móvil donde guardas tu música. Mixxx monitorizará e indexará automáticamente las pistas encontradas."
+                        text: qsTr("Choose the folders on your device where you keep your music. Mixxx will automatically monitor and index the tracks it finds.")
                         font.pixelSize: 11
                         color: "#90a4ae"
                         wrapMode: Text.WordWrap
@@ -175,7 +175,7 @@ Category {
 
                     // --- LISTA DE CARPETAS MONITORIZADAS ---
                     Text {
-                        text: "Carpetas añadidas actualmente:"
+                        text: qsTr("Currently added folders:")
                         font.bold: true
                         font.pixelSize: 12
                         color: "#b0bec5"
@@ -221,7 +221,7 @@ Category {
                                         }
 
                                         Text {
-                                            text: (modelData.trackCount || 0) + " canciones indexadas" +
+                                            text: qsTr("%1 tracks indexed").arg(modelData.trackCount || 0) +
                                                   (modelData.totalSecond > 0 ? " • " + Math.round(modelData.totalSecond / 60) + " min" : "")
                                             font.pixelSize: 10
                                             color: "#00e5ff"
@@ -236,7 +236,7 @@ Category {
                                         normalColor: "#ff8a80"
                                         font.bold: true
                                         font.pixelSize: 10
-                                        text: "🗑 Quitar"
+                                        text: qsTr("🗑 Remove")
                                         onClicked: {
                                             root.removeFolder(modelData.path);
                                         }
@@ -257,7 +257,7 @@ Category {
                                 anchors.centerIn: parent
                                 spacing: 8
                                 Text {
-                                    text: "⚠️ No hay carpetas añadidas aún. Pulsa en los botones de abajo para añadir."
+                                    text: qsTr("⚠️ No folders added yet. Tap the buttons below to add one.")
                                     font.pixelSize: 11
                                     color: "#ffb74d"
                                 }
@@ -267,7 +267,7 @@ Category {
 
                     // --- ACCESOS RÁPIDOS ANDROID ---
                     Text {
-                        text: "Accesos rápidos (Ubicaciones estándar en Android):"
+                        text: qsTr("Quick access (standard Android locations):")
                         font.bold: true
                         font.pixelSize: 12
                         color: "#b0bec5"
@@ -285,7 +285,7 @@ Category {
                             normalColor: root.isFolderAdded("/storage/emulated/0/Music") ? "#00e676" : "#ffffff"
                             font.bold: true
                             font.pixelSize: 11
-                            text: (root.isFolderAdded("/storage/emulated/0/Music") ? "✔ " : "➕ ") + "🎵 Música (/sdcard)"
+                            text: (root.isFolderAdded("/storage/emulated/0/Music") ? "✔ " : "➕ ") + qsTr("🎵 Music (/sdcard)")
                             onClicked: {
                                 root.addQuickFolder("/storage/emulated/0/Music");
                             }
@@ -299,7 +299,7 @@ Category {
                             normalColor: root.isFolderAdded("/storage/emulated/0/Download") ? "#00e676" : "#ffffff"
                             font.bold: true
                             font.pixelSize: 11
-                            text: (root.isFolderAdded("/storage/emulated/0/Download") ? "✔ " : "➕ ") + "📥 Descargas (/Download)"
+                            text: (root.isFolderAdded("/storage/emulated/0/Download") ? "✔ " : "➕ ") + qsTr("📥 Downloads (/Download)")
                             onClicked: {
                                 root.addQuickFolder("/storage/emulated/0/Download");
                             }
@@ -333,7 +333,7 @@ Category {
                             normalColor: "#00e5ff"
                             font.bold: true
                             font.pixelSize: 11
-                            text: root.showFolderBrowser ? "▲ Ocultar Explorador" : "📂 Explorar / Otra Carpeta..."
+                            text: root.showFolderBrowser ? qsTr("▲ Hide Browser") : qsTr("📂 Browse / Other Folder...")
                             onClicked: {
                                 root.showFolderBrowser = !root.showFolderBrowser;
                                 if (root.showFolderBrowser) {
@@ -350,7 +350,7 @@ Category {
                             normalColor: "#ffffff"
                             font.bold: true
                             font.pixelSize: 11
-                            text: "⟳ Re-escanear Música"
+                            text: qsTr("⟳ Rescan Music")
                             enabled: !root.isScanning
                             onClicked: {
                                 if (Mixxx.Library && Mixxx.Library.rescanLibrary) {
@@ -377,7 +377,7 @@ Category {
                             spacing: 8
 
                             Text {
-                                text: "🔍 Explorador de carpetas en el dispositivo:"
+                                text: qsTr("🔍 Device folder browser:")
                                 font.bold: true
                                 font.pixelSize: 12
                                 color: "#00e5ff"
@@ -396,7 +396,7 @@ Category {
                                     normalColor: "#ffffff"
                                     font.bold: true
                                     font.pixelSize: 11
-                                    text: "⬆ Subir"
+                                    text: qsTr("⬆ Up")
                                     onClicked: {
                                         root.goUpDir();
                                     }
@@ -424,7 +424,7 @@ Category {
 
                             // Subdirectories flow
                             Text {
-                                text: "Subcarpetas encontradas en esta ubicación (toca para entrar):"
+                                text: qsTr("Subfolders found in this location (tap to open):")
                                 font.pixelSize: 10
                                 color: "#90a4ae"
                             }
@@ -467,7 +467,7 @@ Category {
 
                                 Text {
                                     visible: !root.subDirectoriesList || root.subDirectoriesList.length === 0
-                                    text: "(No hay más subcarpetas)"
+                                    text: qsTr("(No more subfolders)")
                                     font.pixelSize: 10
                                     color: "#64748b"
                                 }
@@ -486,7 +486,7 @@ Category {
                                     normalColor: "#ffffff"
                                     font.bold: true
                                     font.pixelSize: 11
-                                    text: "✔ Añadir '" + root.currentBrowserPath + "' a la Librería"
+                                    text: qsTr("✔ Add '%1' to Library").arg(root.currentBrowserPath)
                                     onClicked: {
                                         root.addQuickFolder(root.currentBrowserPath);
                                         root.showFolderBrowser = false;
@@ -500,7 +500,7 @@ Category {
                                     backgroundColor: "#2c3440"
                                     normalColor: "#b0bec5"
                                     font.pixelSize: 11
-                                    text: "Cerrar"
+                                    text: qsTr("Close")
                                     onClicked: {
                                         root.showFolderBrowser = false;
                                     }
@@ -527,7 +527,7 @@ Category {
                     spacing: 10
 
                     Text {
-                        text: "☁️ Almacenamiento & Caché de Streaming"
+                        text: qsTr("☁️ Streaming Storage & Cache")
                         font.bold: true
                         font.pixelSize: 14
                         color: "#00e5ff"
@@ -535,7 +535,7 @@ Category {
                     }
 
                     Text {
-                        text: "Las pistas reproducidas desde plataformas de streaming (Navidrome, Audius, SoundCloud, Tidal) se almacenan localmente para garantizar una reproducción sin cortes de audio aunque se pierda la conexión a internet."
+                        text: qsTr("Tracks played from streaming platforms (Navidrome, Audius, SoundCloud, Tidal) are stored locally to ensure uninterrupted playback even if the internet connection drops.")
                         font.pixelSize: 11
                         color: "#90a4ae"
                         wrapMode: Text.WordWrap
@@ -560,7 +560,7 @@ Category {
                                 spacing: 8
 
                                 Text {
-                                    text: "💾 Espacio en uso:"
+                                    text: qsTr("💾 Space used:")
                                     font.pixelSize: 12
                                     color: "#b0bec5"
                                 }
@@ -568,7 +568,7 @@ Category {
                                 Text {
                                     text: {
                                         var bytes = Mixxx.StreamingManager ? Mixxx.StreamingManager.cacheSizeBytes : 0;
-                                        if (bytes <= 0) return "0 MB (Caché vacía)";
+                                        if (bytes <= 0) return qsTr("0 MB (Cache empty)");
                                         var mb = bytes / (1024 * 1024);
                                         if (mb > 1024) return (mb / 1024).toFixed(2) + " GB";
                                         return mb.toFixed(1) + " MB";
@@ -581,7 +581,7 @@ Category {
                                 Item { Layout.fillWidth: true }
 
                                 Text {
-                                    text: "Ruta: " + (Mixxx.StreamingManager ? Mixxx.StreamingManager.cacheDirectory : "")
+                                    text: qsTr("Path: %1").arg(Mixxx.StreamingManager ? Mixxx.StreamingManager.cacheDirectory : "")
                                     font.pixelSize: 10
                                     color: "#607d8b"
                                     elide: Text.ElideMiddle
@@ -597,7 +597,7 @@ Category {
                             backgroundColor: "#421e24"
                             normalColor: "#ff8a80"
                             font.bold: true
-                            text: "🗑️ Vaciar Caché"
+                            text: qsTr("🗑️ Clear Cache")
                             onClicked: {
                                 if (Mixxx.StreamingManager) {
                                     Mixxx.StreamingManager.clearCache();
@@ -624,7 +624,7 @@ Category {
                     spacing: 10
 
                     Text {
-                        text: "🔍 Búsqueda y Organización"
+                        text: qsTr("🔍 Search & Organization")
                         font.bold: true
                         font.pixelSize: 14
                         color: Theme.white
@@ -636,7 +636,7 @@ Category {
                         spacing: 12
 
                         Text {
-                            text: "Autocompletar búsquedas al escribir"
+                            text: qsTr("Autocomplete searches while typing")
                             font.pixelSize: 12
                             color: Theme.white
                             Layout.fillWidth: true
@@ -662,7 +662,7 @@ Category {
                         spacing: 12
 
                         Text {
-                            text: "Sincronizar metadatos y etiquetas ID3 al editar"
+                            text: qsTr("Sync metadata and ID3 tags when editing")
                             font.pixelSize: 12
                             color: Theme.white
                             Layout.fillWidth: true
@@ -695,7 +695,7 @@ Category {
                     spacing: 10
 
                     Text {
-                        text: "⚡ Pre-análisis de Colección (BPM & Tonalidad Camelot)"
+                        text: qsTr("⚡ Collection Pre-analysis (BPM & Camelot Key)")
                         font.bold: true
                         font.pixelSize: 14
                         color: "#00e5ff"
@@ -703,7 +703,7 @@ Category {
                     }
 
                     Text {
-                        text: "Calcula el BPM, rejilla de compases y tono armónico de tus pistas en segundo plano. Al tener todas las pistas pre-analizadas, cargarán al instante sin retardo y el asistente armónico resaltará canciones compatibles."
+                        text: qsTr("Calculates the BPM, beatgrid and harmonic key of your tracks in the background. Once all tracks are pre-analyzed, they load instantly with no delay and the harmonic assistant highlights compatible songs.")
                         font.pixelSize: 11
                         color: "#90a4ae"
                         wrapMode: Text.WordWrap
@@ -722,7 +722,7 @@ Category {
                             normalColor: "#ffffff"
                             font.bold: true
                             font.pixelSize: 11
-                            text: "⚡ Analizar Pistas sin BPM/Key"
+                            text: qsTr("⚡ Analyze Tracks without BPM/Key")
                             onClicked: {
                                 if (Mixxx.Library && Mixxx.Library.analyzeUnanalyzedTracks) {
                                     Mixxx.Library.analyzeUnanalyzedTracks();
@@ -738,7 +738,7 @@ Category {
                             normalColor: "#ffe082"
                             font.bold: true
                             font.pixelSize: 11
-                            text: "⟳ Re-analizar Toda la Colección"
+                            text: qsTr("⟳ Re-analyze Entire Collection")
                             onClicked: {
                                 if (Mixxx.Library && Mixxx.Library.analyzeAllTracks) {
                                     Mixxx.Library.analyzeAllTracks();
@@ -788,7 +788,7 @@ Category {
                         color: (root.isScanning || root.dirty) ? "#ffb300" : "#00e676"
                     }
                     Text {
-                        text: root.isScanning ? qsTr("Escaneando...") : (root.dirty ? qsTr("Cambios pendientes") : qsTr("Colección lista"))
+                        text: root.isScanning ? qsTr("Scanning...") : (root.dirty ? qsTr("Unsaved changes") : qsTr("Collection ready"))
                         font.bold: true
                         font.pixelSize: 12
                         color: (root.isScanning || root.dirty) ? "#ffe082" : "#b9f6ca"
@@ -812,7 +812,7 @@ Category {
                     spacing: 6
                     Text { text: "🔄"; font.pixelSize: 12 }
                     Text {
-                        text: root.isScanning ? qsTr("Escaneando...") : qsTr("Escanear Pistas")
+                        text: root.isScanning ? qsTr("Scanning...") : qsTr("Scan Tracks")
                         font.bold: true
                         font.pixelSize: 12
                         color: "#ffffff"
@@ -845,7 +845,7 @@ Category {
 
                 Text {
                     anchors.centerIn: parent
-                    text: qsTr("Descartar")
+                    text: qsTr("Discard")
                     font.bold: true
                     font.pixelSize: 13
                     color: "#e0e0e0"
@@ -885,7 +885,7 @@ Category {
                     }
 
                     Text {
-                        text: root.dirty ? qsTr("Guardar Librería") : qsTr("Guardado")
+                        text: root.dirty ? qsTr("Save Library") : qsTr("Saved")
                         font.bold: true
                         font.pixelSize: 13
                         color: "#ffffff"

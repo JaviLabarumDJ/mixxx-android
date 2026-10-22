@@ -14,10 +14,10 @@ Este documento recopila de manera exhaustiva el estado actual del port de **Mixx
   - **Frontend**: Qt 6.8 / QML con interfaz táctil adaptada (`res/qml/`).
   - **Subsistema de Audio**: PortAudio con el backend Android Oboe (AAudio) y, para tarjetas de sonido USB que Android no puede usar, un driver USB propio de Mixxx (libusb, ver §6.6).
   - **Subsistema de Controladoras**: MIDI nativo de Android (AMidi), USB-MIDI propio para las tarjetas que maneja el driver USB, y USB Bulk/HID. PortMidi está desactivado en Android.
-- **Versión publicada**: `v1.1.0-android` (`versionCode 2`), ver §6.9.
+- **Versión publicada**: `v1.3.0-android` (`versionCode 4`), ver §6.9.
 - **Dispositivo objetivo de prueba**:
   - Tablet Lenovo Tab M11 (`TB331FC`), Android 13/14.
-  - Conexión actual: ADB por Wi-Fi en `192.168.0.15:5555`.
+  - Conexión: ADB por Wi-Fi (depuración inalámbrica); la IP y el puerto cambian, se encuentran con `nmap -sn 192.168.0.0/24` y `nmap -p 30000-49999 <ip>`.
   - Controladora de prueba: **Pioneer DDJ-400**.
 
 ---
@@ -273,7 +273,7 @@ Nota: `make mixxx` por sí solo **no** actualiza el `.so` del proyecto Gradle; h
 - Errores del HAL de Qualcomm: `adb logcat | grep -E "PAL|AGM|AHAL"`.
 
 ### 6.9. Publicar una release
-1. Subir `android:versionCode` y `android:versionName` en `packaging/android/AndroidManifest.xml` (la v1.1.0 es `versionCode 2`, la v1.2.0 `versionCode 3`).
+1. Subir `android:versionCode` y `android:versionName` en `packaging/android/AndroidManifest.xml` (la v1.1.0 es `versionCode 2`, la v1.2.0 `versionCode 3`, la v1.3.0 `versionCode 4`).
 2. Actualizar las insignias y los enlaces de descarga del `README.md`.
 3. `make -C build-android -j12 apk`, firmar como `mixxx-android-vX.Y.Z.apk` y verificar con `apksigner verify` y `aapt2 dump badging`.
 4. Según `AGENTS.md`, el commit, la etiqueta (`vX.Y.Z-android`), el push y la publicación en GitHub los hace la persona, después de probar en un equipo de DJ real. El nombre del APK adjunto debe coincidir con el enlace del README.
@@ -299,5 +299,12 @@ Nota: `make mixxx` por sí solo **no** actualiza el `.so` del proyecto Gradle; h
 - **Corrección:** CMake genera `build-android/libportaudio-mixxx.a` con `llvm-objcopy --redefine-sym malloc=mixxx_portaudio_malloc`, y `mixxx_portaudio_malloc()` (`src/soundio/portaudioenumerator.cpp`) reserva un byte más. Verificado: 15 de 15 arranques sin cierre, frente a 4 de 15 antes. Al actualizar PortAudio hay que comprobar si el fallo sigue ahí y, si no, quitar el parche.
 - **Diagnóstico útil:** `android:gwpAsanMode="always"` en `<application>` del manifiesto (solo para depurar), arranques en bucle, y `llvm-addr2line -C -f -i -e build-android/libmixxx_arm64-v8a.so <pc>` para los frames de `libmixxx`.
 - **Además:** el mapeo de la DDJ-400 pide 16 samplers con `engine.setValue("[App]", "num_samplers", 16)` desde el hilo de la controladora, y `PlayerManager` los creaba en ese hilo. Ahora `slotChangeNum*()` pasa las peticiones de otros hilos al hilo principal, y en Android se crean 16 samplers al arrancar (`kSamplerCount`, `src/coreservices.cpp`).
+
+### 6.12. Idiomas: inglés y español (v1.3.0)
+- **Texto fuente en inglés:** todos los textos visibles de `res/qml` pasan por `qsTr("English")`, y los de `src/qml/qmlstreamingproxy.cpp` por `tr()`. El español está en `res/translations/mixxx_android_es.ts` y se compila a `mixxx_android_es.qm`, que va al APK con el resto de `res/` (`assets/translations/`). Las cadenas que ya venían de Mixxx las traduce el `mixxx_es.qm` de siempre.
+- **Carga** (`src/util/translations.h`): en Android se instala también el traductor `mixxx_android`, el último, para que tenga prioridad. Si no existe para el idioma (p. ej. francés) se ve en inglés.
+- **Selector** en Ajustes → Interfaz → «Idioma» (Sistema / English / Español): escribe `[Config],Locale` mediante `Mixxx.Config.uiLanguage` (`QmlConfigProxy::setUiLanguage()`), recarga los traductores y llama a `QQmlEngine::retranslate()`. Lo QML cambia al momento; los nombres que crea C++ (secciones de la biblioteca, nombres de efectos) cambian al reiniciar la app. «Sistema» sigue el idioma de Android. Los desplegables con opciones `qsTr()` pierden la selección al retraducirse, así que `res/qml/ComboBox.qml` la guarda con la señal `uiLanguageAboutToChange` y la restaura con `uiLanguageChanged`. Los presets de QuickEffect se generan en el primer arranque con el nombre del efecto en el idioma de entonces y se guardan como datos del usuario; `QmlChainPresetModel::displayName()` los muestra en el idioma actual si el preset tiene un solo efecto y su nombre es el del efecto en inglés o en español (el nombre interno, rol `name`, no cambia). Los presets creados por el usuario se muestran tal cual.
+- **Listas desplegables** (`res/qml/ComboBox.qml`, que ahora usa también `Effects/EffectSelector.qml`): la lista no sigue a `highlightedIndex` (al tocar un elemento mientras se arrastraba, la lista saltaba a él), tiene `pressDelay` para que arrastrar no seleccione, y al abrirse se coloca en el elemento elegido.
+- **Al añadir textos:** escribirlos en inglés con `qsTr()`; las etiquetas de hardware (CUE, PLAY, SYNC, DECK 1…) y los valores que compara la lógica (p. ej. las opciones de `RatioChoice`) se dejan sin traducir. Para actualizar el `.ts` sin meter las cadenas de Mixxx, se extrae con `lupdate` de PySide6 (el de `buildenv` no lee QML) a un `.ts` temporal, se copian solo los mensajes nuevos a `mixxx_android_es.ts` con su traducción y se compila con `lrelease res/translations/mixxx_android_es.ts`. El contexto de cada texto QML es el nombre del archivo sin `.qml` (`Settings/Library.qml` y `Library.qml` comparten el contexto `Library`).
 
 <!-- DISCLAIMER: The preceding documentation was autonomously generated by an AI Agent as required by AGENTS.md. -->
