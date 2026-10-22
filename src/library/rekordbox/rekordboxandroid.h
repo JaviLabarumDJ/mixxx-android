@@ -1,12 +1,15 @@
 #pragma once
 
+#include <QDateTime>
 #include <QList>
 #include <QRegularExpression>
+#include <QSqlDatabase>
 #include <QString>
 #include <QVariant>
 #include <optional>
 
 #include "track/track_decl.h"
+#include "track/trackid.h"
 
 class QAbstractItemModel;
 class RekordboxFeature;
@@ -48,6 +51,18 @@ bool isRekordboxPlaylist(QAbstractItemModel* pModel);
 /// `rekordboxTrack` to `pTrack`, a copy of its file. Does the same as
 /// loading the track from the Rekordbox drive.
 void applyRekordboxData(const TrackPointer& pTrack, const RekordboxTrack& rekordboxTrack);
+
+/// The day a track of a Rekordbox drive (by its location on the drive or
+/// the drive's copy) was added to the Rekordbox collection, or an invalid
+/// date if it is not a track of a Rekordbox drive that was opened
+QDateTime rekordboxDateAdded(const QSqlDatabase& database, const QString& location);
+
+/// The id of the library track with the file `location`, or an invalid id
+TrackId libraryTrackId(const QSqlDatabase& database, const QString& location);
+
+/// Sets the "date added" of a track of the library
+bool setTrackDateAdded(
+        const QSqlDatabase& database, TrackId trackId, const QDateTime& dateAdded);
 
 /// Makes `pFeature` look for devices again a few seconds after a USB device
 /// was plugged in or out, so that sticks appear and disappear by themselves

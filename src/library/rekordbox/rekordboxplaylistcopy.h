@@ -21,7 +21,7 @@ namespace android {
 ///
 /// The files are copied on a worker thread. Each copy is then added to the
 /// library on the main thread, in the order of the playlist, and gets the
-/// beatgrid, cues, key and color Rekordbox exported for it.
+/// beatgrid, cues, key, color and "date added" Rekordbox exported for it.
 ///
 /// Copying a playlist again updates the folder and the playlist: files that
 /// are already in the folder with the same size are not copied again, and

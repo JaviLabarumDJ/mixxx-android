@@ -272,6 +272,7 @@ Item {
                     clip: true
                     model: root.sidebar ? root.sidebar.tracklist : null
                     sourceName: browser.activeLabel
+                    sortNewestFirst: browser.activeIsDrive
                 }
             }
         }

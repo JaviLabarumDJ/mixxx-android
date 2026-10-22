@@ -21,6 +21,9 @@ Rectangle {
     property bool highlighted: false
     // The name of the playlist, crate or folder whose tracks are shown
     property string activeLabel: ""
+    // Whether the tracks shown are a whole USB drive (Rekordbox or Engine
+    // DJ) rather than one of its playlists
+    property bool activeIsDrive: false
 
     // Reading the databases on USB drives needs more than the music permission
     signal storageAccessNeeded()
@@ -60,6 +63,11 @@ Rectangle {
     function activate(index) {
         const label = root.model.data(index, Qt.DisplayRole);
         root.activeLabel = label ? label.toString() : "";
+        // A drive is a direct child of the Rekordbox or Engine DJ section;
+        // SidebarModel::IconNameRole
+        const parent = index.parent;
+        const sectionIcon = parent.valid && !parent.parent.valid ? root.model.data(parent, Qt.UserRole + 1) : "";
+        root.activeIsDrive = sectionIcon === "rekordbox" || sectionIcon === "enginedj";
         root.model.activate(index);
     }
     function activateCurrent() {
