@@ -9,6 +9,7 @@
 #include <QElapsedTimer>
 #include <QFile>
 #include <QFutureWatcher>
+#include <QGuiApplication>
 #include <QHash>
 #include <QJniEnvironment>
 #include <QJniObject>
@@ -42,6 +43,9 @@ constexpr jint kDirectionIn = 0x80;
 /// Android takes a few seconds to mount a drive after it was plugged in.
 /// Taking the drive over meanwhile would keep Android from mounting it.
 constexpr qint64 kMountGraceMs = 10000;
+
+/// mixxx::android::waitForPermission() gives up after 30 s
+constexpr qint64 kPermissionTimeoutMs = 29000;
 
 /// The copied tracks are deleted, oldest first, beyond this size
 constexpr qint64 kMaxTrackCacheBytes = 4LL * 1024 * 1024 * 1024;
@@ -157,14 +161,31 @@ std::shared_ptr<Drive> openDrive(const QJniObject& manager, const QJniObject& us
         if (s_permissionRequested.contains(pDrive->usbDeviceName)) {
             return nullptr;
         }
+        // Android may not show the dialog while another app or the system
+        // settings are in front, e.g. on the first start. Asked again on the
+        // next search for drives.
+        if (QGuiApplication::applicationState() != Qt::ApplicationActive) {
+            qInfo() << "Not asking for the USB permission for the drive" << productName
+                    << "while Mixxx is in the background";
+            return nullptr;
+        }
         s_permissionRequested.append(pDrive->usbDeviceName);
         qInfo() << "Requesting USB permission for the drive" << productName;
         manager.callMethod<void>("requestPermission",
                 "(Landroid/hardware/usb/UsbDevice;Landroid/app/PendingIntent;)V",
                 usbDevice.object(),
                 mixxx::android::getIntent().object());
+        QElapsedTimer waitTimer;
+        waitTimer.start();
         if (!mixxx::android::waitForPermission(usbDevice)) {
-            qWarning() << "USB permission denied for the drive" << productName;
+            if (waitTimer.elapsed() >= kPermissionTimeoutMs) {
+                // Unanswered, not denied: asked again on the next search
+                qWarning() << "No answer to the USB permission request for the drive"
+                           << productName;
+                s_permissionRequested.removeAll(pDrive->usbDeviceName);
+            } else {
+                qWarning() << "USB permission denied for the drive" << productName;
+            }
             return nullptr;
         }
         qInfo() << "USB permission granted for the drive" << productName;
