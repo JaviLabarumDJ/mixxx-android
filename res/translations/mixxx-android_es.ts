@@ -2066,6 +2066,10 @@ Aborting the operation to avoid library inconsistencies</source>
 <context>
     <name>SourceTree</name>
     <message>
+        <source>#</source>
+        <translation>#</translation>
+    </message>
+    <message>
         <source>Title</source>
         <translation>Título</translation>
     </message>

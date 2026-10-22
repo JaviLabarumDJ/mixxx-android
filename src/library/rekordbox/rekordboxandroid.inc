@@ -4,6 +4,8 @@
 
 #include <QAbstractProxyModel>
 #include <QFileInfo>
+#include <QSqlError>
+#include <QSqlQuery>
 #include <QTimer>
 #include <algorithm>
 #include <exception>
@@ -12,6 +14,7 @@
 #include "controllers/android.h"
 #endif
 #include "library/rekordbox/rekordboxandroid.h"
+#include "util/datetime.h"
 
 namespace mixxx {
 namespace android {
@@ -80,6 +83,46 @@ std::optional<QList<RekordboxTrack>> rekordboxPlaylistTracks(QAbstractItemModel*
         result.append(std::move(track.second));
     }
     return result;
+}
+
+QDateTime rekordboxDateAdded(const QSqlDatabase& database, const QString& location) {
+    QSqlQuery query(database);
+    query.prepare(QStringLiteral("SELECT datetime_added FROM ") + kRekordboxLibraryTable +
+            QStringLiteral(" WHERE location=:location"));
+    query.bindValue(QStringLiteral(":location"), location);
+    if (!query.exec() || !query.next() || query.value(0).isNull()) {
+        return QDateTime();
+    }
+    return mixxx::convertVariantToDateTime(query.value(0));
+}
+
+TrackId libraryTrackId(const QSqlDatabase& database, const QString& location) {
+    QSqlQuery query(database);
+    query.prepare(QStringLiteral(
+            "SELECT library.id FROM library "
+            "INNER JOIN track_locations ON library.location = track_locations.id "
+            "WHERE track_locations.location=:location"));
+    query.bindValue(QStringLiteral(":location"), location);
+    if (!query.exec() || !query.next()) {
+        return TrackId();
+    }
+    return TrackId(query.value(0));
+}
+
+bool setTrackDateAdded(
+        const QSqlDatabase& database, TrackId trackId, const QDateTime& dateAdded) {
+    if (!trackId.isValid() || !dateAdded.isValid()) {
+        return false;
+    }
+    QSqlQuery query(database);
+    query.prepare(QStringLiteral("UPDATE library SET datetime_added=:date WHERE id=:id"));
+    query.bindValue(QStringLiteral(":date"), dateAdded);
+    query.bindValue(QStringLiteral(":id"), trackId.toVariant());
+    if (!query.exec()) {
+        qWarning() << "Unable to set the date added of track" << trackId << query.lastError();
+        return false;
+    }
+    return true;
 }
 
 void applyRekordboxData(const TrackPointer& pTrack, const RekordboxTrack& rekordboxTrack) {

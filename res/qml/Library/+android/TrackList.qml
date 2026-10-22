@@ -20,6 +20,43 @@ Rectangle {
     property bool highlighted: false
     // The name of the playlist, crate or folder shown, if known
     property string sourceName: ""
+    // Sort a list without a playlist position by "date added", newest first,
+    // e.g. a whole USB drive
+    property bool sortNewestFirst: false
+
+    // A new list starts in playlist order if it has a position column,
+    // otherwise newest first if requested, otherwise in its own order
+    function applyDefaultSort() {
+        horizontalHeader.sortingColumn = -1;
+        if (!root.model || !root.model.columns) {
+            return;
+        }
+        const columns = root.model.columns;
+        let positionIndex = -1;
+        let dateAddedIndex = -1;
+        for (let i = 0; i < columns.length; ++i) {
+            if (columns[i].columnIdx === Mixxx.TrackListColumn.SQLColumns.Position) {
+                positionIndex = i;
+            } else if (columns[i].columnIdx === Mixxx.TrackListColumn.SQLColumns.DateAdded) {
+                dateAddedIndex = i;
+            }
+        }
+        let index = -1;
+        let order = Qt.AscendingOrder;
+        if (positionIndex >= 0 && !root.sortNewestFirst) {
+            index = positionIndex;
+        } else if (dateAddedIndex >= 0 && root.sortNewestFirst) {
+            index = dateAddedIndex;
+            order = Qt.DescendingOrder;
+        }
+        if (index < 0) {
+            return;
+        }
+        horizontalHeader.sortingColumn = index;
+        horizontalHeader.sortingOrder = order;
+        root.model.sort(index, order);
+    }
+    onModelChanged: Qt.callLater(root.applyDefaultSort)
     readonly property bool isRekordboxPlaylist: Mixxx.MobileLibrary.isRekordboxPlaylist(root.model)
 
     function focusList() {

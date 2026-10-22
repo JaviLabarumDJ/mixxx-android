@@ -294,11 +294,19 @@ bool QmlMobileLibraryProxy::addTrackToPlaylist(int playlistId, const QUrl& track
     if (!playlistDao.playlistExists(playlistId) || playlistDao.isPlaylistLocked(playlistId)) {
         return false;
     }
+    bool alreadyInLibrary = false;
     const TrackPointer pTrack = pTrackCollectionManager->getOrAddTrack(
-            TrackRef::fromUrl(trackUrl));
+            TrackRef::fromUrl(trackUrl), &alreadyInLibrary);
     if (!pTrack || !pTrack->getId().isValid()) {
         qWarning() << "Unable to add" << trackUrl << "to playlist" << playlistId;
         return false;
+    }
+    if (!alreadyInLibrary) {
+        // A track of a Rekordbox drive keeps its date of the collection
+        const QSqlDatabase database = pTrackCollectionManager->internalCollection()->database();
+        android::setTrackDateAdded(database,
+                pTrack->getId(),
+                android::rekordboxDateAdded(database, pTrack->getLocation()));
     }
     return playlistDao.appendTrackToPlaylist(pTrack->getId(), playlistId);
 }
@@ -325,8 +333,22 @@ int QmlMobileLibraryProxy::addAllTracksToPlaylist(int playlistId, QAbstractItemM
             urls.append(url);
         }
     }
+    // The tracks of a Rekordbox drive that are not in the library yet keep
+    // their date of the Rekordbox collection
+    const QSqlDatabase database = pTrackCollectionManager->internalCollection()->database();
+    QList<std::pair<QString, QDateTime>> rekordboxDates;
+    for (const QUrl& url : std::as_const(urls)) {
+        const QString location = url.toLocalFile();
+        const QDateTime dateAdded = android::rekordboxDateAdded(database, location);
+        if (dateAdded.isValid() && !android::libraryTrackId(database, location).isValid()) {
+            rekordboxDates.append({location, dateAdded});
+        }
+    }
     // Keeps the order of the list
     const QList<TrackId> trackIds = pTrackCollectionManager->resolveTrackIdsFromUrls(urls, true);
+    for (const auto& [location, dateAdded] : std::as_const(rekordboxDates)) {
+        android::setTrackDateAdded(database, android::libraryTrackId(database, location), dateAdded);
+    }
     if (trackIds.isEmpty()) {
         return 0;
     }
