@@ -33,6 +33,9 @@
 #ifdef __ANDROID_USB_DRIVE__
 #include "library/usbdrive/androidusbdrive.h"
 #endif
+#ifdef Q_OS_ANDROID
+#include "library/rekordbox/rekordboxandroid.h"
+#endif
 #include "util/sandbox.h"
 #include "waveform/waveform.h"
 #include "widget/wlibrary.h"
@@ -1428,6 +1431,9 @@ RekordboxFeature::RekordboxFeature(
             &RekordboxFeature::onTracksFound);
     // initialize the model
     m_pSidebarModel->setRootItem(TreeItem::newRoot(this));
+#ifdef Q_OS_ANDROID
+    mixxx::android::watchUsbDevices(this);
+#endif
 }
 
 RekordboxFeature::~RekordboxFeature() {

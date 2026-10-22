@@ -4,9 +4,13 @@
 
 #include <QAbstractProxyModel>
 #include <QFileInfo>
+#include <QTimer>
 #include <algorithm>
 #include <exception>
 
+#ifdef __HID__
+#include "controllers/android.h"
+#endif
 #include "library/rekordbox/rekordboxandroid.h"
 
 namespace mixxx {
@@ -134,5 +138,57 @@ void applyRekordboxData(const TrackPointer& pTrack, const RekordboxTrack& rekord
     }
 }
 
+#ifdef __HID__
+namespace {
+
+/// Android mounts a drive a few seconds after it was plugged in
+constexpr int kUsbChangeDelayMs = 4000;
+
+/// Listens to USB changes as long as its feature exists
+class UsbDeviceWatcher : public QObject {
+  public:
+    explicit UsbDeviceWatcher(RekordboxFeature* pFeature)
+            : QObject(pFeature) {
+        m_timer.setSingleShot(true);
+        m_timer.setInterval(kUsbChangeDelayMs);
+        QObject::connect(&m_timer, &QTimer::timeout, pFeature, &RekordboxFeature::refreshDevices);
+        // Called on a Java thread
+        m_listenerId = mixxx::android::addDevicesChangedListener([this]() {
+            QMetaObject::invokeMethod(
+                    this, [this]() { m_timer.start(); }, Qt::QueuedConnection);
+        });
+    }
+    ~UsbDeviceWatcher() override {
+        // Waits for a callback that is running
+        mixxx::android::removeDevicesChangedListener(m_listenerId);
+    }
+
+  private:
+    QTimer m_timer;
+    int m_listenerId;
+};
+
+} // namespace
+
+void watchUsbDevices(RekordboxFeature* pFeature) {
+    new UsbDeviceWatcher(pFeature);
+}
+#else
+// The USB notifications come with the controller support
+void watchUsbDevices(RekordboxFeature*) {
+}
+#endif
+
 } // namespace android
 } // namespace mixxx
+
+void RekordboxFeature::refreshDevices() {
+    if (m_devicesFuture.isRunning()) {
+        // Looks again once the current search is done
+        QTimer::singleShot(1000, this, &RekordboxFeature::refreshDevices);
+        return;
+    }
+    qInfo() << "USB devices changed, looking for Rekordbox devices again";
+    m_devicesFuture = QtConcurrent::run(findRekordboxDevices);
+    m_devicesFutureWatcher.setFuture(m_devicesFuture);
+}

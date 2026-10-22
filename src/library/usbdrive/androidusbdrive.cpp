@@ -17,6 +17,7 @@
 #include <QtConcurrentRun>
 #include <QtCore/private/qandroidextras_p.h>
 #include <algorithm>
+#include <atomic>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -76,8 +77,10 @@ std::mutex s_scanMutex;
 // Guards s_drives, only held briefly
 std::mutex s_drivesMutex;
 std::vector<std::shared_ptr<Drive>> s_drives;
-// The permission is only requested once per plug-in
+// The permission is only requested once per plug-in, guarded by s_scanMutex
 QStringList s_permissionRequested;
+// Set by allowPermissionRequests(), which doesn't wait for s_scanMutex
+std::atomic<bool> s_permissionRequestsAllowed = false;
 
 QString cacheRoot() {
     return QStandardPaths::writableLocation(QStandardPaths::CacheLocation) +
@@ -380,6 +383,9 @@ QFileInfoList driveRoots() {
                                             return !connected.contains(name);
                                         }),
             s_permissionRequested.end());
+    if (s_permissionRequestsAllowed.exchange(false)) {
+        s_permissionRequested.clear();
+    }
 
     if (!androidMountedRemovableStorage()) {
         for (const QJniObject& usbDevice : usbDevices) {
@@ -428,6 +434,10 @@ void prepareFiles(const QString& root, const QStringList& relativePaths) {
             ensureLocal(pDrive, relativePath);
         }
     }
+}
+
+void allowPermissionRequests() {
+    s_permissionRequestsAllowed = true;
 }
 
 bool fetchFile(const QString& localPath) {

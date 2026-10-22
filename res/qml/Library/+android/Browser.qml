@@ -28,9 +28,15 @@ Rectangle {
     function checkStorageAccess(index) {
         // SidebarModel::IconNameRole
         const icon = root.model.data(index, Qt.UserRole + 1);
-        if ((icon === "rekordbox" || icon === "enginedj") && !Mixxx.MobileLibrary.hasFullStorageAccess()) {
+        if (icon !== "rekordbox" && icon !== "enginedj") {
+            return;
+        }
+        if (!Mixxx.MobileLibrary.hasFullStorageAccess()) {
             root.storageAccessNeeded();
         }
+        // Opened on purpose: asks again for the USB permission of sticks
+        // whose earlier request was dismissed
+        Mixxx.MobileLibrary.allowUsbPermissionRequests();
     }
 
     function currentRow() {

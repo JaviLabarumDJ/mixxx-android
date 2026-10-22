@@ -130,6 +130,10 @@ class QmlMobileLibraryProxy : public QObject {
     /// Whether the databases on USB drives (Rekordbox, Engine DJ) can be
     /// read. On Android this needs "All files access".
     Q_INVOKABLE bool hasFullStorageAccess() const;
+    /// Lets the next search for USB drives ask again for the permission to
+    /// read the drives that Android didn't mount, see
+    /// library/usbdrive/androidusbdrive.h
+    Q_INVOKABLE void allowUsbPermissionRequests() const;
     /// Opens the system settings to grant "All files access"
     Q_INVOKABLE void requestFullStorageAccess() const;
 

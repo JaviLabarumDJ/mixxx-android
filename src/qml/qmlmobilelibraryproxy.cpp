@@ -30,6 +30,9 @@
 #ifdef __ANDROID__
 #include "util/androidpermissions.h"
 #endif
+#ifdef __ANDROID_USB_DRIVE__
+#include "library/usbdrive/androidusbdrive.h"
+#endif
 
 namespace mixxx {
 namespace qml {
@@ -448,6 +451,12 @@ bool QmlMobileLibraryProxy::hasFullStorageAccess() const {
     return mixxx::android::hasFullExternalStorageAccess();
 #else
     return true;
+#endif
+}
+
+void QmlMobileLibraryProxy::allowUsbPermissionRequests() const {
+#ifdef __ANDROID_USB_DRIVE__
+    mixxx::usbdrive::allowPermissionRequests();
 #endif
 }
 

@@ -30,6 +30,11 @@ QFileInfoList driveRoots();
 /// Database files are refreshed whenever they changed on the drive.
 void prepareFiles(const QString& root, const QStringList& relativePaths);
 
+/// The USB permission of a drive is asked for once per plug-in. After this
+/// call, the next search for drives asks again for the drives that still
+/// lack it, e.g. because the user opened the drives explicitly.
+void allowPermissionRequests();
+
 /// Makes sure a file of a drive has been copied to its local folder. Blocks
 /// while copying, so it must not be called on the main thread. Returns true
 /// if the file is there, also for files that are not on a drive.

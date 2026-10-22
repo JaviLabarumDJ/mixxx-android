@@ -9,6 +9,7 @@
 #include "track/track_decl.h"
 
 class QAbstractItemModel;
+class RekordboxFeature;
 
 namespace mixxx {
 namespace android {
@@ -47,6 +48,10 @@ bool isRekordboxPlaylist(QAbstractItemModel* pModel);
 /// `rekordboxTrack` to `pTrack`, a copy of its file. Does the same as
 /// loading the track from the Rekordbox drive.
 void applyRekordboxData(const TrackPointer& pTrack, const RekordboxTrack& rekordboxTrack);
+
+/// Makes `pFeature` look for devices again a few seconds after a USB device
+/// was plugged in or out, so that sticks appear and disappear by themselves
+void watchUsbDevices(RekordboxFeature* pFeature);
 
 } // namespace android
 } // namespace mixxx
