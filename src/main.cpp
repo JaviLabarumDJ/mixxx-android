@@ -29,6 +29,9 @@
 #include "nativeeventhandlerwin.h"
 #endif
 #include "skin/skin.h"
+#ifdef Q_OS_ANDROID
+#include "util/androidbackup.h"
+#endif
 #include "skin/skinloader.h"
 #include "sources/soundsourceproxy.h"
 #include "util/cmdlineargs.h"
@@ -258,6 +261,12 @@ int main(int argc, char * argv[]) {
     if (!args.parse(argc, argv)) {
         return kParseCmdlineArgsErrorExitCode;
     }
+
+#ifdef Q_OS_ANDROID
+    // Swaps in a backup chosen in the preferences, before anything reads the
+    // settings folder
+    mixxx::android::applyPendingRestore(args.getSettingsPath());
+#endif
 
     // Set a unique thread object name
     //

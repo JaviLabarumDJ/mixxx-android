@@ -1,8 +1,10 @@
 #include "qml/qmlmobilelibraryproxy.h"
 
+#include <QCoreApplication>
 #include <QDir>
 #include <QSqlQuery>
 #include <QStandardPaths>
+#include <QTimer>
 
 #include "analyzer/analyzerscheduledtrack.h"
 #include "library/dao/directorydao.h"
@@ -14,7 +16,9 @@
 #include "qml/qmlconfigproxy.h"
 #include "qml/qmllibraryproxy.h"
 #include "track/track.h"
+#include "util/androidbackup.h"
 #include "util/assert.h"
+#include "util/cmdlineargs.h"
 #include "util/fileinfo.h"
 #include "util/sandbox.h"
 #ifdef __ANDROID__
@@ -51,6 +55,71 @@ QmlMobileLibraryProxy::QmlMobileLibraryProxy(QObject* pParent)
 // static
 QmlMobileLibraryProxy* QmlMobileLibraryProxy::create(QQmlEngine* pQmlEngine, QJSEngine*) {
     return new QmlMobileLibraryProxy(pQmlEngine);
+}
+
+namespace {
+
+QVariantMap result(bool ok, const QString& message) {
+    return QVariantMap{
+            {QStringLiteral("ok"), ok},
+            {QStringLiteral("message"), message},
+    };
+}
+
+/// Backups are kept in public storage, which needs "All files access"
+bool checkStorageAccess() {
+#ifdef __ANDROID__
+    if (!mixxx::android::hasFullExternalStorageAccess()) {
+        mixxx::android::requestFullExternalStorageAccess();
+        return false;
+    }
+#endif
+    return true;
+}
+
+} // namespace
+
+QString QmlMobileLibraryProxy::backupDirectory() const {
+    return mixxx::android::backupRootDirectory();
+}
+
+QStringList QmlMobileLibraryProxy::backups() const {
+    return mixxx::android::listBackups();
+}
+
+QVariantMap QmlMobileLibraryProxy::createBackup() {
+    if (!checkStorageAccess()) {
+        return result(false, tr("Backups need \"All files access\". Allow it, then try again."));
+    }
+    TrackCollectionManager* pTrackCollectionManager = trackCollectionManager();
+    const UserSettingsPointer pConfig = QmlConfigProxy::get();
+    if (!pTrackCollectionManager || !pConfig) {
+        return result(false, tr("The library is not available."));
+    }
+    // Writes the current settings to mixxx.cfg first
+    pConfig->save();
+    QString error;
+    const QString backupDir = mixxx::android::createBackup(
+            CmdlineArgs::Instance().getSettingsPath(),
+            pTrackCollectionManager->internalCollection()->database(),
+            &error);
+    if (backupDir.isEmpty()) {
+        return result(false, error);
+    }
+    return result(true, tr("Backup saved to %1").arg(backupDir));
+}
+
+QVariantMap QmlMobileLibraryProxy::restoreBackup(const QString& name) {
+    if (!checkStorageAccess()) {
+        return result(false, tr("Restoring needs \"All files access\". Allow it, then try again."));
+    }
+    QString error;
+    if (!mixxx::android::stageRestore(CmdlineArgs::Instance().getSettingsPath(), name, &error)) {
+        return result(false, error);
+    }
+    // Gives the UI time to show the message
+    QTimer::singleShot(3000, QCoreApplication::instance(), &QCoreApplication::quit);
+    return result(true, tr("Mixxx closes now. Open it again to finish restoring %1.").arg(name));
 }
 
 bool QmlMobileLibraryProxy::sidebarVisible() const {

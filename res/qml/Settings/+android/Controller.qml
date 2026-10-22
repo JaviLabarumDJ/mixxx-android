@@ -23,7 +23,10 @@ Category {
     // list the remaining ones as unmapped.
     readonly property var activeDevices: Array.from(manager.knownDevices).concat(
         Array.from(manager.unknownDevices).filter(device => !!device.mapping))
-    readonly property var unmappedDevices: Array.from(manager.unknownDevices).filter(device => !device.mapping)
+    // Many controllers have several USB interfaces, e.g. the DDJ-FLX4 shows
+    // up as "DDJ-FLX4" (MIDI) and "DDJ-FLX4 USB_5" (HID). Once one of them
+    // works with a mapping, the others are not listed as unmapped devices.
+    readonly property var unmappedDevices: Array.from(manager.unknownDevices).filter(device => !device.mapping && !root.activeDevices.some(active => active !== device && active.name.length > 0 && device.name.startsWith(active.name)))
     signal requestNavigateToAudio()
 
     function load() {

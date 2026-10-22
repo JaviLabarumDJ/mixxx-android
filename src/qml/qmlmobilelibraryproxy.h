@@ -19,6 +19,8 @@ class QmlMobileLibraryProxy : public QObject {
     /// Remembered across restarts.
     Q_PROPERTY(bool sidebarVisible READ sidebarVisible WRITE setSidebarVisible NOTIFY
                     sidebarVisibleChanged)
+    /// Where library backups are stored, see util/androidbackup.h
+    Q_PROPERTY(QString backupDirectory READ backupDirectory CONSTANT)
     QML_NAMED_ELEMENT(MobileLibrary)
     QML_SINGLETON
 
@@ -26,6 +28,18 @@ class QmlMobileLibraryProxy : public QObject {
     explicit QmlMobileLibraryProxy(QObject* pParent = nullptr);
 
     static QmlMobileLibraryProxy* create(QQmlEngine* pQmlEngine, QJSEngine* pJsEngine);
+
+    QString backupDirectory() const;
+
+    /// The available backups, newest first
+    Q_INVOKABLE QStringList backups() const;
+    /// Backs up the library database and the settings. Returns
+    /// {ok, message}.
+    Q_INVOKABLE QVariantMap createBackup();
+    /// Prepares restoring the backup and closes Mixxx; the backup replaces
+    /// the library and the settings when Mixxx starts again. Returns
+    /// {ok, message}.
+    Q_INVOKABLE QVariantMap restoreBackup(const QString& name);
 
     bool sidebarVisible() const;
     void setSidebarVisible(bool visible);

@@ -14,6 +14,18 @@ Category {
     property bool showFolderBrowser: false
     property string currentBrowserPath: "/storage/emulated/0/Music"
     property var subDirectoriesList: []
+    property var backupList: []
+    property string backupMessage: ""
+    property bool backupError: false
+
+    function refreshBackups() {
+        root.backupList = Mixxx.MobileLibrary.backups();
+    }
+
+    // "2026-10-22_14-05-09" -> "2026-10-22  14:05:09"
+    function backupLabel(name) {
+        return name.replace("_", "  ").replace(/-(\d\d)-(\d\d)$/, ":$1:$2");
+    }
     readonly property bool isScanning: Mixxx.Library ? (Mixxx.Library.libraryScanActive || (Mixxx.Library.scanner && Mixxx.Library.scanner.running)) : false
 
     function refreshSources() {
@@ -74,6 +86,7 @@ Category {
 
     function load() {
         root.refreshSources();
+        root.refreshBackups();
         if (Mixxx.MobileLibrary && Mixxx.MobileLibrary.defaultMusicDirectory) {
             root.currentBrowserPath = Mixxx.MobileLibrary.defaultMusicDirectory();
         }
@@ -612,6 +625,109 @@ Category {
                 }
             }
 
+            // ================= LIBRARY BACKUP =================
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: backupCol.implicitHeight + 24
+                color: Theme.darkGray3
+                radius: 8
+                border.color: "#303440"
+                border.width: 1
+
+                ColumnLayout {
+                    id: backupCol
+                    anchors.fill: parent
+                    anchors.margins: 12
+                    spacing: 10
+
+                    Text {
+                        text: qsTr("💾 Library backup")
+                        font.bold: true
+                        font.pixelSize: 14
+                        color: "#00e5ff"
+                        Layout.fillWidth: true
+                    }
+
+                    Text {
+                        text: qsTr("Saves the library (tracks, BPM, key, cues, playlists, crates and history) and the settings to %1. That folder is kept when Mixxx is uninstalled or its data is cleared, so a backup can be restored afterwards.").arg(Mixxx.MobileLibrary.backupDirectory)
+                        font.pixelSize: 11
+                        color: "#90a4ae"
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 12
+
+                        Skin.Button {
+                            Layout.preferredHeight: 40
+                            Layout.preferredWidth: 170
+                            activeColor: "#00e676"
+                            backgroundColor: "#1b3a2a"
+                            normalColor: "#69f0ae"
+                            font.bold: true
+                            text: qsTr("💾 Back up now")
+                            onClicked: {
+                                const result = Mixxx.MobileLibrary.createBackup();
+                                root.backupError = !result.ok;
+                                root.backupMessage = result.message;
+                                root.refreshBackups();
+                            }
+                        }
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: root.backupMessage
+                            font.pixelSize: 11
+                            color: root.backupError ? "#ff8a80" : "#69f0ae"
+                            wrapMode: Text.WordWrap
+                        }
+                    }
+
+                    Text {
+                        visible: root.backupList.length === 0
+                        text: qsTr("No backups yet.")
+                        font.pixelSize: 11
+                        color: "#607d8b"
+                    }
+
+                    Repeater {
+                        model: root.backupList
+
+                        RowLayout {
+                            id: backupRow
+
+                            required property string modelData
+
+                            Layout.fillWidth: true
+                            spacing: 12
+
+                            Text {
+                                Layout.fillWidth: true
+                                text: root.backupLabel(backupRow.modelData)
+                                font.pixelSize: 13
+                                color: Theme.white
+                            }
+
+                            Skin.Button {
+                                Layout.preferredHeight: 36
+                                Layout.preferredWidth: 130
+                                activeColor: "#ffab40"
+                                backgroundColor: "#3a2a14"
+                                normalColor: "#ffd180"
+                                font.bold: true
+                                text: qsTr("Restore")
+                                onClicked: {
+                                    restorePopup.backupName = backupRow.modelData;
+                                    restorePopup.open();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             // ================= 3. OPCIONES DE BÚSQUEDA Y METADATOS =================
             Rectangle {
                 Layout.fillWidth: true
@@ -903,6 +1019,95 @@ Category {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
                         root.save();
+                    }
+                }
+            }
+        }
+    }
+
+    Popup {
+        id: restorePopup
+
+        property string backupName: ""
+        property bool restoring: false
+
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(520, root.width - 40)
+        modal: true
+        dim: true
+        closePolicy: restoring ? Popup.NoAutoClose : (Popup.CloseOnEscape | Popup.CloseOnPressOutside)
+        padding: 18
+
+        onAboutToShow: {
+            restoring = false;
+            restoreMessage.text = "";
+        }
+
+        background: Rectangle {
+            color: "#181b24"
+            radius: 10
+            border.color: "#ffab40"
+            border.width: 1
+        }
+
+        contentItem: ColumnLayout {
+            spacing: 12
+
+            Text {
+                Layout.fillWidth: true
+                text: qsTr("Restore the backup of %1?").arg(root.backupLabel(restorePopup.backupName))
+                font.bold: true
+                font.pixelSize: 15
+                color: Theme.white
+                wrapMode: Text.WordWrap
+            }
+
+            Text {
+                Layout.fillWidth: true
+                text: qsTr("Your current library and settings are replaced by the backup (a copy of them is kept). Mixxx closes; open it again to finish.")
+                font.pixelSize: 12
+                color: "#b0bec5"
+                wrapMode: Text.WordWrap
+            }
+
+            Text {
+                id: restoreMessage
+
+                Layout.fillWidth: true
+                visible: text.length > 0
+                font.pixelSize: 12
+                color: restorePopup.restoring ? "#69f0ae" : "#ff8a80"
+                wrapMode: Text.WordWrap
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 12
+                visible: !restorePopup.restoring
+
+                Item {
+                    Layout.fillWidth: true
+                }
+
+                Skin.Button {
+                    Layout.preferredHeight: 40
+                    Layout.preferredWidth: 130
+                    text: qsTr("Cancel")
+                    onClicked: restorePopup.close()
+                }
+
+                Skin.Button {
+                    Layout.preferredHeight: 40
+                    Layout.preferredWidth: 150
+                    activeColor: "#ffab40"
+                    backgroundColor: "#3a2a14"
+                    normalColor: "#ffd180"
+                    font.bold: true
+                    text: qsTr("Restore")
+                    onClicked: {
+                        const result = Mixxx.MobileLibrary.restoreBackup(restorePopup.backupName);
+                        restorePopup.restoring = result.ok;
+                        restoreMessage.text = result.message;
                     }
                 }
             }
