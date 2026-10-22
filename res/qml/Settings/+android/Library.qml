@@ -17,14 +17,14 @@ Category {
     readonly property bool isScanning: Mixxx.Library ? (Mixxx.Library.libraryScanActive || (Mixxx.Library.scanner && Mixxx.Library.scanner.running)) : false
 
     function refreshSources() {
-        if (Mixxx.Library && Mixxx.Library.getSourcesList) {
-            root.sourcesList = Mixxx.Library.getSourcesList();
+        if (Mixxx.MobileLibrary && Mixxx.MobileLibrary.getSourcesList) {
+            root.sourcesList = Mixxx.MobileLibrary.getSourcesList();
         }
     }
 
     function updateSubDirs() {
-        if (Mixxx.Library && Mixxx.Library.getSubDirectories) {
-            root.subDirectoriesList = Mixxx.Library.getSubDirectories(root.currentBrowserPath);
+        if (Mixxx.MobileLibrary && Mixxx.MobileLibrary.getSubDirectories) {
+            root.subDirectoriesList = Mixxx.MobileLibrary.getSubDirectories(root.currentBrowserPath);
         }
     }
 
@@ -49,16 +49,16 @@ Category {
     }
 
     function addQuickFolder(path) {
-        if (Mixxx.Library && Mixxx.Library.addSourcePath) {
-            Mixxx.Library.addSourcePath(path);
+        if (Mixxx.MobileLibrary && Mixxx.MobileLibrary.addSourcePath) {
+            Mixxx.MobileLibrary.addSourcePath(path);
             Mixxx.Library.rescanLibrary();
             root.refreshSources();
         }
     }
 
     function removeFolder(path) {
-        if (Mixxx.Library && Mixxx.Library.removeSourcePath) {
-            Mixxx.Library.removeSourcePath(path);
+        if (Mixxx.MobileLibrary && Mixxx.MobileLibrary.removeSourcePath) {
+            Mixxx.MobileLibrary.removeSourcePath(path);
             Mixxx.Library.rescanLibrary();
             root.refreshSources();
         }
@@ -74,8 +74,8 @@ Category {
 
     function load() {
         root.refreshSources();
-        if (Mixxx.Library && Mixxx.Library.defaultMusicDirectory) {
-            root.currentBrowserPath = Mixxx.Library.defaultMusicDirectory();
+        if (Mixxx.MobileLibrary && Mixxx.MobileLibrary.defaultMusicDirectory) {
+            root.currentBrowserPath = Mixxx.MobileLibrary.defaultMusicDirectory();
         }
         if (Mixxx.StreamingManager) {
             Mixxx.StreamingManager.refreshCacheSize();
@@ -93,11 +93,15 @@ Category {
     }
 
     Connections {
-        target: Mixxx.Library
+        target: Mixxx.MobileLibrary
 
         function onSourcesChanged() {
             root.refreshSources();
         }
+    }
+
+    Connections {
+        target: Mixxx.Library
 
         function onLibraryScanActiveChanged() {
             root.refreshSources();
@@ -724,8 +728,8 @@ Category {
                             font.pixelSize: 11
                             text: qsTr("⚡ Analyze tracks without BPM/key")
                             onClicked: {
-                                if (Mixxx.Library && Mixxx.Library.analyzeUnanalyzedTracks) {
-                                    Mixxx.Library.analyzeUnanalyzedTracks();
+                                if (Mixxx.MobileLibrary && Mixxx.MobileLibrary.analyzeUnanalyzedTracks) {
+                                    Mixxx.MobileLibrary.analyzeUnanalyzedTracks();
                                 }
                             }
                         }
@@ -740,8 +744,8 @@ Category {
                             font.pixelSize: 11
                             text: qsTr("⟳ Re-analyze the whole collection")
                             onClicked: {
-                                if (Mixxx.Library && Mixxx.Library.analyzeAllTracks) {
-                                    Mixxx.Library.analyzeAllTracks();
+                                if (Mixxx.MobileLibrary && Mixxx.MobileLibrary.analyzeAllTracks) {
+                                    Mixxx.MobileLibrary.analyzeAllTracks();
                                 }
                             }
                         }

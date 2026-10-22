@@ -36,7 +36,9 @@ handlers is what allows two decks to be operated at the same time:
 | Drag on a knob or fader          | Change the value                           |
 | Long press on a hotcue           | Open the hotcue popup (right click on desktop) |
 
-## Android QML overrides
+## Merging upstream Mixxx
+
+### QML overrides
 
 > _The following section was written by an AI agent (Claude Code)._
 
@@ -67,6 +69,31 @@ Rules when changing the UI:
 
 To run the Android UI on a desktop build, start Mixxx with
 `QT_FILE_SELECTORS=android mixxx --new-ui`.
+
+### C++ and CMake
+
+The same goal applies to the C++ code: Android features live in their own
+files, and upstream files only get small hooks.
+
+* `cmake/modules/MixxxAndroid.cmake` adds the Android sources, definitions
+  and build steps. `CMakeLists.txt` only includes it at the end; what has to
+  happen at a fixed point (toolchain setup, Qt components, the Android
+  packaging properties and permissions) stays in `CMakeLists.txt`.
+* QML features only used by the Android UI are separate singletons:
+  `Mixxx.MobileLibrary`, `Mixxx.MobileAudio`, `Mixxx.MobileControllers`,
+  `Mixxx.Language`, `Mixxx.StreamingManager` and the
+  `Mixxx.LibraryFeatureSource` type. The singletons that need core services
+  get them in `src/qml/qmlmobilesingletons.cpp`, which `coreservices.cpp`
+  calls once.
+* `SoundManagerAndroid` holds the Android audio logic (routing to DJ
+  controllers, fallback to the speaker, USB hotplug); `SoundManager` calls
+  it at a few points. Likewise `AndroidUsbSoundDevices` for
+  `PortAudioEnumerator`, `mappingmatcher.cpp` for `ControllerManager` and
+  `librarycoverloader.cpp` for `AsyncImageProvider`.
+* The remaining changes to upstream files are fixes of upstream code (for
+  example in `qmlpreferencesproxy.cpp`, `controller.h` or the Oboe setup in
+  `portaudioenumerator.cpp`). The best way to keep them from conflicting is to
+  contribute them to mixxxdj/mixxx.
 
 > _End of AI-written section._
 

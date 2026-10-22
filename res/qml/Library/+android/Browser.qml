@@ -26,7 +26,7 @@ Rectangle {
     function checkStorageAccess(index) {
         // SidebarModel::IconNameRole
         const icon = root.model.data(index, Qt.UserRole + 1);
-        if ((icon === "rekordbox" || icon === "enginedj") && !Mixxx.Library.hasFullStorageAccess()) {
+        if ((icon === "rekordbox" || icon === "enginedj") && !Mixxx.MobileLibrary.hasFullStorageAccess()) {
             root.storageAccessNeeded();
         }
     }

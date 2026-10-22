@@ -46,10 +46,10 @@
 #include "qml/qmlconfigproxy.h"
 #include "qml/qmleffectsmanagerproxy.h"
 #include "qml/qmllibraryproxy.h"
+#include "qml/qmlmobilesingletons.h"
 #include "qml/qmlplayermanagerproxy.h"
 #include "qml/qmlpreferencesproxy.h"
 #include "qml/qmlsoundmanagerproxy.h"
-#include "qml/qmlstreamingproxy.h"
 #endif
 #include "soundio/soundmanager.h"
 #include "sources/soundsourceproxy.h"
@@ -797,11 +797,10 @@ void CoreServices::initializeQMLSingletons() {
     mixxx::qml::QmlApplicationProxy::registerVinylControlManager(
             getVinylControlManager().get());
     mixxx::qml::QmlPlayerManagerProxy::registerPlayerManager(getPlayerManager());
-    mixxx::qml::QmlStreamingProxy::registerPlayerManager(getPlayerManager());
-    mixxx::qml::QmlStreamingProxy::registerUserSettings(getSettings());
     mixxx::qml::QmlConfigProxy::registerUserSettings(getSettings());
     mixxx::qml::QmlLibraryProxy::registerLibrary(getLibrary());
     mixxx::qml::QmlLibraryProxy::registerKeyboardEventFilter(getKeyboardEventFilter());
+    mixxx::qml::registerMobileQmlSingletons(this);
     mixxx::qml::QmlSoundManagerProxy::registerManager(getSoundManager());
     mixxx::qml::QmlControllerManagerProxy::registerManager(
             getControllerManager(),
@@ -904,8 +903,7 @@ void CoreServices::finalize() {
     mixxx::qml::QmlApplicationProxy::registerKeyboardEventFilter(nullptr);
     mixxx::qml::QmlApplicationProxy::registerVinylControlManager(nullptr);
     mixxx::qml::QmlPlayerManagerProxy::registerPlayerManager(nullptr);
-    mixxx::qml::QmlStreamingProxy::registerPlayerManager(nullptr);
-    mixxx::qml::QmlStreamingProxy::registerUserSettings(nullptr);
+    mixxx::qml::unregisterMobileQmlSingletons();
     mixxx::qml::QmlConfigProxy::registerUserSettings(nullptr);
     mixxx::qml::QmlLibraryProxy::registerLibrary(nullptr);
     mixxx::qml::QmlLibraryProxy::registerKeyboardEventFilter(nullptr);

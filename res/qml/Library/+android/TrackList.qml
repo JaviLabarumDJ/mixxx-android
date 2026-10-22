@@ -454,11 +454,11 @@ Rectangle {
             trackUrl = url;
             message = "";
             newPlaylistName.text = "";
-            playlists = Mixxx.Library.playlists();
+            playlists = Mixxx.MobileLibrary.playlists();
             open();
         }
         function addTo(playlistId, name) {
-            if (Mixxx.Library.addTrackToPlaylist(playlistId, trackUrl)) {
+            if (Mixxx.MobileLibrary.addTrackToPlaylist(playlistId, trackUrl)) {
                 close();
             } else {
                 message = qsTr("Could not add to %1").arg(name);
@@ -552,7 +552,7 @@ Rectangle {
 
                     onClicked: {
                         const name = newPlaylistName.text.trim();
-                        const playlistId = Mixxx.Library.createNamedPlaylist(name);
+                        const playlistId = Mixxx.MobileLibrary.createNamedPlaylist(name);
                         if (playlistId < 0) {
                             playlistPopup.message = qsTr("A playlist named %1 already exists").arg(name);
                             return;

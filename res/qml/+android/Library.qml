@@ -322,7 +322,7 @@ Item {
                     text: qsTr("DAR PERMISO")
                     onClicked: {
                         storageAccessPopup.close();
-                        Mixxx.Library.requestFullStorageAccess();
+                        Mixxx.MobileLibrary.requestFullStorageAccess();
                     }
                 }
             }

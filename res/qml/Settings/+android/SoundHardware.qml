@@ -173,7 +173,7 @@ Category {
         soundApi.selected = curApi;
         keylock.update();
         keylock.selected = keylock.options[manager.getKeylockEngine()];
-        usbDirectMode.selected = usbDirectMode.options[Math.max(0, Math.min(2, manager.getAndroidUsbDirectMode()))];
+        usbDirectMode.selected = usbDirectMode.options[Math.max(0, Math.min(2, Mixxx.MobileAudio.getAndroidUsbDirectMode()))];
 
         // Detect current preset by analyzing real SoundManager output connections
         let detected = "custom";
@@ -247,7 +247,7 @@ Category {
         micMonitorMode.value = microphoneMonitorMode.currentIndex;
         manager.setAPI(soundApi.selected);
         manager.setKeylockEngine(keylock.options.indexOf(keylock.selected));
-        manager.setAndroidUsbDirectMode(Math.max(0, usbDirectMode.options.indexOf(usbDirectMode.selected)));
+        Mixxx.MobileAudio.setAndroidUsbDirectMode(Math.max(0, usbDirectMode.options.indexOf(usbDirectMode.selected)));
 
         // Router
         manager.setSyncBuffers(router.multiSoundcard.options.indexOf(router.multiSoundcard.selected));
@@ -333,10 +333,10 @@ Category {
             manager.clearOutputs();
             rebuildFromRouter();
             // Respect the manual routing even when a controller is plugged in
-            manager.setAutoRouteController(false);
+            Mixxx.MobileAudio.setAutoRouteController(false);
         } else if (root.presetChosen) {
             // Only the controller preset follows the controller automatically
-            manager.setAutoRouteController(root.activePreset === "controller");
+            Mixxx.MobileAudio.setAutoRouteController(root.activePreset === "controller");
             let plan = presetPlan(root.activePreset);
             if (!plan.error) {
                 manager.clearOutputs();

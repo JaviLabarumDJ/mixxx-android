@@ -6,10 +6,7 @@
 #include <qstringliteral.h>
 #include <qvideosink.h>
 
-#include <QClipboard>
 #include <QFileInfo>
-#include <QGuiApplication>
-#include <QStandardPaths>
 #include <QVideoFrame>
 #include <QVideoFrameFormat>
 #include <algorithm>
@@ -720,30 +717,6 @@ QmlControllerMappingProxy* QmlControllerManagerProxy::findMapping(
     return nullptr;
 }
 
-QmlControllerMappingProxy* QmlControllerManagerProxy::suggestedMapping(
-        QmlControllerDeviceProxy* pDevice) const {
-    if (!pDevice) {
-        return nullptr;
-    }
-    QmlControllerMappingProxy* pBestMatch = nullptr;
-    int bestScore = 0;
-    const auto mappings = m_knownMappings.value(pDevice->getType());
-    for (auto* pMapping : mappings) {
-        const int score = ControllerManager::mappingNameMatchScore(
-                pDevice->internal()->getName(), pMapping->getName());
-        if (score <= 0) {
-            continue;
-        }
-        if (score > bestScore ||
-                (score == bestScore &&
-                        pMapping->getName().size() < pBestMatch->getName().size())) {
-            bestScore = score;
-            pBestMatch = pMapping;
-        }
-    }
-    return pBestMatch;
-}
-
 void QmlControllerManagerProxy::rescan() {
     // Picks up mappings copied to the user mapping folder since startup
     refreshMappings();
@@ -908,20 +881,6 @@ QmlControllerManagerProxy* QmlControllerManagerProxy::create(
 
 std::shared_ptr<ControllerManager> QmlControllerManagerProxy::internal() const {
     return m_pControllerManager;
-}
-
-QString QmlControllerManagerProxy::getMappingsDirectory() const {
-#if defined(Q_OS_ANDROID)
-    return QStringLiteral("/storage/emulated/0/Mixxx/controllers/");
-#else
-    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + QStringLiteral("/controllers/");
-#endif
-}
-
-void QmlControllerManagerProxy::copyToClipboard(const QString& text) {
-    if (auto* clipboard = QGuiApplication::clipboard()) {
-        clipboard->setText(text);
-    }
 }
 
 } // namespace qml

@@ -153,12 +153,8 @@ class QmlSoundManagerProxy : public QObject {
             int type,
             unsigned char channelGroup,
             unsigned char index);
-    Q_INVOKABLE int getAndroidUsbDirectMode() const;
-    Q_INVOKABLE void setAndroidUsbDirectMode(int mode);
-    Q_INVOKABLE bool getAutoRouteController() const;
-    Q_INVOKABLE void setAutoRouteController(bool enabled);
     /// Re-reads the active configuration, which the engine may have changed
-    /// (e.g. automatic routing to a DJ controller).
+    /// (e.g. automatic routing to a DJ controller on Android).
     Q_INVOKABLE void reload();
     Q_INVOKABLE void clearOutputs();
     Q_INVOKABLE void clearInputs();

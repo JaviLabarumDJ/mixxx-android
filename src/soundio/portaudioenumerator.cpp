@@ -1,10 +1,5 @@
 #include "soundio/portaudioenumerator.h"
 
-#ifdef __ANDROID_USB_AUDIO__
-#include "soundio/androidusbaudiodevice.h"
-#include "soundio/sounddeviceandroidusb.h"
-#endif
-
 #include <portaudio.h>
 
 #include <QLibrary>
@@ -30,9 +25,9 @@
 
 #include <cstdlib>
 
-/// Called by PortAudio instead of malloc() (see CMakeLists.txt): its Oboe
-/// host API allocates strlen(name) bytes for a copy of each device name and
-/// strcpy() then writes the terminating null byte past the end.
+/// Called by PortAudio instead of malloc() (see MixxxAndroid.cmake): its
+/// Oboe host API allocates strlen(name) bytes for a copy of each device name
+/// and strcpy() then writes the terminating null byte past the end.
 extern "C" void* mixxx_portaudio_malloc(size_t size) {
     return std::malloc(size + 1);
 }
@@ -322,52 +317,8 @@ void PortAudioEnumerator::initialize() {
 #ifdef __ANDROID_USB_AUDIO__
 bool PortAudioEnumerator::refreshAndroidUsbDevices(
         std::vector<SoundDevicePointer>* pRemoved, bool waitForPermission) {
-    using mixxx::androidusb::AndroidUsbAudioDevice;
-    using mixxx::androidusb::DirectMode;
-    // Some Android devices (e.g. with Qualcomm USB audio offload) fail to play
-    // to multichannel USB sound cards. Mixxx drives those directly instead,
-    // and hides the Android device of the same sound card.
-    const auto mode = static_cast<DirectMode>(m_pConfig->getValue(
-            ConfigKey(QStringLiteral("[Soundcard]"), QStringLiteral("AndroidUsbDirectMode")),
-            static_cast<int>(DirectMode::Auto)));
-    const auto usbDevices = AndroidUsbAudioDevice::scan(mode, waitForPermission);
-
-    bool changed = false;
-    std::vector<SoundDevicePointer> devices;
-    for (const auto& pUsbDevice : usbDevices) {
-        auto existing = std::find_if(m_androidUsbDevices.begin(),
-                m_androidUsbDevices.end(),
-                [&pUsbDevice](const SoundDevicePointer& pDevice) {
-                    return pDevice.staticCast<SoundDeviceAndroidUsb>()->usbDevice() ==
-                            pUsbDevice;
-                });
-        if (existing != m_androidUsbDevices.end()) {
-            devices.push_back(*existing);
-            continue;
-        }
-        changed = true;
-        const QString productName = pUsbDevice->productName();
-        m_devices.erase(std::remove_if(m_devices.begin(),
-                                m_devices.end(),
-                                [&productName](const auto& pDevice) {
-                                    const QString& name = pDevice->getDisplayName();
-                                    return name.endsWith(QStringLiteral(": USB")) &&
-                                            name.contains(productName);
-                                }),
-                m_devices.end());
-        devices.push_back(SoundDevicePointer(
-                new SoundDeviceAndroidUsb(m_pConfig, m_pSoundManager, pUsbDevice)));
-    }
-    for (const auto& pDevice : m_androidUsbDevices) {
-        if (std::find(devices.begin(), devices.end(), pDevice) == devices.end()) {
-            changed = true;
-            if (pRemoved) {
-                pRemoved->push_back(pDevice);
-            }
-        }
-    }
-    m_androidUsbDevices = std::move(devices);
-    return changed;
+    return m_androidUsbDevices.refresh(
+            m_pConfig, m_pSoundManager, &m_devices, pRemoved, waitForPermission);
 }
 #endif
 
@@ -381,7 +332,7 @@ std::vector<SoundDevicePointer> PortAudioEnumerator::queryDevices() const {
         devices.push_back(device);
     }
 #ifdef __ANDROID_USB_AUDIO__
-    for (const auto& device : m_androidUsbDevices) {
+    for (const auto& device : m_androidUsbDevices.devices()) {
         devices.push_back(device);
     }
 #endif

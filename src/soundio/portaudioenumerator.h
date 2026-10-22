@@ -8,6 +8,9 @@
 #include "soundio/sounddevice.h"
 #include "soundio/sounddeviceenumerator.h"
 #include "soundio/sounddeviceportaudio.h"
+#ifdef __ANDROID_USB_AUDIO__
+#include "soundio/androidusbsounddevices.h"
+#endif
 
 class PortAudioEnumerator : public SoundDeviceEnumerator {
   public:
@@ -38,8 +41,7 @@ class PortAudioEnumerator : public SoundDeviceEnumerator {
 
     std::vector<QSharedPointer<SoundDevicePortAudio>> m_devices;
 #ifdef __ANDROID_USB_AUDIO__
-    /// USB audio interfaces driven directly by Mixxx, see SoundDeviceAndroidUsb
-    std::vector<SoundDevicePointer> m_androidUsbDevices;
+    AndroidUsbSoundDevices m_androidUsbDevices;
 #endif
     mixxx::audio::SampleRate m_jackSampleRate;
 

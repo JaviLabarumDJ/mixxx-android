@@ -492,7 +492,7 @@ Category {
                                             anchors.right: parent.right
                                             anchors.rightMargin: 8
                                             elide: Text.ElideMiddle
-                                            text: root.manager.mappingsDirectory || "/storage/emulated/0/Mixxx/controllers/"
+                                            text: Mixxx.MobileControllers.mappingsDirectory || "/storage/emulated/0/Mixxx/controllers/"
                                             font.pixelSize: 11
                                             font.family: "monospace"
                                             color: "#80d8ff"
@@ -519,7 +519,7 @@ Category {
                                             hoverEnabled: true
                                             cursorShape: Qt.PointingHandCursor
                                             onClicked: {
-                                                root.manager.copyToClipboard(root.manager.mappingsDirectory || "/storage/emulated/0/Mixxx/controllers/");
+                                                Mixxx.MobileControllers.copyToClipboard(Mixxx.MobileControllers.mappingsDirectory || "/storage/emulated/0/Mixxx/controllers/");
                                                 copyTimer.restart();
                                             }
                                         }

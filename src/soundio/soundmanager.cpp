@@ -3,17 +3,8 @@
 #include <qlogging.h>
 
 #include <QLibrary>
-#if defined(Q_OS_ANDROID)
-#include <QCoreApplication>
-#include <QJniObject>
-#include <condition_variable>
-#include <mutex>
-
-#include "controllers/android.h"
-#endif
-#ifdef __ANDROID_USB_AUDIO__
-#include "soundio/androidusbaudiodevice.h"
-#include "soundio/sounddeviceandroidusb.h"
+#ifdef Q_OS_ANDROID
+#include "soundio/soundmanagerandroid.h"
 #endif
 #include <QThread>
 #include <QtGlobal>
@@ -46,10 +37,6 @@
 namespace {
 
 const QString kAppGroup = QStringLiteral("[App]");
-const ConfigKey kAndroidUsbDirectModeKey =
-        ConfigKey(QStringLiteral("[Soundcard]"), QStringLiteral("AndroidUsbDirectMode"));
-const ConfigKey kAutoRouteControllerKey =
-        ConfigKey(QStringLiteral("[Soundcard]"), QStringLiteral("AndroidAutoRouteController"));
 
 #define CPU_OVERLOAD_DURATION 500 // in ms
 
@@ -101,15 +88,11 @@ SoundManager::SoundManager(
 
     queryDevices();
 
-#if defined(Q_OS_ANDROID)
-    if (!m_config.readFromDisk() || m_config.getOutputs().isEmpty()) {
-        m_config.loadDefaults(this, SoundManagerConfig::API | SoundManagerConfig::DEVICES | SoundManagerConfig::OTHER);
-        m_config.writeToDisk();
-    }
-#else
     if (!m_config.readFromDisk()) {
         m_config.loadDefaults(this, SoundManagerConfig::API | SoundManagerConfig::OTHER);
     }
+#ifdef Q_OS_ANDROID
+    m_pAndroid = new SoundManagerAndroid(this);
 #endif
 
     if (!isPipewireSelected()) {
@@ -118,21 +101,6 @@ SoundManager::SoundManager(
 
     checkConfig();
 
-#ifdef __ANDROID_USB_AUDIO__
-    // USB sound cards driven by Mixxx can be plugged in and out at any time
-    m_pAndroidUsbTimer = new QTimer(this);
-    m_pAndroidUsbTimer->setSingleShot(true);
-    m_pAndroidUsbTimer->setInterval(1000);
-    connect(m_pAndroidUsbTimer,
-            &QTimer::timeout,
-            this,
-            &SoundManager::slotAndroidUsbDevicesChanged);
-    m_androidUsbListenerId = mixxx::android::addDevicesChangedListener([this]() {
-        QMetaObject::invokeMethod(
-                this, [this]() { m_pAndroidUsbTimer->start(); }, Qt::QueuedConnection);
-    });
-#endif
-
     // Don't write config to disk, yet -- it may be reset to defaults in case
     // previously configured devices were not found.
     // Write new config after MixxxMainWindow::noOutputDlg where the user has
@@ -140,9 +108,6 @@ SoundManager::SoundManager(
 }
 
 SoundManager::~SoundManager() {
-#ifdef __ANDROID_USB_AUDIO__
-    mixxx::android::removeDevicesChangedListener(m_androidUsbListenerId);
-#endif
     // Clean up devices.
     const bool sleepAfterClosing = false;
     clearDeviceList(sleepAfterClosing);
@@ -327,83 +292,6 @@ void SoundManager::clearAndQueryDevices() {
     queryDevices();
 }
 
-int SoundManager::getAndroidUsbDirectMode() const {
-    return m_pConfig->getValue(kAndroidUsbDirectModeKey, 0);
-}
-
-void SoundManager::setAndroidUsbDirectMode(int mode) {
-    m_pConfig->setValue(kAndroidUsbDirectModeKey, mode);
-}
-
-#ifdef __ANDROID_USB_AUDIO__
-void SoundManager::slotAndroidUsbDevicesChanged() {
-    auto* pEnumerator = dynamic_cast<PortAudioEnumerator*>(m_pEnumerator.get());
-    if (!pEnumerator) {
-        return;
-    }
-    std::vector<SoundDevicePointer> removed;
-    if (!pEnumerator->refreshAndroidUsbDevices(&removed, false)) {
-        return;
-    }
-    qInfo() << "USB sound cards changed, reconfiguring the audio devices";
-    for (const auto& pDevice : removed) {
-        if (pDevice->isOpen()) {
-            pDevice->close();
-        }
-    }
-    const bool sleepAfterClosing = false;
-    closeDevices(sleepAfterClosing);
-    setupDevices();
-    emit devicesUpdated();
-}
-#endif
-
-bool SoundManager::getAutoRouteController() const {
-    return m_pConfig->getValue(kAutoRouteControllerKey, true);
-}
-
-void SoundManager::setAutoRouteController(bool enabled) {
-    m_pConfig->setValue(kAutoRouteControllerKey, enabled);
-}
-
-#ifdef Q_OS_ANDROID
-void SoundManager::autoRouteToController() {
-    if (!getAutoRouteController()) {
-        return;
-    }
-    // The Android enumerator suffixes USB devices with ": USB"
-    SoundDevicePointer pController;
-    for (const auto& pDevice : m_pEnumerator->queryDevices()) {
-        if (pDevice->getNumOutputChannels() >= 4 &&
-                pDevice->getDisplayName().endsWith(QStringLiteral(": USB")) &&
-                (!pController ||
-                        pDevice->getNumOutputChannels() > pController->getNumOutputChannels())) {
-            pController = pDevice;
-        }
-    }
-    if (!pController || m_config.getOutputs().contains(pController->getDeviceId())) {
-        return;
-    }
-
-    qInfo() << "DJ controller sound card detected, routing Main to channels 1-2 "
-               "and Headphones to channels 3-4 of"
-            << pController->getDisplayName();
-    m_config.clearOutputs();
-    m_config.addOutput(pController->getDeviceId(),
-            AudioOutput(AudioPathType::Main, 0, mixxx::audio::ChannelCount::stereo(), 0));
-    m_config.addOutput(pController->getDeviceId(),
-            AudioOutput(AudioPathType::Headphones, 2, mixxx::audio::ChannelCount::stereo(), 0));
-    // Play at the controller's own rate to avoid resampling
-    const auto sampleRate = pController->getDefaultSampleRate();
-    if (sampleRate.isValid()) {
-        m_config.setSampleRate(sampleRate);
-    }
-    // The cable splitter preset is not used with a controller
-    ControlObject::set(ConfigKey(QStringLiteral("[Master]"), QStringLiteral("headSplit")), 0.0);
-    m_config.writeToDisk();
-}
-#endif
-
 SoundDeviceStatus SoundManager::setupDevices() {
     // NOTE(rryan): Big warning: This function is concurrent with calls to
     // pushBuffer and onDeviceOutputCallback until closeDevices() below.
@@ -419,7 +307,6 @@ SoundDeviceStatus SoundManager::setupDevices() {
     //m_pClkRefDevice = NULL;
     m_pErrorDevice.clear();
     int outputDevicesOpened = 0;
-    int physicalOutputDevicesOpened = 0;
     int inputDevicesOpened = 0;
 
     // NOTE(rryan): Documenting for future people touching this class. If you
@@ -440,33 +327,10 @@ SoundDeviceStatus SoundManager::setupDevices() {
     SoundDevicePointer pNewMainClockRef;
 
     m_audioLatencyOverloadCount.set(0);
+#ifdef Q_OS_ANDROID
+    m_pAndroid->prepareSetup();
+#endif
 
-#if defined(Q_OS_ANDROID)
-    if (m_config.getOutputs().isEmpty()) {
-        qWarning() << "SoundManager on Android: No outputs configured in SoundManagerConfig. Loading defaults...";
-        m_config.loadDefaults(this, SoundManagerConfig::API | SoundManagerConfig::DEVICES | SoundManagerConfig::OTHER);
-        m_config.writeToDisk();
-    }
-#endif
-#if defined(Q_OS_ANDROID)
-    autoRouteToController();
-    // A USB sound card driven directly by Mixxx only plays at the rates it
-    // supports (e.g. 44.1 kHz for the DDJ-400), there is no resampling
-#ifdef __ANDROID_USB_AUDIO__
-    for (const auto& pDevice : m_pEnumerator->queryDevices()) {
-        const auto* pUsbDevice = dynamic_cast<const SoundDeviceAndroidUsb*>(pDevice.data());
-        if (!pUsbDevice || !m_config.getOutputs().contains(pDevice->getDeviceId())) {
-            continue;
-        }
-        const int sampleRate = static_cast<int>(m_config.getSampleRate().value());
-        if (!pUsbDevice->usbDevice()->sampleRates().contains(sampleRate)) {
-            qInfo() << pDevice->getDisplayName() << "doesn't support" << sampleRate
-                    << "Hz, using" << pDevice->getDefaultSampleRate();
-            m_config.setSampleRate(pDevice->getDefaultSampleRate());
-        }
-    }
-#endif
-#endif
     // load with all configured devices.
     // all found devices are removed below
     QSet<SoundDeviceId> devicesNotFound = m_config.getDevices();
@@ -568,9 +432,9 @@ SoundDeviceStatus SoundManager::setupDevices() {
         const bool deviceAllowedClockReference = isPipewireSelected() != isNetworkDevice;
 
         // If we have not yet set a clock source then we use the first
-        // output pDevice (preferring real physical devices over network stream)
+        // output pDevice
         if (pNewMainClockRef.isNull() &&
-                (!haveOutput || mode.isOutput) && deviceAllowedClockReference && !isNetworkDevice) {
+                (!haveOutput || mode.isOutput) && deviceAllowedClockReference) {
             pNewMainClockRef = pDevice;
             qWarning() << "Output sound device clock reference not set! Using"
                        << pDevice->getDisplayName();
@@ -584,87 +448,26 @@ SoundDeviceStatus SoundManager::setupDevices() {
         }
         status = pDevice->open(pNewMainClockRef == pDevice, syncBuffers);
         if (status != SoundDeviceStatus::Ok) {
-#if defined(Q_OS_ANDROID)
-            // Never end up without any sound: skip the device and let the
-            // fallback below open another one
-            qWarning() << "Unable to open" << pDevice->getDisplayName() << ":"
-                       << pDevice->getError();
-            if (pNewMainClockRef == pDevice) {
-                pNewMainClockRef.clear();
+#ifdef Q_OS_ANDROID
+            if (m_pAndroid->skipFailedDevice(pDevice, &pNewMainClockRef)) {
+                status = SoundDeviceStatus::Ok;
+                continue;
             }
-            status = SoundDeviceStatus::Ok;
-            continue;
-#else
-            goto closeAndError;
 #endif
+            goto closeAndError;
         }
         devicesNotFound.remove(pDevice->getDeviceId());
         if (mode.isOutput) {
             ++outputDevicesOpened;
-            if (pDevice->getDeviceId().name != kNetworkDeviceInternalName) {
-                ++physicalOutputDevicesOpened;
-            }
         }
         if (mode.isInput) {
             ++inputDevicesOpened;
         }
     }
 
-#if defined(Q_OS_ANDROID)
-    if (!haveOutput || physicalOutputDevicesOpened == 0) {
-        qWarning() << "SoundManager on Android: No physical output device opened! Forcing first available output device...";
-        SoundDevicePointer targetDevice;
-        for (const auto& pDevice : devices) {
-            if (pDevice && pDevice->getNumOutputChannels() > 0 && pDevice->getDeviceId().name != kNetworkDeviceInternalName) {
-                if (pDevice->getDisplayName().contains(QStringLiteral("earpiece"), Qt::CaseInsensitive)) {
-                    continue;
-                }
-                if (pDevice->getHostAPI().contains(QStringLiteral("Oboe"), Qt::CaseInsensitive)) {
-                    // Prefer the built-in speaker, which is always present
-                    if (pDevice->getDisplayName().contains(QStringLiteral("Speaker"))) {
-                        targetDevice = pDevice;
-                        break;
-                    }
-                    if (!targetDevice || !targetDevice->getHostAPI().contains(
-                                                 QStringLiteral("Oboe"), Qt::CaseInsensitive)) {
-                        targetDevice = pDevice;
-                    }
-                    continue;
-                }
-                if (!targetDevice) {
-                    targetDevice = pDevice;
-                }
-            }
-        }
-
-        if (targetDevice) {
-            const auto channelCount = targetDevice->getNumOutputChannels() >= 2
-                    ? mixxx::audio::ChannelCount::stereo()
-                    : mixxx::audio::ChannelCount::mono();
-            AudioOutput forcedOut(AudioPathType::Main, 0, channelCount, 0);
-            auto pSource = m_registeredSources.value(forcedOut);
-            const CSAMPLE* pBuffer = pSource ? pSource->buffer(forcedOut).data() : nullptr;
-            if (pBuffer) {
-                targetDevice->clearOutputs();
-                AudioOutputBuffer aob(forcedOut, pBuffer);
-                targetDevice->addOutput(aob);
-                targetDevice->setSampleRate(m_config.getSampleRate());
-                targetDevice->setConfigFramesPerBuffer(m_config.getFramesPerBuffer());
-                if (targetDevice->open(true, m_config.getSyncBuffers()) == SoundDeviceStatus::Ok) {
-                    pNewMainClockRef = targetDevice;
-                    ++outputDevicesOpened;
-                    haveOutput = true;
-                    devicesNotFound.remove(targetDevice->getDeviceId());
-                    // Not saved to the configuration on purpose: the
-                    // configured device (e.g. a DJ controller that isn't
-                    // plugged in yet) must be used again next time.
-                    qInfo() << "Successfully opened fallback Android audio device:" << targetDevice->getDisplayName();
-                }
-            }
-        }
-    }
+#ifdef Q_OS_ANDROID
+    m_pAndroid->finishSetup(devices, &pNewMainClockRef, &outputDevicesOpened, &devicesNotFound);
 #endif
-
     if (pNewMainClockRef) {
         qDebug() << "Using" << pNewMainClockRef->getDisplayName()
                  << "as output sound device clock reference";
@@ -674,24 +477,6 @@ SoundDeviceStatus SoundManager::setupDevices() {
 
     qDebug() << outputDevicesOpened << "output sound devices opened";
     qDebug() << inputDevicesOpened << "input sound devices opened";
-
-#if defined(Q_OS_ANDROID)
-    // Android attenuates USB sound cards with the media volume. DJ
-    // controllers have their own level knobs, so play at full scale.
-    for (const auto& mode : std::as_const(toOpen)) {
-        if (mode.isOutput &&
-                mode.pDevice->getDisplayName().endsWith(QStringLiteral(": USB"))) {
-            QNativeInterface::QAndroidApplication::runOnAndroidMainThread([]() {
-                QJniObject context = QNativeInterface::QAndroidApplication::context();
-                QJniObject::callStaticMethod<jboolean>("org/mixxx/AudioHelper",
-                        "maximizeMediaVolumeForUsb",
-                        "(Landroid/content/Context;)Z",
-                        context.object<jobject>());
-            });
-            break;
-        }
-    }
-#endif
     for (const auto& device : std::as_const(devicesNotFound)) {
         qWarning() << device << "not found";
     }

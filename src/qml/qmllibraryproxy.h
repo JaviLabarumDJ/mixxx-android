@@ -170,12 +170,6 @@ class QmlLibraryProxy : public QObject {
     Q_INVOKABLE mixxx::qml::QmlLibraryProxy::RelocateResult relinkSource(
             const QUrl& oldPath, const QUrl& newPath);
 
-    Q_INVOKABLE QVariantList getSourcesList() const;
-    Q_INVOKABLE bool addSourcePath(const QString& rawPath);
-    Q_INVOKABLE bool removeSourcePath(const QString& rawPath);
-    Q_INVOKABLE QStringList getSubDirectories(const QString& rawPath) const;
-    Q_INVOKABLE QString defaultMusicDirectory() const;
-
     static void registerKeyboardEventFilter(std::shared_ptr<KeyboardEventFilter> pKeyboard) {
         s_pKeyboard = std::move(pKeyboard);
     }
@@ -192,22 +186,8 @@ class QmlLibraryProxy : public QObject {
     bool enginePrimeExportAvailable() const;
 
     Q_INVOKABLE void analyze(const mixxx::qml::QmlTrackProxy* track) const;
-    Q_INVOKABLE void analyzeAllTracks() const;
-    Q_INVOKABLE void analyzeUnanalyzedTracks() const;
     Q_INVOKABLE void createCrate();
     Q_INVOKABLE void createPlaylist();
-    /// The visible playlists as a list of {id, name, locked}
-    Q_INVOKABLE QVariantList playlists() const;
-    /// Creates a playlist without asking for the name. Returns its id, or -1
-    /// if the name is empty or already used.
-    Q_INVOKABLE int createNamedPlaylist(const QString& name);
-    /// Appends the track, adding it to the library if needed
-    Q_INVOKABLE bool addTrackToPlaylist(int playlistId, const QUrl& trackUrl);
-    /// Whether the databases on USB drives (Rekordbox, Engine DJ) can be
-    /// read. On Android this needs "All files access".
-    Q_INVOKABLE bool hasFullStorageAccess() const;
-    /// Opens the system settings to grant "All files access"
-    Q_INVOKABLE void requestFullStorageAccess() const;
     Q_INVOKABLE void exportLibrary();
     Q_INVOKABLE void rescanLibrary();
     Q_INVOKABLE void searchInCurrentView();
@@ -234,7 +214,6 @@ class QmlLibraryProxy : public QObject {
             int hotcueNumber);
 
   signals:
-    void sourcesChanged();
     void libraryScanActiveChanged();
     void waveformCacheDiskUsageChanged();
     void libraryScanSummaryAvailable(

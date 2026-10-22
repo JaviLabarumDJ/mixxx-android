@@ -36,7 +36,7 @@ Item {
         // type pre-selected; it is only applied once the user saves.
         if (root.modelData.mapping)
             return;
-        let suggestion = Mixxx.ControllerManager.suggestedMapping(root.modelData);
+        let suggestion = Mixxx.MobileControllers.suggestedMapping(root.modelData, Mixxx.ControllerManager.mappings(root.modelData.type));
         if (!suggestion)
             return;
         root.modelData.mapping = suggestion;
