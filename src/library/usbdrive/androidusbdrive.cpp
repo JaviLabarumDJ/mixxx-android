@@ -167,6 +167,7 @@ std::shared_ptr<Drive> openDrive(const QJniObject& manager, const QJniObject& us
             qWarning() << "USB permission denied for the drive" << productName;
             return nullptr;
         }
+        qInfo() << "USB permission granted for the drive" << productName;
     }
 
     const QJniObject usbInterface = massStorageInterface(usbDevice);
@@ -191,6 +192,8 @@ std::shared_ptr<Drive> openDrive(const QJniObject& manager, const QJniObject& us
         return nullptr;
     }
 
+    qInfo() << "Opening the USB drive" << productName << "interface"
+            << pDrive->interfaceNumber;
     pDrive->connection = manager.callObjectMethod("openDevice",
             "(Landroid/hardware/usb/UsbDevice;)Landroid/hardware/usb/UsbDeviceConnection;",
             usbDevice.object());
@@ -206,6 +209,7 @@ std::shared_ptr<Drive> openDrive(const QJniObject& manager, const QJniObject& us
         qWarning() << "Unable to claim the USB drive" << productName;
         return nullptr;
     }
+    qInfo() << "Claimed the USB drive" << productName;
     libusb_set_option(nullptr, LIBUSB_OPTION_NO_DEVICE_DISCOVERY);
     if (libusb_init(&pDrive->pContext) < 0) {
         pDrive->pContext = nullptr;
@@ -217,6 +221,7 @@ std::shared_ptr<Drive> openDrive(const QJniObject& manager, const QJniObject& us
         return nullptr;
     }
     libusb_claim_interface(pDrive->pHandle, pDrive->interfaceNumber);
+    qInfo() << "Reading the file system of the USB drive" << productName;
 
     pDrive->pStorage = std::make_unique<UsbMassStorage>(
             pDrive->pHandle, pDrive->interfaceNumber, endpointIn, endpointOut);
@@ -386,6 +391,10 @@ QFileInfoList driveRoots() {
     }
 
     if (!androidMountedRemovableStorage()) {
+        if (mountDeadlineMs > 0) {
+            qInfo() << "Android didn't mount the USB drives" << connected
+                    << ", reading them directly";
+        }
         for (const QJniObject& usbDevice : usbDevices) {
             if (!massStorageInterface(usbDevice).isValid()) {
                 continue;

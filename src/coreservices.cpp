@@ -72,6 +72,7 @@
 #include <X11/XKBlib.h>
 #endif
 #if defined(Q_OS_ANDROID)
+#include "util/androidcrashreport.h"
 #include "util/androidpermissions.h"
 #endif
 
@@ -481,11 +482,24 @@ void CoreServices::initializeLogging() {
     if (m_cmdlineArgs.getDebugAssertBreak()) {
         logFlags.setFlag(mixxx::LogFlag::DebugAssertBreak);
     }
+#ifdef Q_OS_ANDROID
+    // The log is the only trace of a crash on Android, see
+    // util/androidcrashreport.h
+    const auto logLevel = std::max(m_cmdlineArgs.getLogLevel(), mixxx::LogLevel::Info);
+    const auto logFlushLevel = std::max(m_cmdlineArgs.getLogFlushLevel(), mixxx::LogLevel::Info);
+#else
+    const auto logLevel = m_cmdlineArgs.getLogLevel();
+    const auto logFlushLevel = m_cmdlineArgs.getLogFlushLevel();
+#endif
     mixxx::Logging::initialize(
             m_pSettingsManager->settings()->getSettingsPath(),
-            m_cmdlineArgs.getLogLevel(),
-            m_cmdlineArgs.getLogFlushLevel(),
+            logLevel,
+            logFlushLevel,
             logFlags);
+#ifdef Q_OS_ANDROID
+    mixxx::android::installCrashReporter();
+    mixxx::android::exportPreviousLog(m_pSettingsManager->settings()->getSettingsPath());
+#endif
 }
 
 void CoreServices::initialize(QApplication* pApp) {
