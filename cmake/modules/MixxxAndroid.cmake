@@ -11,7 +11,7 @@ target_sources(
   PRIVATE
     src/controllers/mappingmatcher.cpp
     src/soundio/soundmanagerandroid.cpp
-    src/library/androidfirstscanorder.cpp
+    src/library/androidscanorder.cpp
     src/util/androidbackup.cpp
     src/util/androidpermissions.cpp
     src/util/removablestorage.cpp

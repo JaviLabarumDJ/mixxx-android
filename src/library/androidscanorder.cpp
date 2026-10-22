@@ -1,4 +1,4 @@
-#include "library/androidfirstscanorder.h"
+#include "library/androidscanorder.h"
 
 #include <QDateTime>
 #include <QFileInfo>
@@ -7,7 +7,6 @@
 #include <QSqlQuery>
 #include <QtDebug>
 #include <algorithm>
-#include <atomic>
 #include <memory>
 
 #include "library/scanner/libraryscanner.h"
@@ -23,29 +22,22 @@ struct ScannedTrack {
     QDateTime fileDate;
 };
 
-bool isLibraryEmpty(QSqlDatabase database) {
-    QSqlQuery query(database);
-    if (!query.exec(QStringLiteral("SELECT COUNT(*) FROM library")) || !query.next()) {
-        qWarning() << "First scan order:" << query.lastError();
-        return false;
-    }
-    return query.value(0).toInt() == 0;
-}
-
-void orderTracksByFileDate(QSqlDatabase database) {
+/// Orders the tracks added at or after scanStart
+void orderTracksByFileDate(QSqlDatabase database, const QDateTime& scanStart) {
     QSqlQuery select(database);
     if (!select.exec(QStringLiteral(
                 "SELECT library.id, library.datetime_added, track_locations.location "
                 "FROM library "
-                "INNER JOIN track_locations ON library.location = track_locations.id"))) {
-        qWarning() << "First scan order:" << select.lastError();
+                "INNER JOIN track_locations ON library.location = track_locations.id "
+                "ORDER BY library.id"))) {
+        qWarning() << "Scan order:" << select.lastError();
         return;
     }
     QList<ScannedTrack> tracks;
     QList<QDateTime> datesAdded;
     while (select.next()) {
         const QDateTime dateAdded = mixxx::convertVariantToDateTime(select.value(1));
-        if (!dateAdded.isValid()) {
+        if (!dateAdded.isValid() || dateAdded < scanStart) {
             continue;
         }
         tracks.append({select.value(0),
@@ -84,13 +76,13 @@ void orderTracksByFileDate(QSqlDatabase database) {
         update.bindValue(QStringLiteral(":date"), datesAdded[i]);
         update.bindValue(QStringLiteral(":id"), tracks[i].id);
         if (!update.exec()) {
-            qWarning() << "First scan order:" << update.lastError();
+            qWarning() << "Scan order:" << update.lastError();
             return;
         }
     }
     if (transaction.commit()) {
         qInfo() << "Ordered the" << tracks.size()
-                << "tracks of the first library scan by file date";
+                << "tracks added by the library scan by file date";
     }
 }
 
@@ -99,28 +91,30 @@ void orderTracksByFileDate(QSqlDatabase database) {
 namespace mixxx {
 namespace android {
 
-void connectFirstScanOrder(
+void connectScanOrder(
         LibraryScanner* pScanner,
         const mixxx::DbConnectionPoolPtr& pDbConnectionPool) {
     // Both signals are emitted from the scanner thread, which holds a
-    // connection of the pool
-    auto pFirstScan = std::make_shared<std::atomic<bool>>(false);
+    // connection of the pool. Only the scanner thread uses the shared start
+    // time.
+    auto pScanStart = std::make_shared<QDateTime>();
     QObject::connect(
             pScanner,
             &LibraryScanner::scanStarted,
             pScanner,
-            [pFirstScan, pDbConnectionPool]() {
-                pFirstScan->store(isLibraryEmpty(
-                        mixxx::DbConnectionPooled(pDbConnectionPool)));
+            [pScanStart]() {
+                *pScanStart = QDateTime::currentDateTimeUtc();
             },
             Qt::DirectConnection);
     QObject::connect(
             pScanner,
             &LibraryScanner::scanFinished,
             pScanner,
-            [pFirstScan, pDbConnectionPool]() {
-                if (pFirstScan->exchange(false)) {
-                    orderTracksByFileDate(mixxx::DbConnectionPooled(pDbConnectionPool));
+            [pScanStart, pDbConnectionPool]() {
+                if (pScanStart->isValid()) {
+                    orderTracksByFileDate(
+                            mixxx::DbConnectionPooled(pDbConnectionPool), *pScanStart);
+                    *pScanStart = QDateTime();
                 }
             },
             Qt::DirectConnection);

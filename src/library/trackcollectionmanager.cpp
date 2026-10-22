@@ -7,7 +7,7 @@
 #include "library/library_prefs.h"
 #include "library/scanner/libraryscanner.h"
 #ifdef Q_OS_ANDROID
-#include "library/androidfirstscanorder.h"
+#include "library/androidscanorder.h"
 #endif
 #include "library/trackcollection.h"
 #include "moc_trackcollectionmanager.cpp"
@@ -75,7 +75,7 @@ TrackCollectionManager::TrackCollectionManager(
     } else {
         m_pScanner = std::make_unique<LibraryScanner>(pDbConnectionPool, pConfig);
 #ifdef Q_OS_ANDROID
-        mixxx::android::connectFirstScanOrder(m_pScanner.get(), pDbConnectionPool);
+        mixxx::android::connectScanOrder(m_pScanner.get(), pDbConnectionPool);
 #endif
 
         connect(
