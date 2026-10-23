@@ -104,7 +104,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
         color: "#9a9ea6"
-        font.pixelSize: Math.max(8, Math.round(root.ringSize * 0.24))
+        font.pixelSize: Math.max(8, Math.min(13, Math.round(root.width * 0.22)))
         text: root.label
         visible: root.label.length > 0
     }

@@ -266,11 +266,28 @@ Rectangle {
                 case "hotcue":
                     return padItem.hotcueSet && sampleRateControl.value > 0 ? root.formatTime(hotcuePosition.value / sampleRateControl.value / 2) : "";
                 case "beatjump":
-                    // The left half jumps back, the right half forward
-                    return "‹   " + padItem.jumpLabels[padItem.sizeIndex] + "   ›";
+                    return padItem.jumpLabels[padItem.sizeIndex];
                 default:
                     return padItem.loopLabels[padItem.index];
                 }
+            }
+        }
+        // Beat jump: the left half jumps back, the right half forward
+        Repeater {
+            model: root.padMode === "beatjump" ? [false, true] : []
+
+            BoothArrow {
+                required property bool modelData
+
+                anchors.left: modelData ? undefined : parent.left
+                anchors.leftMargin: Math.round(padItem.width * 0.12)
+                anchors.right: modelData ? parent.right : undefined
+                anchors.rightMargin: Math.round(padItem.width * 0.12)
+                anchors.verticalCenter: parent.verticalCenter
+                color: "#e5332a"
+                height: Math.round(root.unit * 1.1)
+                pointsRight: modelData
+                width: Math.round(height * 0.8)
             }
         }
         TapHandler {

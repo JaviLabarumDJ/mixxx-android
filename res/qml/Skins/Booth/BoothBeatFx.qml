@@ -125,7 +125,7 @@ Rectangle {
         anchors.top: header.bottom
         spacing: root.compact ? 4 : 6
 
-        // The effect of the focused slot: ‹ › change it (not ◀ ▶, drawn as emoji on Android)
+        // The effect of the focused slot: the arrows change it
         RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: false
@@ -138,10 +138,11 @@ Rectangle {
                 color: prevMouse.pressed ? "#2a2d33" : "#141518"
                 radius: 3
 
-                Text {
+                BoothArrow {
                     anchors.centerIn: parent
-                    color: "#c0c4ca"
-                    text: "‹"
+                    height: 11
+                    pointsRight: false
+                    width: 8
                 }
                 MouseArea {
                     id: prevMouse
@@ -178,10 +179,11 @@ Rectangle {
                 color: nextMouse.pressed ? "#2a2d33" : "#141518"
                 radius: 3
 
-                Text {
+                BoothArrow {
                     anchors.centerIn: parent
-                    color: "#c0c4ca"
-                    text: "›"
+                    height: 11
+                    pointsRight: true
+                    width: 8
                 }
                 MouseArea {
                     id: nextMouse
