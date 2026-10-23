@@ -3,7 +3,6 @@ import "." as Booth
 import Mixxx 1.0 as Mixxx
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Layouts
 
 // Booth skin: a main window in the style of the screen of a booth player,
 // for landscape phones and tablets. The waveforms are stacked over the
@@ -68,118 +67,202 @@ Item {
     Skin.LibraryScanSummaryDialog {
     }
 
-    component TopButton: Rectangle {
-        id: topButton
+    // A tab of the top bar, like OVERVIEW / BROWSE on a player
+    component Tab: Rectangle {
+        id: tab
 
         required property string label
         property bool active: false
-        property color activeColor: "#2f9bff"
         signal clicked
 
-        Layout.fillHeight: true
-        Layout.preferredWidth: Math.max(root.compact ? 54 : 74, topText.implicitWidth + 20)
-        border.color: active ? activeColor : "#3a3d42"
-        border.width: 1
-        color: active ? activeColor : (topMouse.pressed ? "#2a2d33" : "#1a1c20")
-        radius: 3
+        border.color: active ? "#d4e157" : "#5c6068"
+        border.width: active ? 2 : 1
+        color: tabMouse.pressed ? "#1c1e22" : "#000000"
+        height: parent.height
+        width: Math.max(root.compact ? 64 : 96, tabText.implicitWidth + 24)
 
         Text {
-            id: topText
+            id: tabText
 
             anchors.centerIn: parent
-            color: topButton.active ? "#000000" : "#e6e8eb"
+            color: tab.active ? "#d4e157" : "#9a9ea6"
             font.bold: true
             font.pixelSize: root.compact ? 11 : 13
-            text: topButton.label
+            text: tab.label
         }
         MouseArea {
-            id: topMouse
+            id: tabMouse
 
             anchors.fill: parent
-            onClicked: topButton.clicked()
+            onClicked: tab.clicked()
         }
     }
-    // Next to a waveform: deck number, quantize and slip
-    component DeckStrip: Rectangle {
-        id: strip
+    // Left of a waveform: deck, key, bars left, quantize and slip
+    component DeckInfo: Item {
+        id: deckInfo
 
         required property string group
         required property int deckNumber
-        readonly property color accent: deckNumber === 1 ? "#2f9bff" : "#ff8a1f"
+        readonly property var currentTrack: Mixxx.PlayerManager.getPlayer(group)?.currentTrack
+        readonly property bool loaded: loadedControl.value > 0
+        readonly property real rowHeight: Math.max(18, Math.min(34, (height - header.height) / 4))
+        // Bars and beats to the end of the track, as a player counts down to
+        // the next memory cue
+        readonly property string barsLeft: {
+            if (!loaded || bpmControl.value <= 0) {
+                return "--.-";
+            }
+            const seconds = durationControl.value * (1 - Math.max(0, Math.min(1, positionControl.value)));
+            const beats = Math.floor(seconds * bpmControl.value / 60);
+            return ("0" + Math.floor(beats / 4)).slice(-2) + "." + (beats % 4 + 1);
+        }
 
-        color: "#0b0c0e"
-        border.color: "#2c2f34"
-        border.width: 1
+        Mixxx.ControlProxy {
+            id: loadedControl
 
+            group: deckInfo.group
+            key: "track_loaded"
+        }
+        Mixxx.ControlProxy {
+            id: bpmControl
+
+            group: deckInfo.group
+            key: "bpm"
+        }
+        Mixxx.ControlProxy {
+            id: durationControl
+
+            group: deckInfo.group
+            key: "duration"
+        }
+        Mixxx.ControlProxy {
+            id: positionControl
+
+            group: deckInfo.group
+            key: "playposition"
+        }
         Mixxx.ControlProxy {
             id: quantizeControl
 
-            group: strip.group
+            group: deckInfo.group
             key: "quantize"
         }
         Mixxx.ControlProxy {
             id: slipControl
 
-            group: strip.group
+            group: deckInfo.group
             key: "slip_enabled"
         }
-        ColumnLayout {
-            anchors.fill: parent
-            anchors.margins: 3
-            spacing: 3
 
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: root.compact ? 16 : 20
-                color: strip.accent
-                radius: 2
+        Rectangle {
+            id: header
 
-                Text {
-                    anchors.centerIn: parent
-                    color: "#000000"
-                    font.bold: true
-                    font.pixelSize: root.compact ? 10 : 12
-                    text: strip.deckNumber
-                }
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            color: "#2a2c30"
+            height: root.compact ? 18 : 24
+
+            Text {
+                anchors.left: parent.left
+                anchors.leftMargin: 8
+                anchors.verticalCenter: parent.verticalCenter
+                color: "#d8dadd"
+                font.pixelSize: root.compact ? 10 : 12
+                text: qsTr("DECK %1").arg(deckInfo.deckNumber)
             }
             Rectangle {
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-                border.color: "#e0a000"
-                border.width: 1
-                color: quantizeControl.value > 0 ? "#e0a000" : "transparent"
-                radius: 2
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                color: deckInfo.deckNumber === 1 ? "#1f6fd1" : "#e8650f"
+                height: 2
+            }
+        }
+        Column {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: header.bottom
 
-                Text {
-                    anchors.centerIn: parent
-                    color: quantizeControl.value > 0 ? "#000000" : "#e0a000"
-                    font.bold: true
-                    font.pixelSize: root.compact ? 10 : 12
-                    text: "Q"
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: quantizeControl.value = quantizeControl.value > 0 ? 0 : 1
+            Repeater {
+                model: [
+                    {
+                        "text": deckInfo.loaded ? (deckInfo.currentTrack?.keyText || "--") : "--",
+                        "color": "#ffffff",
+                        "unit": "♯"
+                    },
+                    {
+                        "text": deckInfo.barsLeft,
+                        "color": "#ff6a13",
+                        "unit": qsTr("Bars")
+                    }
+                ]
+
+                Rectangle {
+                    required property var modelData
+
+                    border.color: "#2a2c30"
+                    border.width: 1
+                    color: "#141518"
+                    height: deckInfo.rowHeight
+                    width: parent.width
+
+                    Text {
+                        id: rowValue
+
+                        anchors.left: parent.left
+                        anchors.leftMargin: 8
+                        anchors.verticalCenter: parent.verticalCenter
+                        color: modelData.color
+                        font.pixelSize: Math.round(deckInfo.rowHeight * 0.55)
+                        text: modelData.text
+                    }
+                    Text {
+                        anchors.baseline: rowValue.baseline
+                        anchors.left: rowValue.right
+                        anchors.leftMargin: 4
+                        color: modelData.color
+                        font.pixelSize: Math.round(deckInfo.rowHeight * 0.36)
+                        text: modelData.unit === "♯" ? "" : modelData.unit
+                    }
                 }
             }
-            Rectangle {
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-                border.color: "#c0c4ca"
-                border.width: 1
-                color: slipControl.value > 0 ? "#c0c4ca" : "transparent"
-                radius: 2
+            Repeater {
+                model: [
+                    {
+                        "label": qsTr("QUANTIZE"),
+                        "control": quantizeControl
+                    },
+                    {
+                        "label": qsTr("SLIP"),
+                        "control": slipControl
+                    }
+                ]
 
-                Text {
-                    anchors.centerIn: parent
-                    color: slipControl.value > 0 ? "#000000" : "#c0c4ca"
-                    font.bold: true
-                    font.pixelSize: root.compact ? 8 : 10
-                    text: "SLIP"
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: slipControl.value = slipControl.value > 0 ? 0 : 1
+                Rectangle {
+                    id: toggleRow
+
+                    required property var modelData
+                    readonly property bool on: modelData.control.value > 0
+
+                    border.color: on ? "#ff6a13" : "#2a2c30"
+                    border.width: 1
+                    color: on ? "#3a1a08" : "#141518"
+                    height: deckInfo.rowHeight
+                    width: parent.width
+
+                    Text {
+                        anchors.left: parent.left
+                        anchors.leftMargin: 8
+                        anchors.verticalCenter: parent.verticalCenter
+                        color: toggleRow.on ? "#ff6a13" : "#9a9ea6"
+                        font.pixelSize: Math.round(deckInfo.rowHeight * 0.42)
+                        text: toggleRow.modelData.label
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: toggleRow.modelData.control.value = toggleRow.on ? 0 : 1
+                    }
                 }
             }
         }
@@ -190,103 +273,163 @@ Item {
         color: "#000000"
     }
 
-    ColumnLayout {
+    Item {
         id: content
+
+        readonly property int gap: 3
 
         anchors.fill: parent
         enabled: !quickLoadDrawer.opened && !settingsPopup.opened
-        spacing: 3
 
-        // ---- Top bar ----
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.leftMargin: 4
-            Layout.preferredHeight: root.compact ? 30 : 38
-            Layout.rightMargin: 4
-            Layout.topMargin: 3
-            spacing: 4
+        // ---- Top bar: tabs, deck loaders, settings ----
+        Row {
+            id: topBar
 
-            TopButton {
+            anchors.left: parent.left
+            anchors.leftMargin: 4
+            anchors.top: parent.top
+            anchors.topMargin: 3
+            height: root.compact ? 26 : 34
+            spacing: 6
+
+            Tab {
+                active: !root.browsing
+                label: qsTr("WAVE")
+                onClicked: root.viewMode = 1
+            }
+            Tab {
                 active: root.browsing
                 label: qsTr("BROWSE")
                 onClicked: root.toggleLibraryView()
             }
-            TopButton {
-                activeColor: "#2f9bff"
+            Tab {
                 label: qsTr("LOAD %1").arg(1)
                 onClicked: root.openQuickLoad("[Channel1]")
             }
-            TopButton {
-                activeColor: "#ff8a1f"
+            Tab {
                 label: qsTr("LOAD %1").arg(2)
                 onClicked: root.openQuickLoad("[Channel2]")
             }
-            Item {
-                Layout.fillWidth: true
-            }
-            TopButton {
+        }
+        Row {
+            anchors.right: parent.right
+            anchors.rightMargin: 4
+            anchors.top: topBar.top
+            height: topBar.height
+            spacing: 6
+
+            Tab {
                 active: root.beatFxShown
                 label: "BEAT FX"
                 visible: root.compact && !root.browsing
                 onClicked: root.beatFxShown = !root.beatFxShown
             }
-            TopButton {
+            Tab {
                 label: "⚙"
-                Layout.preferredWidth: root.compact ? 36 : 44
+                width: height * 1.4
                 onClicked: settingsPopup.open()
+            }
+        }
+
+        // ---- Deck displays ----
+        Row {
+            id: deckPanels
+
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: content.gap
+            anchors.left: parent.left
+            anchors.leftMargin: content.gap
+            anchors.right: parent.right
+            anchors.rightMargin: content.gap
+            height: root.browsing ? (root.compact ? 64 : 84) : Math.round(root.height * (root.compact ? 0.36 : 0.3))
+            spacing: content.gap
+
+            Booth.BoothDeckPanel {
+                deckNumber: 1
+                group: "[Channel1]"
+                height: parent.height
+                slim: root.browsing
+                width: (parent.width - parent.spacing) / 2
+            }
+            Booth.BoothDeckPanel {
+                deckNumber: 2
+                group: "[Channel2]"
+                height: parent.height
+                slim: root.browsing
+                width: (parent.width - parent.spacing) / 2
             }
         }
 
         // ---- Waveforms, or the library while browsing ----
         Item {
-            Layout.fillHeight: true
-            Layout.fillWidth: true
+            id: middle
 
-            RowLayout {
+            anchors.bottom: deckPanels.top
+            anchors.bottomMargin: content.gap
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: topBar.bottom
+            anchors.topMargin: content.gap
+
+            Item {
                 anchors.fill: parent
-                spacing: 3
                 visible: !root.browsing
 
-                ColumnLayout {
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: root.compact ? 38 : 52
-                    spacing: 3
+                Column {
+                    id: deckInfos
 
-                    DeckStrip {
-                        Layout.fillHeight: true
-                        Layout.fillWidth: true
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.leftMargin: content.gap
+                    anchors.top: parent.top
+                    spacing: content.gap
+                    width: root.compact ? 86 : 124
+
+                    DeckInfo {
                         deckNumber: 1
                         group: "[Channel1]"
+                        height: (parent.height - parent.spacing) / 2
+                        width: parent.width
                     }
-                    DeckStrip {
-                        Layout.fillHeight: true
-                        Layout.fillWidth: true
+                    DeckInfo {
                         deckNumber: 2
                         group: "[Channel2]"
+                        height: (parent.height - parent.spacing) / 2
+                        width: parent.width
                     }
                 }
-                ColumnLayout {
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    spacing: 3
+                Column {
+                    anchors.bottom: parent.bottom
+                    anchors.left: deckInfos.right
+                    anchors.leftMargin: content.gap
+                    anchors.right: beatFx.visible ? beatFx.left : parent.right
+                    anchors.rightMargin: content.gap
+                    anchors.top: parent.top
 
                     Skin.WaveformDisplay {
-                        Layout.fillHeight: true
-                        Layout.fillWidth: true
                         group: "[Channel1]"
+                        height: parent.height / 2
                         isTouchMode: true
+                        showHud: false
+                        width: parent.width
                     }
                     Skin.WaveformDisplay {
-                        Layout.fillHeight: true
-                        Layout.fillWidth: true
                         group: "[Channel2]"
+                        height: parent.height / 2
                         isTouchMode: true
+                        showHud: false
+                        width: parent.width
                     }
                 }
                 Booth.BoothBeatFx {
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: 190
+                    id: beatFx
+
+                    anchors.bottom: parent.bottom
+                    anchors.right: parent.right
+                    anchors.rightMargin: content.gap
+                    anchors.top: parent.top
                     visible: !root.compact
+                    width: 180
                 }
             }
 
@@ -313,37 +456,12 @@ Item {
             Booth.BoothBeatFx {
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
+                anchors.rightMargin: content.gap
                 anchors.top: parent.top
+                compact: true
                 visible: root.compact && root.beatFxShown && !root.browsing
-                width: 200
+                width: 190
                 z: 10
-            }
-        }
-
-        // ---- Deck displays ----
-        RowLayout {
-            Layout.bottomMargin: 3
-            Layout.fillWidth: true
-            Layout.leftMargin: 3
-            Layout.preferredHeight: root.browsing ? (root.compact ? 52 : 68) : Math.round(root.height * (root.compact ? 0.40 : 0.36))
-            Layout.rightMargin: 3
-            spacing: 3
-
-            Booth.BoothDeckPanel {
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-                compact: root.compact
-                deckNumber: 1
-                group: "[Channel1]"
-                slim: root.browsing
-            }
-            Booth.BoothDeckPanel {
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-                compact: root.compact
-                deckNumber: 2
-                group: "[Channel2]"
-                slim: root.browsing
             }
         }
     }

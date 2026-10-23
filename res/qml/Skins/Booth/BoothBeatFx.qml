@@ -14,15 +14,17 @@ Rectangle {
     readonly property int focusedSlot: Math.min(3, Math.max(1, focusedControl.value))
     readonly property string slotGroup: `[EffectRack1_EffectUnit1_Effect${root.focusedSlot}]`
     readonly property var slot: Mixxx.EffectsManager.getEffectSlot(1, root.focusedSlot)
-    readonly property color accent: "#2f9bff"
+    readonly property color accent: "#1e88e5"
+    // Landscape phones: smaller rows
+    property bool compact: false
 
-    color: "#0b0c0e"
-    border.color: "#2c2f34"
+    color: "#000000"
+    border.color: "#3a3c40"
     border.width: 1
 
     component SmallLabel: Text {
-        color: "#8a9099"
-        font.pixelSize: 10
+        color: "#9a9ea6"
+        font.pixelSize: root.compact ? 9 : 10
         horizontalAlignment: Text.AlignHCenter
         Layout.fillWidth: true
     }
@@ -36,11 +38,10 @@ Rectangle {
         property color onColor: root.accent
 
         Layout.fillWidth: true
-        Layout.preferredHeight: 30
-        border.color: toggleControl.value > 0 ? onColor : "#3a3d42"
+        Layout.preferredHeight: root.compact ? 24 : 30
+        border.color: toggleControl.value > 0 ? onColor : "#5c6068"
         border.width: 1
-        color: toggleControl.value > 0 ? onColor : "#141518"
-        radius: 3
+        color: toggleControl.value > 0 ? onColor : "#000000"
 
         Mixxx.ControlProxy {
             id: toggleControl
@@ -50,9 +51,8 @@ Rectangle {
         }
         Text {
             anchors.centerIn: parent
-            color: toggleControl.value > 0 ? "#000000" : "#c0c4ca"
-            font.bold: true
-            font.pixelSize: 12
+            color: toggleControl.value > 0 ? "#ffffff" : "#d8dadd"
+            font.pixelSize: root.compact ? 11 : 13
             text: toggleBox.label
         }
         MouseArea {
@@ -98,24 +98,38 @@ Rectangle {
         key: "prev_effect"
     }
 
-    ColumnLayout {
-        anchors.fill: parent
-        anchors.margins: 8
-        spacing: 6
+    // Header, as on a player screen
+    Rectangle {
+        id: header
+
+        anchors.left: parent.left
+        anchors.margins: 1
+        anchors.right: parent.right
+        anchors.top: parent.top
+        color: "#2a2c30"
+        height: root.compact ? 20 : 26
 
         Text {
-            Layout.fillWidth: true
-            color: "#ffffff"
-            font.bold: true
-            font.pixelSize: 12
-            horizontalAlignment: Text.AlignHCenter
+            anchors.centerIn: parent
+            color: "#d8dadd"
+            font.pixelSize: root.compact ? 11 : 13
             text: "BEAT FX"
         }
+    }
+
+    ColumnLayout {
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.margins: root.compact ? 5 : 8
+        anchors.right: parent.right
+        anchors.top: header.bottom
+        spacing: root.compact ? 4 : 6
 
         // The effect of the focused slot: ◀ ▶ change it
         RowLayout {
             Layout.fillWidth: true
-            Layout.preferredHeight: 38
+            Layout.fillHeight: false
+            Layout.preferredHeight: root.compact ? 30 : 40
             spacing: 4
 
             Rectangle {
@@ -142,17 +156,17 @@ Rectangle {
             Rectangle {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
-                border.color: "#5a5e66"
+                border.color: "#5c6068"
                 border.width: 1
-                color: "#000000"
+                color: "#141518"
 
                 Text {
                     anchors.fill: parent
                     anchors.margins: 3
                     color: "#ffffff"
                     elide: Text.ElideRight
-                    font.bold: true
-                    font.pixelSize: 15
+                    fontSizeMode: Text.HorizontalFit
+                    font.pixelSize: root.compact ? 14 : 17
                     horizontalAlignment: Text.AlignHCenter
                     text: root.slot && root.slot.loaded ? root.slot.effectName : "—"
                     verticalAlignment: Text.AlignVCenter
@@ -196,11 +210,10 @@ Rectangle {
                     readonly property bool focused: root.focusedSlot === index + 1
 
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 22
-                    border.color: focused ? root.accent : "#3a3d42"
+                    Layout.preferredHeight: root.compact ? 20 : 24
+                    border.color: focused ? "#d8dadd" : "#5c6068"
                     border.width: 1
-                    color: slotEnabledControl.value > 0 ? "#123a5c" : "#141518"
-                    radius: 3
+                    color: slotEnabledControl.value > 0 ? "#123a5c" : "#000000"
 
                     Mixxx.ControlProxy {
                         id: slotEnabledControl
@@ -228,6 +241,7 @@ Rectangle {
         }
         Slider {
             Layout.fillWidth: true
+            Layout.preferredHeight: root.compact ? 22 : 32
             from: 0
             to: 1
             value: mixControl.value
@@ -238,6 +252,7 @@ Rectangle {
         }
         Slider {
             Layout.fillWidth: true
+            Layout.preferredHeight: root.compact ? 22 : 32
             from: 0
             to: 1
             value: metaControl.value
@@ -275,17 +290,16 @@ Rectangle {
         // ON/OFF of the focused effect
         Rectangle {
             Layout.fillWidth: true
-            Layout.preferredHeight: 44
-            border.color: "#e04040"
-            border.width: 2
-            color: enabledControl.value > 0 ? "#e04040" : "#141518"
-            radius: 4
+            Layout.preferredHeight: root.compact ? 34 : 44
+            border.color: enabledControl.value > 0 ? "#ff6a13" : "#5c6068"
+            border.width: 1
+            color: enabledControl.value > 0 ? "#ff6a13" : "#000000"
 
             Text {
                 anchors.centerIn: parent
-                color: enabledControl.value > 0 ? "#000000" : "#e04040"
+                color: enabledControl.value > 0 ? "#000000" : "#d8dadd"
                 font.bold: true
-                font.pixelSize: 15
+                font.pixelSize: root.compact ? 13 : 15
                 text: "ON / OFF"
             }
             MouseArea {
