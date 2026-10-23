@@ -90,6 +90,18 @@
                 </options>
             </control>
             <!-- BROWSER Section END -->
+            <!-- Mixxx Android: SHIFT + BEAT ▶ shows or hides the effects of the
+                 skin (FX bar of the Classic skin, BEAT FX of the Booth skin) -->
+            <control>
+                <description>BEAT RIGHT +SHIFT - press - Show or hide the effects (Android)</description>
+                <group>[Skin]</group>
+                <key>mobile_fx_toggle</key>
+                <status>0x94</status>
+                <midino>0x6B</midino>
+                <options>
+                    <Normal/>
+                </options>
+            </control>
 
             <!--
             DECK Section START
