@@ -16,6 +16,8 @@ namespace {
 
 const ConfigKey kSkinConfigKey(QStringLiteral("[Config]"), QStringLiteral("AndroidSkin"));
 const QString kClassicSkin = QStringLiteral("Classic");
+const ConfigKey kHiddenTopBarItemsKey(
+        QStringLiteral("[Skin]"), QStringLiteral("AndroidHiddenTopBarItems"));
 
 } // namespace
 
@@ -78,6 +80,26 @@ QStringList QmlMobileAppProxy::skinsIn(const QUrl& skinsFolder) const {
         }
     }
     return skins;
+}
+
+QStringList QmlMobileAppProxy::hiddenTopBarItems() const {
+    const UserSettingsPointer pConfig = QmlConfigProxy::get();
+    if (!pConfig) {
+        return {};
+    }
+    return pConfig->getValue(kHiddenTopBarItemsKey, QString())
+            .split(QChar(','), Qt::SkipEmptyParts);
+}
+
+void QmlMobileAppProxy::setHiddenTopBarItems(const QStringList& items) {
+    const UserSettingsPointer pConfig = QmlConfigProxy::get();
+    if (!pConfig || items == hiddenTopBarItems()) {
+        return;
+    }
+    pConfig->setValue(kHiddenTopBarItemsKey, items.join(QChar(',')));
+    // Android may close the app without the usual shutdown
+    pConfig->save();
+    emit hiddenTopBarItemsChanged();
 }
 
 } // namespace qml

@@ -106,6 +106,7 @@ class QmlWaveformDisplay : public QQuickItem, VSyncTimeProvider, public Waveform
     void setZoom(double zoom) {
         WaveformWidgetRenderer::setZoom(zoom);
         emit zoomChanged();
+        update();
     }
     int getFrameRate() const {
         return m_frameRate;
@@ -177,6 +178,7 @@ class QmlWaveformDisplay : public QQuickItem, VSyncTimeProvider, public Waveform
 
     std::chrono::microseconds m_syncInterval;
     int m_frameRate;
+    double m_lastFramePlayPos{-1.0};
     enum class DirtyFlag : int {
         None = 0x0,
         Geometry = 0x1,

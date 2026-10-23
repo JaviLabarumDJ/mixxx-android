@@ -21,6 +21,10 @@ class QmlMobileAppProxy : public QObject {
     /// res/qml, or the name of a folder in res/qml/Skins with its own
     /// MainWindow.qml. Remembered across restarts.
     Q_PROPERTY(QString skin READ skin WRITE setSkin NOTIFY skinChanged)
+    /// The items of the top bar the user hid in the settings, e.g. "wave",
+    /// "xy" (see res/qml/+android/MainWindow.qml)
+    Q_PROPERTY(QStringList hiddenTopBarItems READ hiddenTopBarItems WRITE
+                    setHiddenTopBarItems NOTIFY hiddenTopBarItemsChanged)
     QML_NAMED_ELEMENT(MobileApp)
     QML_SINGLETON
 
@@ -38,8 +42,12 @@ class QmlMobileAppProxy : public QObject {
     /// subfolders that contain a MainWindow.qml
     Q_INVOKABLE QStringList skinsIn(const QUrl& skinsFolder) const;
 
+    QStringList hiddenTopBarItems() const;
+    void setHiddenTopBarItems(const QStringList& items);
+
   signals:
     void skinChanged();
+    void hiddenTopBarItemsChanged();
 };
 
 } // namespace qml

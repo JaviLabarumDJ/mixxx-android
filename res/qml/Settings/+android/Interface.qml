@@ -353,6 +353,84 @@ Category {
                         }
                     }
 
+                    // Items shown in the top bar. Applied immediately.
+                    Rectangle {
+                        Layout.fillWidth: true
+                        implicitHeight: topBarCol.implicitHeight + 20
+                        color: "#181b24"
+                        radius: 8
+                        border.color: "#282d3b"
+                        border.width: 1
+
+                        ColumnLayout {
+                            id: topBarCol
+                            anchors.fill: parent
+                            anchors.margins: 12
+                            spacing: 10
+
+                            Text {
+                                text: qsTr("🧭 TOP BAR")
+                                font.bold: true
+                                font.pixelSize: 13
+                                color: "#00e5ff"
+                            }
+                            Text {
+                                Layout.fillWidth: true
+                                text: qsTr("Choose the views and buttons shown at the top of the screen. At least one view stays visible.")
+                                color: "#90a4ae"
+                                font.pixelSize: 11
+                                wrapMode: Text.WordWrap
+                            }
+
+                            Flow {
+                                Layout.fillWidth: true
+                                spacing: 6
+
+                                Repeater {
+                                    model: [
+                                        {name: "dj", label: "DJ", view: true},
+                                        {name: "wave", label: qsTr("WAVE"), view: true},
+                                        {name: "lib", label: qsTr("LIB"), view: true},
+                                        {name: "ctl", label: qsTr("CTL"), view: true},
+                                        {name: "load1", label: qsTr("LOAD %1").arg(1), view: false},
+                                        {name: "load2", label: qsTr("LOAD %1").arg(2), view: false},
+                                        {name: "fx", label: "FX", view: false},
+                                        {name: "xy", label: "XY", view: false},
+                                        {name: "split", label: "SPLIT", view: false},
+                                        {name: "rec", label: "REC", view: false},
+                                        {name: "4d", label: "4D", view: false}
+                                    ]
+
+                                    Skin.Button {
+                                        required property var modelData
+                                        readonly property bool shown: Mixxx.MobileApp.hiddenTopBarItems.indexOf(modelData.name) < 0
+                                        readonly property int shownViews: ["dj", "wave", "lib", "ctl"].filter(name => Mixxx.MobileApp.hiddenTopBarItems.indexOf(name) < 0).length
+
+                                        implicitWidth: 72
+                                        implicitHeight: 34
+                                        activeColor: Theme.accentColor
+                                        backgroundColor: shown ? "#1e3a5f" : "#222733"
+                                        normalColor: shown ? "#ffffff" : "#607d8b"
+                                        font.bold: true
+                                        font.pixelSize: 11
+                                        text: (shown ? "✓ " : "") + modelData.label
+                                        // The last view shown can't be hidden
+                                        enabled: !(shown && modelData.view && shownViews <= 1)
+                                        onClicked: {
+                                            let hidden = Mixxx.MobileApp.hiddenTopBarItems.slice();
+                                            if (shown) {
+                                                hidden.push(modelData.name);
+                                            } else {
+                                                hidden = hidden.filter(name => name !== modelData.name);
+                                            }
+                                            Mixxx.MobileApp.hiddenTopBarItems = hidden;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     // CARD 2: BIBLIOTECA & COLECCIÓN
                     Rectangle {
                         Layout.fillWidth: true

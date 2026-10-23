@@ -5,8 +5,8 @@
 ![Android Version](https://img.shields.io/badge/Android-10.0%2B%20(API%2029--35)-brightgreen?logo=android&logoColor=white)
 ![Architecture](https://img.shields.io/badge/Arch-ARM64%20(arm64--v8a)-blue?logo=arm)
 ![Framework](https://img.shields.io/badge/Qt-6.8%20%7C%20QML-41cd52?logo=qt)
-[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.4.1-android)
-[![Download APK](https://img.shields.io/badge/Download-APK%20(249%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.4.1-android/mixxx-android-v1.4.1.apk)
+[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.4.2-android)
+[![Download APK](https://img.shields.io/badge/Download-APK%20(249%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.4.2-android/mixxx-android-v1.4.2.apk)
 ![License](https://img.shields.io/badge/License-GPL%20v2-orange.svg)
 
 **The world's premier open-source DJ software, fully ported, modernized, and touch-optimized for Android smartphones, tablets, and standalone hardware setups.**
@@ -28,7 +28,14 @@ Whether you're performing live sets using a USB DJ controller, mixing on the go 
 <!-- START_AI_GENERATED_DISCLAIMER -->
 <!-- This section was written with the assistance of an AI Agent (Claude). -->
 
-## 🆕 What's New in v1.4.1
+## 🆕 What's New in v1.4.2
+
+* **Rekordbox "date added"** (by [morpheasgr](https://github.com/morpheasgr)): the *Added* column of Rekordbox sticks and stick backups shows the day each track was added to the Rekordbox collection, and tracks that **⬇ COPY**, **+ ALL** or **+ PLAYLIST** bring into the library keep that date.
+* **Playlist order:** a new **#** column shows each track's position in playlists, history and Rekordbox playlists, and a playlist opens in its own order. A whole USB drive opens newest first.
+* **Smoother app:** the waveforms only redraw at full rate while the track moves, so the interface no longer repaints the whole screen 60 times a second when idle (UI CPU on a Lenovo tablet went from 74% to about 1%). The app no longer runs in developer mode with debug logging, and the log is no longer written to disk line by line, which caused audio and UI stutters.
+* **Choose your top bar:** in **Settings → Interface → 🧭 TOP BAR**, pick which views (DJ, WAVE, LIB, CTL) and buttons (LOAD 1/2, FX, XY, SPLIT, REC, 4D) appear at the top of the screen. At least one view always stays visible.
+
+## 🗂️ What was new in v1.4.1
 
 * **Beatgrid corrections from the deck** (by [morpheasgr](https://github.com/morpheasgr)): tap a deck's **BPM box** (or its **Beatgrid / GRID** button) to fix the grid of the loaded track: **½ BEAT** for beats detected on the off-beats, **SET DOWNBEAT HERE**, fine **‹ EARLIER / LATER ›** nudges, **BPM ÷2 / ×2**, **MATCH OTHER DECK**, **UNDO**, and lock or unlock the grid. Changes are saved with the track.
 * **Settings fixes:** the audio profile cards no longer cut off their descriptions, the streaming cache path no longer runs under its button, and the analysis buttons show their full text.
@@ -137,7 +144,7 @@ This release merges the work of **[morpheasgr (Angelos Exarchos)](https://github
 ## 🚀 Installation & Quick Start
 
 ### Option A: Install Pre-Built Signed APK
-1. Download [**mixxx-android-v1.4.1.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.4.1-android/mixxx-android-v1.4.1.apk) from the [Official GitHub Release v1.4.1](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.4.1-android).
+1. Download [**mixxx-android-v1.4.2.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.4.2-android/mixxx-android-v1.4.2.apk) from the [Official GitHub Release v1.4.2](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.4.2-android).
 2. Enable *"Install unknown apps"* in your Android device settings.
 3. Install and launch **MIXXX**.
 4. Grant storage and audio permissions when prompted.
@@ -201,7 +208,7 @@ $ANDROID_SDK/build-tools/35.0.0/apksigner sign \
 ## 👥 Authors & Acknowledgments
 
 * **Android Port & Touch UI Enhancements:** [Javier Sáenz (JaviLabarumDJ)](https://github.com/JaviLabarumDJ)
-* **Contributions (v1.4.0, v1.4.1):** [morpheasgr (Angelos Exarchos)](https://github.com/morpheasgr) — *merged from [morpheasgr/mixxx-android (android-stable)](https://github.com/morpheasgr/mixxx-android/tree/android-stable): Rekordbox playlist copies, library and stick backups, controller library navigation, upstream-friendly architecture, and beatgrid corrections from the deck.*
+* **Contributions (v1.4.0 – v1.4.2):** [morpheasgr (Angelos Exarchos)](https://github.com/morpheasgr) — *merged from [morpheasgr/mixxx-android (android-stable)](https://github.com/morpheasgr/mixxx-android/tree/android-stable): Rekordbox playlist copies, library and stick backups, controller library navigation, upstream-friendly architecture, beatgrid corrections from the deck, and Rekordbox dates and playlist order.*
 * **Upstream Project:** [Mixxx DJ Development Team](https://github.com/mixxxdj/mixxx) - *Free & Open Source DJ Software*
 
 ## 📄 License

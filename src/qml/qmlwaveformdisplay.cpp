@@ -28,6 +28,8 @@ using namespace allshader;
 
 namespace {
 constexpr int kDefaultFrameRate = 60;
+// Refresh interval of a still waveform, see requestUpdateAtFrameRate()
+constexpr int kStillRefreshMillis = 100;
 } // namespace
 
 namespace mixxx {
@@ -325,6 +327,25 @@ void QmlWaveformDisplay::requestUpdateAtFrameRate() {
     if (!window()) {
         return;
     }
+
+    // Redraw at the frame rate only while the waveform moves. Each redraw
+    // repaints the whole window, so redrawing still or empty waveforms kept
+    // the UI thread busy and made the app stutter on Android.
+    if (!getTrackInfo()) {
+        m_frameRateTimer.stop();
+        return;
+    }
+    const double playPos = WaveformWidgetRenderer::m_visualPlayPosition
+            ? WaveformWidgetRenderer::m_visualPlayPosition->getEnginePlayPos()
+            : -1.0;
+    if (playPos == m_lastFramePlayPos) {
+        // Still: a slow refresh for marks, analysis progress and the like
+        if (!m_frameRateTimer.isActive()) {
+            m_frameRateTimer.start(kStillRefreshMillis);
+        }
+        return;
+    }
+    m_lastFramePlayPos = playPos;
 
     if (!m_frameRequestTimer.isValid()) {
         m_frameRequestTimer.start();

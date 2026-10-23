@@ -14,7 +14,7 @@ Este documento recopila de manera exhaustiva el estado actual del port de **Mixx
   - **Frontend**: Qt 6.8 / QML con interfaz táctil adaptada (`res/qml/`).
   - **Subsistema de Audio**: PortAudio con el backend Android Oboe (AAudio) y, para tarjetas de sonido USB que Android no puede usar, un driver USB propio de Mixxx (libusb, ver §6.6).
   - **Subsistema de Controladoras**: MIDI nativo de Android (AMidi), USB-MIDI propio para las tarjetas que maneja el driver USB, y USB Bulk/HID. PortMidi está desactivado en Android.
-- **Versión publicada**: `v1.4.1-android` (`versionCode 6`), ver §6.9.
+- **Versión publicada**: `v1.4.2-android` (`versionCode 7`), ver §6.9.
 - **Dispositivo objetivo de prueba**:
   - Tablet Lenovo Tab M11 (`TB331FC`), Android 13/14.
   - Conexión: ADB por Wi-Fi (depuración inalámbrica); la IP y el puerto cambian, se encuentran con `nmap -sn 192.168.0.0/24` y `nmap -p 30000-49999 <ip>`.
@@ -273,7 +273,7 @@ Nota: `make mixxx` por sí solo **no** actualiza el `.so` del proyecto Gradle; h
 - Errores del HAL de Qualcomm: `adb logcat | grep -E "PAL|AGM|AHAL"`.
 
 ### 6.9. Publicar una release
-1. Subir `android:versionCode` y `android:versionName` en `packaging/android/AndroidManifest.xml` (la v1.1.0 es `versionCode 2`, la v1.2.0 `versionCode 3`, la v1.3.0 `versionCode 4`, la v1.4.0 `versionCode 5`, la v1.4.1 `versionCode 6`).
+1. Subir `android:versionCode` y `android:versionName` en `packaging/android/AndroidManifest.xml` (la v1.1.0 es `versionCode 2`, la v1.2.0 `versionCode 3`, la v1.3.0 `versionCode 4`, la v1.4.0 `versionCode 5`, la v1.4.1 `versionCode 6`, la v1.4.2 `versionCode 7`).
 2. Actualizar las insignias y los enlaces de descarga del `README.md`.
 3. `make -C build-android -j12 apk`, firmar como `mixxx-android-vX.Y.Z.apk` y verificar con `apksigner verify` y `aapt2 dump badging`.
 4. Según `AGENTS.md`, el commit, la etiqueta (`vX.Y.Z-android`), el push y la publicación en GitHub los hace la persona, después de probar en un equipo de DJ real. El nombre del APK adjunto debe coincidir con el enlace del README.
@@ -348,5 +348,27 @@ La v1.4.0 fusiona `morpheasgr/android-stable` (ya incluía la v1.3.0, así que l
 
 - Aportado por morpheasgr (PR #2). Tocar la casilla de BPM de un deck (`Deck/+android/InfoBar.qml`) o el botón «Beatgrid»/«REJILLA» de su barra (`Deck/+android/Toolbar.qml`) abre `res/qml/Deck/BeatgridPopup.qml`, que usa los controles estándar `beats_translate_half`, `beats_translate_curpos`, `beats_translate_earlier/later`, `beats_set_halve/double`, `beats_translate_match_alignment`, `beats_undo_adjustment` y `bpmlock`. Los cambios se guardan en la pista.
 - Las flechas de ANTES/DESPUÉS son «‹ ›»: Android dibuja «◀ ▶» como emoji aunque lleven U+FE0E, y sus fuentes no tienen «◄ ▸» (salen como un cuadrado). Lo mismo con «⟳», sustituido por 🔄.
+
+> _Fin de la sección escrita por IA._
+
+### 6.16. Fechas de Rekordbox y orden de las listas (v1.4.2)
+
+> _La siguiente sección la ha escrito un agente de IA (Claude Code)._
+
+- Aportado por morpheasgr (PR #3). `rekordboxfeature.cpp` guarda `date_added` del `export.pdb` en la columna `datetime_added` de la tabla temporal (mediodía UTC de ese día). Al pasar pistas de un USB a la biblioteca (⬇ COPIAR, + TODAS, + PLAYLIST) se escribe esa fecha con `setTrackDateAdded()` (`rekordboxandroid.inc`); `TrackDAO::updateTrack()` no reescribe `datetime_added`, así que no se pierde.
+- Columna «#» (`TrackListColumn.SQLColumns.Position`) en playlists, historial y Rekordbox (`Library/+android/SourceTree.qml`). `TrackList.qml` ordena al cambiar de lista: por «#» las playlists y por «Añadida» descendente un USB entero (`Browser.qml` → `activeIsDrive`).
+- Pendiente menor: en la vista de un USB entero la «#» muestra números sin significado (no es una playlist).
+
+> _Fin de la sección escrita por IA._
+
+### 6.17. Fluidez y barra superior configurable (v1.4.2)
+
+> _La siguiente sección la ha escrito un agente de IA (Claude Code)._
+
+- **Formas de onda:** `QmlWaveformDisplay::requestUpdateAtFrameRate()` (llamado tras cada fotograma) pedía siempre otro fotograma, así que la ventana entera se repintaba a 60 fps aunque no hubiera pista o el deck estuviera parado (QtThread al 74% de CPU en reposo). Ahora solo sigue a la tasa de fotogramas si cambia la posición de reproducción; parada, refresca cada 100 ms (`kStillRefreshMillis`), y sin pista no pide fotogramas. `setZoom()` pide un `update()` explícito. En reposo QtThread queda en ~1%.
+- **Arranque:** el manifiesto pasa solo `--new-ui`. Con `--developer --log-level debug` se registraban tiempos y avisos de cada evento. `CoreServices::initializeLogging()` ya no fuerza el volcado a disco de cada línea en Android (solo críticos), porque los avisos del hilo de audio provocaban cortes. Para depurar, añadir esos argumentos temporalmente.
+- **Barra superior:** `Mixxx.MobileApp.hiddenTopBarItems` (`qmlmobileappproxy.cpp`, clave `[Skin],AndroidHiddenTopBarItems`, nombres separados por comas: `dj wave lib ctl load1 load2 fx xy split rec 4d`). `+android/MainWindow.qml` oculta esos botones y salta a otra vista si la actual se oculta; la tarjeta «🧭 BARRA SUPERIOR» de `Settings/+android/Interface.qml` los activa y no deja ocultar la última vista.
+- **Altavoz atascado (no es Mixxx):** si en Híbrido no suena la tablet, medir con `dumpsys media.audio_flinger` (hilo del altavoz, «Frames written»). Se vio el altavoz a ~11–16k frames/s con Mixxx cerrado; un reinicio de la tablet lo arregla. Causa sin confirmar (sospecha: driver USB directo o el hub).
+- Pendiente: la página de Audio puede marcar «Móvil / Bluetooth» estando en Híbrido; revisar con la DDJ conectada.
 
 > _Fin de la sección escrita por IA._

@@ -964,6 +964,30 @@ Button</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>🧭 TOP BAR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose the views and buttons shown at the top of the screen. At least one view stays visible.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WAVE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LIB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CTL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LOAD %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>📁 LIBRARY &amp; COLLECTION</source>
         <translation type="unfinished"></translation>
     </message>

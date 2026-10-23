@@ -979,6 +979,30 @@ Cue</translation>
         <translation>Auto-ocultar barra superior</translation>
     </message>
     <message>
+        <source>🧭 TOP BAR</source>
+        <translation>🧭 BARRA SUPERIOR</translation>
+    </message>
+    <message>
+        <source>Choose the views and buttons shown at the top of the screen. At least one view stays visible.</source>
+        <translation>Elige las vistas y botones que aparecen en la parte superior de la pantalla. Siempre queda al menos una vista visible.</translation>
+    </message>
+    <message>
+        <source>WAVE</source>
+        <translation>WAVE</translation>
+    </message>
+    <message>
+        <source>LIB</source>
+        <translation>LIB</translation>
+    </message>
+    <message>
+        <source>CTL</source>
+        <translation>CTL</translation>
+    </message>
+    <message>
+        <source>LOAD %1</source>
+        <translation>LOAD %1</translation>
+    </message>
+    <message>
         <source>📁 LIBRARY &amp; COLLECTION</source>
         <translation>📁 BIBLIOTECA &amp; COLECCIÓN</translation>
     </message>
