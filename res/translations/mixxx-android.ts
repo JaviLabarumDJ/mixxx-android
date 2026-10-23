@@ -314,6 +314,49 @@ Use the advanced mode to view them</source>
     </message>
 </context>
 <context>
+    <name>BoothBrowse</name>
+    <message>
+        <source>STREAMING</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BROWSE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LOAD TO DECK %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SEARCH</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>KEY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ADDED</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Permission to read USB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To read Rekordbox and Engine DJ playlists from a USB drive, Android has to grant Mixxx access to all files. Enable it on the screen that opens, then tap the section again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NOT NOW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GRANT PERMISSION</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BoothDeckPanel</name>
     <message>
         <source>DECK</source>
@@ -337,6 +380,29 @@ Use the advanced mode to view them</source>
     </message>
     <message>
         <source>REMAIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BoothSourceTree</name>
+    <message>
+        <source>TRACK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ARTIST</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>KEY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ADDED</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1562,6 +1628,10 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>BROWSE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UTILITY</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

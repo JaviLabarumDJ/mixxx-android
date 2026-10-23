@@ -7,21 +7,25 @@ import QtQuick.Controls
 // Booth skin: a main window in the style of the screen of a booth player,
 // for landscape phones and tablets. The waveforms are stacked over the
 // whole width, the deck displays are below them and BEAT FX (effect unit 1)
-// is on the right. BROWSE shows the library in place of the waveforms.
+// is on the right. BROWSE shows the skin's browser (BoothBrowse.qml) in
+// place of the waveforms; LOAD 1/2 open it for one deck. UTILITY opens the
+// shared settings in the skin's frame.
 //
 // A skin is a folder in res/qml/Skins with a MainWindow.qml whose root item
-// takes the application window, see packaging/android/README.md. The
-// library, the deck loaders and the settings are the shared ones.
+// takes the application window, see packaging/android/README.md.
 Item {
     id: root
 
     required property ApplicationWindow applicationWindow
     property var menuBar: null
 
-    // 2: the library is shown (BROWSE). The deck loader switches to it with
-    // its "full library" button, as in the Classic skin.
+    // 2: the browser is shown (BROWSE)
     property int viewMode: 1
     readonly property bool browsing: viewMode === 2
+    // The deck LOAD 1/2 opened the browser for, or "". Loading a track into
+    // it returns to the waveforms.
+    property string loadTarget: ""
+    readonly property var loadTargetPlayer: loadTarget.length > 0 ? Mixxx.PlayerManager.getPlayer(loadTarget) : null
     // Landscape phones
     readonly property bool compact: height < 520
     // BEAT FX is always shown on tablets, on demand on phones
@@ -31,12 +35,33 @@ Item {
     readonly property int numPreviewDecks: 1
     readonly property int waveformOverviewTypeRgb: 2
 
+    // The deck loader of the Classic skin is the browser here
     function openQuickLoad(group) {
-        quickLoadDrawer.targetDeck = (group && group.length > 0) ? group : "[Channel1]";
-        quickLoadDrawer.open();
+        root.loadTarget = (group && group.length > 0) ? group : "[Channel1]";
+        root.viewMode = 2;
+    }
+    function showWaveforms() {
+        root.loadTarget = "";
+        root.viewMode = 1;
     }
     function toggleLibraryView() {
-        root.viewMode = root.browsing ? 1 : 2;
+        if (root.browsing && root.loadTarget.length === 0) {
+            root.showWaveforms();
+        } else {
+            root.loadTarget = "";
+            root.viewMode = 2;
+        }
+    }
+
+    Connections {
+        function onTrackChanged() {
+            if (root.browsing) {
+                root.showWaveforms();
+            }
+        }
+
+        ignoreUnknownSignals: true
+        target: root.loadTargetPlayer
     }
 
     // ---- The same engine setup as the Classic skin ----
@@ -282,7 +307,7 @@ Item {
         readonly property int gap: 3
 
         anchors.fill: parent
-        enabled: !quickLoadDrawer.opened && !settingsPopup.opened
+        enabled: !settingsPopup.opened
 
         // ---- Top bar: tabs, deck loaders, settings ----
         Row {
@@ -298,18 +323,20 @@ Item {
             Tab {
                 active: !root.browsing
                 label: qsTr("WAVE")
-                onClicked: root.viewMode = 1
+                onClicked: root.showWaveforms()
             }
             Tab {
-                active: root.browsing
+                active: root.browsing && root.loadTarget.length === 0
                 label: qsTr("BROWSE")
                 onClicked: root.toggleLibraryView()
             }
             Tab {
+                active: root.browsing && root.loadTarget === "[Channel1]"
                 label: qsTr("LOAD %1").arg(1)
                 onClicked: root.openQuickLoad("[Channel1]")
             }
             Tab {
+                active: root.browsing && root.loadTarget === "[Channel2]"
                 label: qsTr("LOAD %1").arg(2)
                 onClicked: root.openQuickLoad("[Channel2]")
             }
@@ -328,8 +355,8 @@ Item {
                 onClicked: root.beatFxShown = !root.beatFxShown
             }
             Tab {
-                label: "⚙"
-                width: height * 1.4
+                active: settingsPopup.opened
+                label: qsTr("UTILITY")
                 onClicked: settingsPopup.open()
             }
         }
@@ -436,7 +463,8 @@ Item {
                 }
             }
 
-            // The library stays loaded once opened, like in the Classic skin
+            // The browser stays loaded once opened, like the library of the
+            // Classic skin
             Loader {
                 id: library
 
@@ -448,9 +476,11 @@ Item {
                 onLoaded: keepLoaded = true
 
                 sourceComponent: Component {
-                    Skin.Library {
+                    Booth.BoothBrowse {
+                        acceptsController: !settingsPopup.opened
                         anchors.fill: parent
-                        acceptsController: !quickLoadDrawer.opened && !settingsPopup.opened
+                        compact: root.compact
+                        loadTarget: root.loadTarget
                     }
                 }
             }
@@ -472,6 +502,9 @@ Item {
     Skin.Settings {
         id: settingsPopup
 
+        backgroundColor: "#000000"
+        headerColor: "#1c1e22"
+        title: qsTr("UTILITY")
         height: root.applicationWindow.isMobile ? parent.height : Math.min(840, parent.height)
         modal: true
         width: root.applicationWindow.isMobile ? parent.width : Math.min(1400, parent.width)
@@ -483,19 +516,10 @@ Item {
         }
     }
 
-    Skin.QuickLoadDrawer {
-        id: quickLoadDrawer
-
-        height: root.applicationWindow.isMobile ? parent.height : Math.min(840, parent.height)
-        width: root.applicationWindow.isMobile ? parent.width : Math.min(1400, parent.width)
-        x: root.applicationWindow.isMobile ? 0 : Math.round((parent.width - width) / 2)
-        y: root.applicationWindow.isMobile ? 0 : Math.round((parent.height - height) / 2)
-    }
-
     // ================= CONTROLLER ACCESS TO THE SCREENS =================
     // The same [Skin] controls as the Classic skin (see its MainWindow.qml):
     // mobile_library_toggle switches BROWSE, mobile_loader_deck1/2 open the
-    // deck loaders, and LOAD opens the deck loader when the library isn't
+    // browser for a deck, and LOAD does that too when the browser isn't
     // shown.
     property bool mobileControlsCreated: false
 
@@ -510,7 +534,6 @@ Item {
         key: root.mobileControlsCreated ? "mobile_library_toggle" : ""
         onValueChanged: value => {
             if (value > 0) {
-                quickLoadDrawer.close();
                 root.toggleLibraryView();
             }
         }
@@ -547,9 +570,7 @@ Item {
                     if (value <= 0) {
                         return;
                     }
-                    if (quickLoadDrawer.opened) {
-                        Qt.callLater(quickLoadDrawer.close);
-                    } else if (!library.visible) {
+                    if (!library.visible) {
                         Qt.callLater(root.openQuickLoad, deckLoaderAccess.group);
                     }
                 }

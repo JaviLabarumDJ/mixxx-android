@@ -325,6 +325,49 @@ Usa el modo avanzado para verla</translation>
     </message>
 </context>
 <context>
+    <name>BoothBrowse</name>
+    <message>
+        <source>STREAMING</source>
+        <translation>STREAMING</translation>
+    </message>
+    <message>
+        <source>BROWSE</source>
+        <translation>BROWSE</translation>
+    </message>
+    <message>
+        <source>LOAD TO DECK %1</source>
+        <translation>CARGAR EN DECK %1</translation>
+    </message>
+    <message>
+        <source>SEARCH</source>
+        <translation>BUSCAR</translation>
+    </message>
+    <message>
+        <source>KEY</source>
+        <translation>TONALIDAD</translation>
+    </message>
+    <message>
+        <source>ADDED</source>
+        <translation>AÑADIDA</translation>
+    </message>
+    <message>
+        <source>Permission to read USB</source>
+        <translation>Permiso para leer USB</translation>
+    </message>
+    <message>
+        <source>To read Rekordbox and Engine DJ playlists from a USB drive, Android has to grant Mixxx access to all files. Enable it on the screen that opens, then tap the section again.</source>
+        <translation>Para leer las playlists de Rekordbox y Engine DJ de un USB, Android tiene que permitir a Mixxx el acceso a todos los archivos. Actívalo en la pantalla que se abre y vuelve a tocar la sección.</translation>
+    </message>
+    <message>
+        <source>NOT NOW</source>
+        <translation>AHORA NO</translation>
+    </message>
+    <message>
+        <source>GRANT PERMISSION</source>
+        <translation>DAR PERMISO</translation>
+    </message>
+</context>
+<context>
     <name>BoothDeckPanel</name>
     <message>
         <source>DECK</source>
@@ -349,6 +392,29 @@ Usa el modo avanzado para verla</translation>
     <message>
         <source>REMAIN</source>
         <translation>REMAIN</translation>
+    </message>
+</context>
+<context>
+    <name>BoothSourceTree</name>
+    <message>
+        <source>TRACK</source>
+        <translation>PISTA</translation>
+    </message>
+    <message>
+        <source>ARTIST</source>
+        <translation>ARTISTA</translation>
+    </message>
+    <message>
+        <source>KEY</source>
+        <translation>TONALIDAD</translation>
+    </message>
+    <message>
+        <source>ADDED</source>
+        <translation>AÑADIDA</translation>
+    </message>
+    <message>
+        <source>All...</source>
+        <translation>Todas...</translation>
     </message>
 </context>
 <context>
@@ -1578,6 +1644,10 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>BROWSE</source>
         <translation>BROWSE</translation>
+    </message>
+    <message>
+        <source>UTILITY</source>
+        <translation>UTILITY</translation>
     </message>
 </context>
 <context>
