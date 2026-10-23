@@ -164,6 +164,12 @@ waveforms when one is plugged in or out. Its knobs and faders
 moved at once. XY shows the XY pad of the Classic skin in the colors of the
 skin (`XYPad.qml` has properties for its colors, and `closable`).
 
+Settings → Interface → TOP BAR lists the items of the skin in use: a skin
+can list its own in a `topBarItems` property of its main window (`main.qml`
+exposes it as `skinItem`), otherwise the Classic items are listed. Booth
+shares the names of the matching Classic items (`Mixxx.MobileApp.hiddenTopBarItems`)
+and hides its tabs that are turned off.
+
 > _End of AI-written section._
 
 ## Merging upstream Mixxx
