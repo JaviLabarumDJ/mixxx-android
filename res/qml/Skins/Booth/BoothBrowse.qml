@@ -36,9 +36,14 @@ Item {
     property string key: ""
     property string added: ""
 
-    // The entry whose entries are listed, or null
+    // The entry whose entries are listed, as the rows from the top level
+    // down, or null. Model indexes of the sources are not kept: opening a
+    // source can rebuild its entries (e.g. a Rekordbox drive) and an old
+    // index would point to deleted entries. levelIndex is looked up again
+    // from levelPath after every change.
+    property var levelPath: null
     property var levelIndex: null
-    // The tracks are shown rather than the entries of levelIndex
+    // The tracks are shown rather than the entries of levelPath
     property bool showTracks: true
     // The row the controller's browse knob is on: in the list of entries
     // (-1 is ALL TRACKS) or, without one, in the column of sources
@@ -53,11 +58,19 @@ Item {
     // levelIndex, or the invisible root of the sources
     readonly property var listRoot: root.levelIndex ?? root.sidebar?.index(-1, -1)
     // Entries below a top level source can show their own tracks too
-    readonly property bool levelHasAll: root.levelIndex !== null && root.levelIndex.parent.valid
+    readonly property bool levelHasAll: root.levelPath !== null && root.levelPath.length > 1
+    // The entries listed are drives, which list their playlists once read
+    readonly property bool levelIsDrives: {
+        if (root.levelPath === null || root.levelPath.length !== 1 || root.levelIndex === null) {
+            return false;
+        }
+        const icon = root.iconOf(root.levelIndex);
+        return icon === "rekordbox" || icon === "enginedj";
+    }
 
     // SidebarModel::IconNameRole
     function iconOf(index) {
-        return root.sidebar.data(index, Qt.UserRole + 1) ?? "";
+        return root.sidebar?.data(index, Qt.UserRole + 1) ?? "";
     }
     function sectionLabel(icon, label) {
         switch (icon) {
@@ -80,22 +93,51 @@ Item {
         }
         return (label ?? "").toString().toUpperCase();
     }
-    function isDrive(index) {
-        const parent = index.parent;
-        if (!parent.valid || parent.parent.valid) {
-            return false;
+    function pathOf(index) {
+        const path = [];
+        for (let i = index; i.valid; i = i.parent) {
+            path.unshift(i.row);
         }
-        const icon = root.iconOf(parent);
-        return icon === "rekordbox" || icon === "enginedj";
+        return path;
+    }
+    // A fresh index for a path, or null if the entry is gone
+    function indexOf(path) {
+        let index = root.sidebar.index(-1, -1);
+        for (let i = 0; i < path.length; ++i) {
+            if (path[i] < 0 || path[i] >= root.sidebar.rowCount(index)) {
+                return null;
+            }
+            index = root.sidebar.index(path[i], 0, index);
+        }
+        return index.valid ? index : null;
+    }
+    function sectionIcon(path) {
+        const section = root.indexOf(path.slice(0, 1));
+        return section ? root.iconOf(section) : "";
+    }
+    function pathIsDrive(path) {
+        const icon = root.sectionIcon(path);
+        return path.length === 2 && (icon === "rekordbox" || icon === "enginedj");
+    }
+    function refreshLevel() {
+        if (root.levelPath === null) {
+            root.levelIndex = null;
+            return;
+        }
+        const index = root.indexOf(root.levelPath);
+        if (index === null) {
+            // The entry went away, e.g. an unplugged drive
+            root.levelPath = null;
+            root.levelIndex = null;
+            root.showTracks = true;
+            return;
+        }
+        root.levelIndex = index;
     }
     // Reading the databases on USB drives needs more than the music
     // permission, as in Library/Browser.qml
-    function checkStorageAccess(index) {
-        let section = index;
-        while (section.parent.valid) {
-            section = section.parent;
-        }
-        const icon = root.iconOf(section);
+    function checkStorageAccess(path) {
+        const icon = root.sectionIcon(path);
         if (icon !== "rekordbox" && icon !== "enginedj") {
             return;
         }
@@ -104,28 +146,38 @@ Item {
         }
         Mixxx.MobileLibrary.allowUsbPermissionRequests();
     }
-    function activate(index) {
+    // Shows the tracks of the entry at path
+    function activate(path) {
+        const index = root.indexOf(path);
+        if (index === null) {
+            return;
+        }
         const label = root.sidebar.data(index, Qt.DisplayRole);
         root.activeLabel = label ? label.toString() : "";
-        root.activeIsDrive = root.isDrive(index);
-        let section = index;
-        while (section.parent.valid) {
-            section = section.parent;
-        }
-        root.activeSection = section.row;
+        root.activeIsDrive = root.pathIsDrive(path);
+        root.activeSection = path[0];
+        // May rebuild the entries below it: no index is used after this
         root.sidebar.activate(index);
     }
     // Opens a source or an entry. Returns true if its tracks are shown,
     // false if its entries are listed.
-    function open(index) {
-        root.checkStorageAccess(index);
-        root.activate(index);
+    function open(path) {
+        root.checkStorageAccess(path);
+        root.activate(path);
+        const index = root.indexOf(path);
+        if (index === null) {
+            root.levelPath = null;
+            root.refreshLevel();
+            root.showTracks = true;
+            return true;
+        }
         if (root.sidebar.canFetchMore(index)) {
             root.sidebar.fetchMore(index);
         }
         // Drives list their playlists once they have been read
-        if (root.sidebar.hasChildren(index) || root.isDrive(index)) {
-            root.levelIndex = index;
+        if (root.sidebar.hasChildren(root.indexOf(path)) || root.pathIsDrive(path)) {
+            root.levelPath = path;
+            root.refreshLevel();
             root.showTracks = false;
             root.cursor = root.levelHasAll ? -1 : 0;
             return false;
@@ -133,21 +185,27 @@ Item {
         root.showTracks = true;
         return true;
     }
+    function openEntry(row) {
+        return root.open(root.levelPath.concat([row]));
+    }
     function openAllTracks() {
-        root.activate(root.levelIndex);
+        root.activate(root.levelPath);
+        root.refreshLevel();
         root.showTracks = true;
     }
     function back() {
         if (root.showTracks) {
-            if (root.levelIndex !== null) {
-                root.showTracks = false;
+            if (root.levelPath !== null) {
+                root.refreshLevel();
+                root.showTracks = root.levelIndex === null;
             }
             return;
         }
-        if (root.levelIndex !== null && root.levelIndex.parent.valid) {
-            const child = root.levelIndex;
-            root.levelIndex = child.parent;
-            root.cursor = child.row;
+        if (root.levelHasAll) {
+            const row = root.levelPath[root.levelPath.length - 1];
+            root.levelPath = root.levelPath.slice(0, -1);
+            root.refreshLevel();
+            root.cursor = row;
         }
     }
     // The controller's browse knob
@@ -159,7 +217,8 @@ Item {
             }
         } else {
             root.showTracks = true;
-            root.levelIndex = null;
+            root.levelPath = null;
+            root.refreshLevel();
             root.cursor = Math.max(0, Math.min(sections.count - 1, root.cursor + offset));
         }
     }
@@ -169,11 +228,20 @@ Item {
                 root.openAllTracks();
                 return true;
             }
-            return root.open(root.sidebar.index(root.cursor, 0, root.levelIndex));
+            return root.openEntry(root.cursor);
         }
-        return root.open(root.sidebar.index(root.cursor, 0));
+        return root.openSection(root.cursor);
     }
-
+    function openSection(row) {
+        root.streaming = false;
+        root.cursor = row;
+        const tracksShown = root.open([row]);
+        if (tracksShown) {
+            root.levelPath = null;
+            root.refreshLevel();
+        }
+        return tracksShown;
+    }
     function loadSelected(tableView) {
         if (root.loadTarget.length > 0) {
             tableView.loadSelectedTrack(root.loadTarget, false);
@@ -215,8 +283,9 @@ Item {
                 break;
             case Skin.FocusedWidgetControl.WidgetKind.Sidebar:
                 root.streaming = false;
-                if (root.levelIndex !== null) {
-                    root.showTracks = false;
+                if (root.levelPath !== null) {
+                    root.refreshLevel();
+                    root.showTracks = root.levelIndex === null;
                 } else {
                     root.cursor = root.activeSection;
                 }
@@ -256,24 +325,31 @@ Item {
         target: root.sidebar
     }
 
-    Component.onCompleted: root.activate(root.sidebar.index(0, 0))
+    Component.onCompleted: root.activate([0])
 
-    // A listed entry that goes away (e.g. an unplugged drive) must not be
-    // used any more: back to the top
+    // While the sources change no index of them may be used: the list is
+    // emptied first and looked up again afterwards
     Connections {
+        function onLayoutAboutToBeChanged() {
+            root.levelIndex = null;
+        }
+        function onLayoutChanged() {
+            Qt.callLater(root.refreshLevel);
+        }
         function onModelAboutToBeReset() {
             root.levelIndex = null;
-            root.showTracks = true;
         }
-        function onRowsAboutToBeRemoved(parent, first, last) {
-            for (let index = root.levelIndex; index !== null && index.valid; index = index.parent) {
-                const sameParent = index.parent.valid === parent.valid && (!parent.valid || index.parent.internalId === parent.internalId);
-                if (sameParent && index.row >= first && index.row <= last) {
-                    root.levelIndex = null;
-                    root.showTracks = true;
-                    return;
-                }
-            }
+        function onModelReset() {
+            Qt.callLater(root.refreshLevel);
+        }
+        function onRowsAboutToBeRemoved() {
+            root.levelIndex = null;
+        }
+        function onRowsInserted() {
+            Qt.callLater(root.refreshLevel);
+        }
+        function onRowsRemoved() {
+            Qt.callLater(root.refreshLevel);
         }
 
         target: root.sidebar
@@ -507,13 +583,7 @@ Item {
                                 id: sectionMouse
 
                                 anchors.fill: parent
-                                onClicked: {
-                                    root.streaming = false;
-                                    root.cursor = section.index;
-                                    if (root.open(root.sidebar.index(section.index, 0))) {
-                                        root.levelIndex = null;
-                                    }
-                                }
+                                onClicked: root.openSection(section.index)
                             }
                         }
                     }
@@ -579,7 +649,7 @@ Item {
 
                         required property int index
                         required property var model
-                        readonly property var modelIndex: root.sidebar ? root.sidebar.index(index, 0, root.listRoot) : undefined
+                        required property bool hasModelChildren
 
                         color: root.cursor === index ? "#1e5fb4" : (entryMouse.pressed ? "#2a2c30" : (index % 2 === 0 ? "#0c0d0f" : "#16181b"))
                         height: root.compact ? 40 : 46
@@ -603,7 +673,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             color: "#8a8d93"
                             font.pixelSize: root.compact ? 15 : 17
-                            text: root.sidebar && (root.sidebar.hasChildren(entry.modelIndex) || root.isDrive(entry.modelIndex)) ? "›" : ""
+                            text: entry.hasModelChildren || root.levelIsDrives ? "›" : ""
                         }
                         MouseArea {
                             id: entryMouse
@@ -611,7 +681,7 @@ Item {
                             anchors.fill: parent
                             onClicked: {
                                 root.cursor = entry.index;
-                                root.open(entry.modelIndex);
+                                root.openEntry(entry.index);
                             }
                         }
                     }
