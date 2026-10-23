@@ -109,6 +109,22 @@ reader there without changing it.
 
 > _End of AI-written section._
 
+## Skins
+
+> _The following section was written by an AI agent (Claude Code)._
+
+*Settings → Interface → Skin* switches the main window at once (the decks
+keep playing) and remembers the choice (`[Config],AndroidSkin`, through
+`Mixxx.MobileApp.skin`). "Classic" is `res/qml/MainWindow.qml` (its
+`+android` override); every other skin is a folder `res/qml/Skins/<Name>/`
+with its own `MainWindow.qml`, whose root item takes the application window
+(`required property ApplicationWindow applicationWindow`) and may provide
+`menuBar` and `openQuickLoad(group)` like the Classic one. Skins reuse the
+shared components (library, deck loaders, settings) by importing `"../.."`.
+If a skin fails to load, Classic is loaded instead.
+
+> _End of AI-written section._
+
 ## Merging upstream Mixxx
 
 ### QML overrides

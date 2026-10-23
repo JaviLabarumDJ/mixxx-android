@@ -791,8 +791,8 @@ Cue</translation>
         <translation>Skin / Piel visual</translation>
     </message>
     <message>
-        <source>Unnamed</source>
-        <translation>Sin nombre</translation>
+        <source>Classic</source>
+        <translation>Clásico</translation>
     </message>
     <message>
         <source>Theme color</source>
@@ -1516,6 +1516,10 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>Edit</source>
         <translation>Editar</translation>
+    </message>
+    <message>
+        <source>Booth skin – preview, work in progress</source>
+        <translation>Skin Booth – vista previa, en desarrollo</translation>
     </message>
 </context>
 <context>

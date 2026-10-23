@@ -273,11 +273,19 @@ Category {
                             RowLayout {
                                 Layout.fillWidth: true
                                 Text { Layout.fillWidth: true; text: qsTr("Skin"); color: Theme.white; font.pixelSize: 13 }
+                                // Applied immediately, like the language: the
+                                // interface is reloaded with the other skin
                                 Skin.ComboBox {
                                     id: skinInput
+
+                                    readonly property var skins: Mixxx.MobileApp.skinsIn(Qt.resolvedUrl("../Skins/"))
+
                                     Layout.preferredWidth: 180
-                                    model: [qsTr("Unnamed")]
-                                    onCurrentIndexChanged: themeColorTab.dirty = true
+                                    model: skins.map(skin => skin === "Classic" ? qsTr("Classic") : skin)
+                                    currentIndex: Math.max(0, skins.indexOf(Mixxx.MobileApp.skin))
+                                    onActivated: index => {
+                                        Mixxx.MobileApp.skin = skins[index];
+                                    }
                                 }
                             }
 

@@ -1,12 +1,23 @@
 #include "qml/qmlmobileappproxy.h"
 
+#include <QDir>
+#include <QFileInfo>
+
 #ifdef Q_OS_ANDROID
 #include <QCoreApplication>
 #include <QJniObject>
 #endif
 
 #include "moc_qmlmobileappproxy.cpp"
+#include "qml/qmlconfigproxy.h"
 #include "util/versionstore.h"
+
+namespace {
+
+const ConfigKey kSkinConfigKey(QStringLiteral("[Config]"), QStringLiteral("AndroidSkin"));
+const QString kClassicSkin = QStringLiteral("Classic");
+
+} // namespace
 
 namespace mixxx {
 namespace qml {
@@ -39,6 +50,34 @@ QString QmlMobileAppProxy::packageVersion() const {
     }
 #endif
     return VersionStore::version();
+}
+
+QString QmlMobileAppProxy::skin() const {
+    const UserSettingsPointer pConfig = QmlConfigProxy::get();
+    return pConfig ? pConfig->getValue(kSkinConfigKey, kClassicSkin) : kClassicSkin;
+}
+
+void QmlMobileAppProxy::setSkin(const QString& skin) {
+    const UserSettingsPointer pConfig = QmlConfigProxy::get();
+    if (!pConfig || skin.isEmpty() || skin == this->skin()) {
+        return;
+    }
+    pConfig->setValue(kSkinConfigKey, skin);
+    pConfig->save();
+    emit skinChanged();
+}
+
+QStringList QmlMobileAppProxy::skinsIn(const QUrl& skinsFolder) const {
+    QStringList skins{kClassicSkin};
+    const QDir dir(skinsFolder.isLocalFile() ? skinsFolder.toLocalFile() : skinsFolder.path());
+    const QStringList folders = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+    for (const QString& folder : folders) {
+        if (folder != kClassicSkin &&
+                QFileInfo::exists(dir.filePath(folder + QStringLiteral("/MainWindow.qml")))) {
+            skins.append(folder);
+        }
+    }
+    return skins;
 }
 
 } // namespace qml

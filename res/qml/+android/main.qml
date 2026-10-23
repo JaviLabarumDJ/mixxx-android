@@ -35,14 +35,42 @@ ApplicationWindow {
         }
     }
 
+    // The main window of the selected skin: "Classic" is MainWindow.qml
+    // next to this file, the others are in Skins/<name>/MainWindow.qml
+    function skinSource(skin) {
+        if (skin === "Classic" || Mixxx.MobileApp.skinsIn(Qt.resolvedUrl("Skins/")).indexOf(skin) < 0) {
+            return Qt.resolvedUrl("MainWindow.qml");
+        }
+        return Qt.resolvedUrl("Skins/" + skin + "/MainWindow.qml");
+    }
+    function loadSkin() {
+        if (!Mixxx.Core.ready) {
+            return;
+        }
+        content.setSource(root.skinSource(Mixxx.MobileApp.skin), {
+            "applicationWindow": root
+        });
+    }
+
     Connections {
         target: Mixxx.Core
         function onReadyChanged() {
             root.updateVisibility();
+            root.loadSkin();
+        }
+    }
+    // Switched at once; the decks keep playing
+    Connections {
+        target: Mixxx.MobileApp
+        function onSkinChanged() {
+            Qt.callLater(root.loadSkin);
         }
     }
 
-    Component.onCompleted: root.updateVisibility()
+    Component.onCompleted: {
+        root.updateVisibility();
+        root.loadSkin();
+    }
 
     Loader {
         id: content
@@ -53,13 +81,14 @@ ApplicationWindow {
         asynchronous: true
         onStatusChanged: {
             if (status === Loader.Error) {
+                if (Mixxx.MobileApp.skin !== "Classic") {
+                    // A broken skin must not lock the user out
+                    console.error("Failed to load the skin", Mixxx.MobileApp.skin, "- using Classic");
+                    Mixxx.MobileApp.skin = "Classic";
+                    return;
+                }
                 console.error("Failed to load the Mixxx main window")
                 Qt.quit()
-            }
-        }
-        sourceComponent: Component {
-            MainWindow {
-                applicationWindow: root
             }
         }
     }

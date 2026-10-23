@@ -776,7 +776,7 @@ Button</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unnamed</source>
+        <source>Classic</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1500,6 +1500,10 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Booth skin – preview, work in progress</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
