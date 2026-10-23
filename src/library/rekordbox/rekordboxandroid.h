@@ -11,6 +11,7 @@
 #include "track/track_decl.h"
 #include "track/trackid.h"
 
+class PlayerManager;
 class QAbstractItemModel;
 class RekordboxFeature;
 
@@ -51,6 +52,16 @@ bool isRekordboxPlaylist(QAbstractItemModel* pModel);
 /// `rekordboxTrack` to `pTrack`, a copy of its file. Does the same as
 /// loading the track from the Rekordbox drive.
 void applyRekordboxData(const TrackPointer& pTrack, const RekordboxTrack& rekordboxTrack);
+
+/// Applies the Rekordbox data to the tracks of Rekordbox drives and their
+/// backups when a deck loads them. The QML library loads tracks by their
+/// location, without the Rekordbox track model that does this on desktop, so
+/// without it these tracks would get the beatgrid of Mixxx's own analysis
+/// instead of the one Rekordbox exported for them. A beatgrid of Rekordbox is
+/// only applied once, so changes made to it in Mixxx are kept.
+/// Must be called before other code that reacts to tracks being loaded,
+/// which should see the beatgrid and the cues of Rekordbox.
+void applyRekordboxDataOnLoad(PlayerManager* pPlayerManager, const QSqlDatabase& database);
 
 /// The day a track of a Rekordbox drive (by its location on the drive or
 /// the drive's copy) was added to the Rekordbox collection, or an invalid

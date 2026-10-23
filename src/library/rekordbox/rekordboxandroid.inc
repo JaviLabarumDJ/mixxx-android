@@ -14,6 +14,8 @@
 #include "controllers/android.h"
 #endif
 #include "library/rekordbox/rekordboxandroid.h"
+#include "mixer/basetrackplayer.h"
+#include "mixer/playermanager.h"
 #include "util/datetime.h"
 
 namespace mixxx {
@@ -179,6 +181,79 @@ void applyRekordboxData(const TrackPointer& pTrack, const RekordboxTrack& rekord
             color && *color != kColorForIDNoColor) {
         pTrack->setColor(color);
     }
+}
+
+namespace {
+
+/// The Rekordbox data of the track with the file `location`, if it is a
+/// track of a Rekordbox drive or backup that was opened
+std::optional<RekordboxTrack> rekordboxTrackAt(
+        const QSqlDatabase& database, const QString& location) {
+    QSqlQuery query(database);
+    query.prepare(QStringLiteral("SELECT analyze_path, key, color FROM ") +
+            kRekordboxLibraryTable + QStringLiteral(" WHERE location=:location"));
+    query.bindValue(QStringLiteral(":location"), location);
+    if (!query.exec() || !query.next()) {
+        return std::nullopt;
+    }
+    return RekordboxTrack{location,
+            query.value(0).toString(),
+            query.value(1).toString(),
+            query.value(2)};
+}
+
+void applyRekordboxDataToTrack(const TrackPointer& pTrack, const QSqlDatabase& database) {
+    // The positions of Rekordbox are converted with the sample rate
+    if (!pTrack || pTrack->isBpmLocked() || !pTrack->getSampleRate().isValid()) {
+        return;
+    }
+    // Already applied, maybe changed in Mixxx since
+    const mixxx::BeatsPointer pBeats = pTrack->getBeats();
+    if (pBeats && pBeats->getSubVersion() == mixxx::rekordboxconstants::beatsSubversion) {
+        return;
+    }
+    const std::optional<RekordboxTrack> rekordboxTrack =
+            rekordboxTrackAt(database, pTrack->getLocation());
+    if (!rekordboxTrack) {
+        return;
+    }
+    qDebug() << "Applying the Rekordbox analysis to" << pTrack->getLocation();
+    applyRekordboxData(pTrack, *rekordboxTrack);
+}
+
+void connectDeckForRekordbox(
+        PlayerManager* pPlayerManager, BaseTrackPlayer* pDeck, const QSqlDatabase& database) {
+    // The deck is only connected once
+    if (!pDeck || pDeck->property("androidRekordboxData").toBool()) {
+        return;
+    }
+    pDeck->setProperty("androidRekordboxData", true);
+    // loadingTrack is emitted before the engine loads the track and before
+    // the analysis of the loaded track starts
+    QObject::connect(pDeck,
+            &BaseTrackPlayer::loadingTrack,
+            pPlayerManager,
+            [database](TrackPointer pNewTrack, TrackPointer) {
+                applyRekordboxDataToTrack(pNewTrack, database);
+            });
+}
+
+void connectDecksForRekordbox(PlayerManager* pPlayerManager, const QSqlDatabase& database) {
+    for (int i = 0; i < pPlayerManager->numberOfDecks(); ++i) {
+        connectDeckForRekordbox(pPlayerManager, pPlayerManager->getDeckBase(i), database);
+    }
+}
+
+} // namespace
+
+void applyRekordboxDataOnLoad(PlayerManager* pPlayerManager, const QSqlDatabase& database) {
+    connectDecksForRekordbox(pPlayerManager, database);
+    QObject::connect(pPlayerManager,
+            &PlayerManager::numberOfDecksChanged,
+            pPlayerManager,
+            [pPlayerManager, database](int) {
+                connectDecksForRekordbox(pPlayerManager, database);
+            });
 }
 
 #ifdef __HID__
