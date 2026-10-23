@@ -98,17 +98,82 @@ Item {
         root.playView = mode;
     }
 
-    Component.onCompleted: {
-        if (!root.controllerConnected) {
-            root.showView(3);
+    // The tabs of the top bar, which can be hidden in Settings → Interface
+    // → TOP BAR (Mixxx.MobileApp.hiddenTopBarItems, shared with the Classic
+    // skin, whose names are used where the tabs match). The settings list
+    // these instead of the ones of the Classic skin. At least one view
+    // stays shown; UTILITY always does.
+    readonly property var topBarItems: [
+        {
+            "name": "wave",
+            "label": qsTr("WAVE"),
+            "view": true
+        },
+        {
+            "name": "dj",
+            "label": "DJ",
+            "view": true
+        },
+        {
+            "name": "lib",
+            "label": qsTr("BROWSE"),
+            "view": true
+        },
+        {
+            "name": "load1",
+            "label": qsTr("LOAD %1").arg(1),
+            "view": false
+        },
+        {
+            "name": "load2",
+            "label": qsTr("LOAD %1").arg(2),
+            "view": false
+        },
+        {
+            "name": "xy",
+            "label": "XY",
+            "view": false
+        },
+        {
+            "name": "fx",
+            "label": "BEAT FX",
+            "view": false
         }
+    ]
+    readonly property var hiddenTopBarItems: Mixxx.MobileApp.hiddenTopBarItems
+    // The name of the tab of each view
+    readonly property var viewNames: ({
+            "1": "wave",
+            "2": "lib",
+            "3": "dj",
+            "4": "xy"
+        })
+
+    function itemShown(name) {
+        return root.hiddenTopBarItems.indexOf(name) < 0;
     }
+    // The view to play in: DJ without a controller, else the waveforms; the
+    // other one or the browser if that one is hidden
+    function preferredView() {
+        const order = root.controllerConnected ? [1, 3, 2] : [3, 1, 2];
+        const mode = order.find(mode => root.itemShown(root.viewNames[mode]));
+        return mode ?? 2;
+    }
+    // A hidden view is left, except the browser opened by LOAD 1/2 or a
+    // controller
+    function leaveHiddenView() {
+        if (root.browsing || root.itemShown(root.viewNames[root.viewMode])) {
+            return;
+        }
+        root.showView(root.preferredView());
+    }
+
+    Component.onCompleted: root.showView(root.preferredView())
+    onHiddenTopBarItemsChanged: root.leaveHiddenView()
     // A controller plugged in or out mid-set: its view
     onControllerConnectedChanged: {
-        if (!root.controllerConnected && root.viewMode === 1) {
-            root.showView(3);
-        } else if (root.controllerConnected && root.viewMode === 3) {
-            root.showView(1);
+        if ((root.viewMode === 1 || root.viewMode === 3) && root.viewMode !== root.preferredView()) {
+            root.showView(root.preferredView());
         }
     }
     function toggleLibraryView() {
@@ -390,26 +455,31 @@ Item {
             Tab {
                 active: root.viewMode === 1
                 label: qsTr("WAVE")
+                visible: root.itemShown("wave")
                 onClicked: root.showView(1)
             }
             Tab {
                 active: root.djView
                 label: "DJ"
+                visible: root.itemShown("dj")
                 onClicked: root.showView(3)
             }
             Tab {
                 active: root.browsing && root.loadTarget.length === 0
                 label: qsTr("BROWSE")
+                visible: root.itemShown("lib")
                 onClicked: root.toggleLibraryView()
             }
             Tab {
                 active: root.browsing && root.loadTarget === "[Channel1]"
                 label: qsTr("LOAD %1").arg(1)
+                visible: root.itemShown("load1")
                 onClicked: root.openQuickLoad("[Channel1]")
             }
             Tab {
                 active: root.browsing && root.loadTarget === "[Channel2]"
                 label: qsTr("LOAD %1").arg(2)
+                visible: root.itemShown("load2")
                 onClicked: root.openQuickLoad("[Channel2]")
             }
         }
@@ -423,12 +493,13 @@ Item {
             Tab {
                 active: root.xyView
                 label: "XY"
-                onClicked: root.xyView ? root.showView(root.controllerConnected ? 1 : 3) : root.showView(4)
+                visible: root.itemShown("xy")
+                onClicked: root.xyView ? root.showView(root.preferredView()) : root.showView(4)
             }
             Tab {
                 active: root.beatFxShown
                 label: "BEAT FX"
-                visible: root.compact && !root.browsing && !root.xyView
+                visible: root.compact && !root.browsing && !root.xyView && root.itemShown("fx")
                 onClicked: root.beatFxShown = !root.beatFxShown
             }
             Tab {
@@ -553,7 +624,7 @@ Item {
                     anchors.right: parent.right
                     anchors.rightMargin: content.gap
                     anchors.top: parent.top
-                    visible: !root.compact
+                    visible: !root.compact && root.itemShown("fx")
                     width: 180
                 }
             }
@@ -610,7 +681,7 @@ Item {
                 anchors.rightMargin: content.gap
                 anchors.top: parent.top
                 compact: true
-                visible: root.compact && root.beatFxShown && !root.browsing && !root.xyView
+                visible: root.compact && root.beatFxShown && !root.browsing && !root.xyView && root.itemShown("fx")
                 width: 190
                 z: 10
             }

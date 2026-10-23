@@ -387,7 +387,11 @@ Category {
                                 spacing: 6
 
                                 Repeater {
-                                    model: [
+                                    id: topBarItems
+
+                                    // The items of the Classic skin; other skins list theirs
+                                    // in a topBarItems property of their main window
+                                    readonly property var classicItems: [
                                         {name: "dj", label: "DJ", view: true},
                                         {name: "wave", label: qsTr("WAVE"), view: true},
                                         {name: "lib", label: qsTr("LIB"), view: true},
@@ -400,11 +404,14 @@ Category {
                                         {name: "rec", label: "REC", view: false},
                                         {name: "4d", label: "4D", view: false}
                                     ]
+                                    readonly property var skinItems: ApplicationWindow.window?.skinItem?.topBarItems
+
+                                    model: skinItems ?? classicItems
 
                                     Skin.Button {
                                         required property var modelData
                                         readonly property bool shown: Mixxx.MobileApp.hiddenTopBarItems.indexOf(modelData.name) < 0
-                                        readonly property int shownViews: ["dj", "wave", "lib", "ctl"].filter(name => Mixxx.MobileApp.hiddenTopBarItems.indexOf(name) < 0).length
+                                        readonly property int shownViews: topBarItems.model.filter(item => item.view && Mixxx.MobileApp.hiddenTopBarItems.indexOf(item.name) < 0).length
 
                                         implicitWidth: 72
                                         implicitHeight: 34

@@ -9,6 +9,8 @@ ApplicationWindow {
     id: root
 
     readonly property bool isMobile: Qt.platform.os === "android" || Qt.platform.os === "ios"
+    // The main window of the skin, for the settings that depend on it
+    readonly property var skinItem: content.item
     readonly property int designWidth: 1792
     readonly property int designHeight: 1008
 
