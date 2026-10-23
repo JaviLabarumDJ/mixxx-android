@@ -100,6 +100,16 @@ bool AnalyzerBeats::initialize(const AnalyzerTrack& track,
 
     // if we can load a stored track don't reanalyze it
     bool bShouldAnalyze = shouldAnalyze(track.getTrack());
+#ifdef Q_OS_ANDROID
+    // Re-analyzing the whole collection: the beats of the tracks too, so
+    // older beatgrids get the corrections of newer versions. Locked beats
+    // were excluded above, the beatgrids of Rekordbox are kept.
+    if (!bShouldAnalyze && track.getOptions().redoBeats.value_or(false)) {
+        const mixxx::BeatsPointer pBeats = track.getTrack()->getBeats();
+        bShouldAnalyze = !pBeats ||
+                pBeats->getSubVersion() != mixxx::rekordboxconstants::beatsSubversion;
+    }
+#endif
 
     DEBUG_ASSERT(!m_pPlugin);
     if (bShouldAnalyze) {
