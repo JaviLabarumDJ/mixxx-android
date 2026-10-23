@@ -267,7 +267,7 @@ Rectangle {
                     return padItem.hotcueSet && sampleRateControl.value > 0 ? root.formatTime(hotcuePosition.value / sampleRateControl.value / 2) : "";
                 case "beatjump":
                     // The left half jumps back, the right half forward
-                    return "◀   " + padItem.jumpLabels[padItem.sizeIndex] + "   ▶";
+                    return "‹   " + padItem.jumpLabels[padItem.sizeIndex] + "   ›";
                 default:
                     return padItem.loopLabels[padItem.index];
                 }
@@ -507,12 +507,46 @@ Rectangle {
                 color: playTap.pressed ? "#0c2a0c" : "#141518"
                 radius: width / 2
 
-                Text {
+                // Drawn, as the fonts of some phones lack the pause sign and
+                // draw the play sign as an emoji
+                Row {
+                    readonly property real barHeight: Math.round(parent.height * 0.34)
+
                     anchors.centerIn: parent
-                    anchors.horizontalCenterOffset: playControl.value > 0 ? 0 : 2
-                    color: playControl.value > 0 ? "#3ad33a" : "#6ab86a"
-                    font.pixelSize: Math.round(parent.height * 0.4)
-                    text: playControl.value > 0 ? "❚❚" : "▶"
+                    spacing: Math.round(barHeight * 0.3)
+                    visible: playControl.value > 0
+
+                    Repeater {
+                        model: 2
+
+                        Rectangle {
+                            color: "#3ad33a"
+                            height: parent.barHeight
+                            width: Math.round(parent.barHeight * 0.3)
+                        }
+                    }
+                }
+                Canvas {
+                    id: playSign
+
+                    anchors.centerIn: parent
+                    anchors.horizontalCenterOffset: Math.round(width * 0.1)
+                    height: Math.round(parent.height * 0.36)
+                    visible: playControl.value <= 0
+                    width: height
+
+                    onHeightChanged: requestPaint()
+                    onPaint: {
+                        const ctx = getContext("2d");
+                        ctx.reset();
+                        ctx.fillStyle = "#6ab86a";
+                        ctx.beginPath();
+                        ctx.moveTo(width * 0.1, 0);
+                        ctx.lineTo(width, height / 2);
+                        ctx.lineTo(width * 0.1, height);
+                        ctx.closePath();
+                        ctx.fill();
+                    }
                 }
                 TapHandler {
                     id: playTap
