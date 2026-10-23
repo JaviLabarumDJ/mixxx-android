@@ -235,6 +235,85 @@ Category {
                 }
             }
 
+            // ================= THANKS =================
+            Rectangle {
+                Layout.fillWidth: true
+                radius: 8
+                color: "#161b24"
+                border.color: "#2a3648"
+                border.width: 1
+                implicitHeight: thanksCol.implicitHeight + 24
+
+                ColumnLayout {
+                    id: thanksCol
+                    anchors.fill: parent
+                    anchors.margins: 12
+                    spacing: 8
+
+                    RowLayout {
+                        spacing: 8
+                        Text {
+                            text: "🙏"
+                            font.pixelSize: 15
+                        }
+                        Text {
+                            text: qsTr("THANKS")
+                            font.bold: true
+                            font.pixelSize: 12
+                            color: "#ff9100"
+                            font.letterSpacing: 0.5
+                        }
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 8
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: 1
+                            spacing: 4
+
+                            SocialButton {
+                                Layout.fillWidth: true
+                                title: "Dani Roman"
+                                handle: "@danigiavanni"
+                                accentColor: "#e1306c"
+                                url: "https://www.instagram.com/danigiavanni"
+                            }
+                            Text {
+                                Layout.fillWidth: true
+                                text: qsTr("Live stems in Mixxx: his mixxx-stems project inspired the stem separation of this app.")
+                                font.pixelSize: 9
+                                color: "#90a4ae"
+                                wrapMode: Text.WordWrap
+                            }
+                        }
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: 1
+                            spacing: 4
+
+                            SocialButton {
+                                Layout.fillWidth: true
+                                title: "Angelos Exarchos"
+                                handle: "@daedalus.music"
+                                accentColor: "#e1306c"
+                                url: "https://www.instagram.com/daedalus.music"
+                            }
+                            Text {
+                                Layout.fillWidth: true
+                                text: qsTr("Beatgrid editing, Rekordbox playlists and dates, library backups and controller navigation.")
+                                font.pixelSize: 9
+                                color: "#90a4ae"
+                                wrapMode: Text.WordWrap
+                            }
+                        }
+                    }
+                }
+            }
+
             // ================= SECTION 3: APP INFO & VERSION =================
             Rectangle {
                 Layout.fillWidth: true

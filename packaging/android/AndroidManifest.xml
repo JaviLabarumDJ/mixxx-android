@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.mixxx"
     android:installLocation="auto"
-    android:versionCode="7"
-    android:versionName="1.4.2">
+    android:versionCode="8"
+    android:versionName="1.5.0">
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"  />
     <uses-permission android:name="android.permission.INTERNET"  />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
@@ -14,6 +14,9 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
+    <!-- Separating tracks into stems in the background, see StemsService.java -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="29" />
     <!-- Reading the music collection. Up to Android 12 this is covered by
@@ -77,6 +80,10 @@
                 android:name="android.app.arguments"
                 android:value="--new-ui" />
         </activity>
+        <service
+            android:name="org.mixxx.StemsService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

@@ -14,7 +14,7 @@ Este documento recopila de manera exhaustiva el estado actual del port de **Mixx
   - **Frontend**: Qt 6.8 / QML con interfaz táctil adaptada (`res/qml/`).
   - **Subsistema de Audio**: PortAudio con el backend Android Oboe (AAudio) y, para tarjetas de sonido USB que Android no puede usar, un driver USB propio de Mixxx (libusb, ver §6.6).
   - **Subsistema de Controladoras**: MIDI nativo de Android (AMidi), USB-MIDI propio para las tarjetas que maneja el driver USB, y USB Bulk/HID. PortMidi está desactivado en Android.
-- **Versión publicada**: `v1.4.2-android` (`versionCode 7`), ver §6.9.
+- **Versión publicada**: `v1.5.0-android` (`versionCode 8`), ver §6.9.
 - **Dispositivo objetivo de prueba**:
   - Tablet Lenovo Tab M11 (`TB331FC`), Android 13/14.
   - Conexión: ADB por Wi-Fi (depuración inalámbrica); la IP y el puerto cambian, se encuentran con `nmap -sn 192.168.0.0/24` y `nmap -p 30000-49999 <ip>`.
@@ -273,7 +273,7 @@ Nota: `make mixxx` por sí solo **no** actualiza el `.so` del proyecto Gradle; h
 - Errores del HAL de Qualcomm: `adb logcat | grep -E "PAL|AGM|AHAL"`.
 
 ### 6.9. Publicar una release
-1. Subir `android:versionCode` y `android:versionName` en `packaging/android/AndroidManifest.xml` (la v1.1.0 es `versionCode 2`, la v1.2.0 `versionCode 3`, la v1.3.0 `versionCode 4`, la v1.4.0 `versionCode 5`, la v1.4.1 `versionCode 6`, la v1.4.2 `versionCode 7`).
+1. Subir `android:versionCode` y `android:versionName` en `packaging/android/AndroidManifest.xml` (la v1.1.0 es `versionCode 2`, la v1.2.0 `versionCode 3`, la v1.3.0 `versionCode 4`, la v1.4.0 `versionCode 5`, la v1.4.1 `versionCode 6`, la v1.4.2 `versionCode 7`, la v1.5.0 `versionCode 8`).
 2. Actualizar las insignias y los enlaces de descarga del `README.md`.
 3. `make -C build-android -j12 apk`, firmar como `mixxx-android-vX.Y.Z.apk` y verificar con `apksigner verify` y `aapt2 dump badging`.
 4. Según `AGENTS.md`, el commit, la etiqueta (`vX.Y.Z-android`), el push y la publicación en GitHub los hace la persona, después de probar en un equipo de DJ real. El nombre del APK adjunto debe coincidir con el enlace del README.
@@ -370,5 +370,25 @@ La v1.4.0 fusiona `morpheasgr/android-stable` (ya incluía la v1.3.0, así que l
 - **Barra superior:** `Mixxx.MobileApp.hiddenTopBarItems` (`qmlmobileappproxy.cpp`, clave `[Skin],AndroidHiddenTopBarItems`, nombres separados por comas: `dj wave lib ctl load1 load2 fx xy split rec 4d`). `+android/MainWindow.qml` oculta esos botones y salta a otra vista si la actual se oculta; la tarjeta «🧭 BARRA SUPERIOR» de `Settings/+android/Interface.qml` los activa y no deja ocultar la última vista.
 - **Altavoz atascado (no es Mixxx):** si en Híbrido no suena la tablet, medir con `dumpsys media.audio_flinger` (hilo del altavoz, «Frames written»). Se vio el altavoz a ~11–16k frames/s con Mixxx cerrado; un reinicio de la tablet lo arregla. Causa sin confirmar (sospecha: driver USB directo o el hub).
 - Pendiente: la página de Audio puede marcar «Móvil / Bluetooth» estando en Híbrido; revisar con la DDJ conectada.
+
+> _Fin de la sección escrita por IA._
+
+### 6.18. Stems con IA (v1.5.0)
+
+> _La siguiente sección la ha escrito un agente de IA (Claude Code)._
+
+- **Qué hace:** separa en segundo plano las pistas que elige el usuario (botón 🎚 STEMS de la biblioteca: la pista seleccionada o toda la lista) en batería, bajo, resto y voz, y escribe un `.stem.mp4` (formato de Native Instruments: 5 pistas AAC, la mezcla y los 4 stems, y el átomo `moov/udta/stem` con el manifiesto JSON). Inspirado en `dromangdev/mixxx-stems` de Dani Roman, pero sin tocar el motor de audio: reproduce el soporte de stems nativo de Mixxx.
+- **Dónde se guardan** (`src/stems/stemcompanion.cpp`): junto a la pista, `<carpeta>/.stems/<archivo>.stem.mp4` (el escáner salta las carpetas ocultas). Si no se puede escribir, en `AppLocalDataLocation/stems/<sha1 de la ruta>.stem.mp4`. Las pistas de los USB que lee Mixxx (`usbdrive`, solo lectura) siempre van a la app.
+- **Reproducción** (`SoundSourceProxy::openAudioSource()`): si la pista tiene archivo de stems se abre ese en vez del suyo (`openSeparatedStems()`), y `Track::setSeparatedStemInfos()` pone los stems en la pista; así se conservan cues, rejilla y metadatos. El archivo de stems se escribe a la frecuencia de la pista para que cues y beats no se muevan. `openTrackFileAudioSource()` abre siempre el archivo original (lo usa el separador).
+- **Modelos** (`src/stems/stemmodels.cpp`): se descargan desde la release `stems-models-v1` del repositorio (`spleeter-{drums,bass,other,vocals}.fp16.onnx`, `htdemucs-int8.onnx`) a `AppLocalDataLocation/stem-models/`, con tamaño y SHA-256 comprobados. HTDemucs guarda en el primer uso el modelo optimizado por ONNX Runtime (`htdemucs.optimized.onnx`), que carga en ~1 s en vez de ~30 s. Para publicar modelos nuevos: subir a una release nueva y cambiar `kBaseUrl` y los hashes.
+- **ONNX Runtime 1.31.0**: `MixxxAndroid.cmake` descarga el AAR de Maven (SHA-256 fijado), extrae cabeceras y `libonnxruntime.so` y la añade a `QT_ANDROID_EXTRA_LIBS` (~33 MB más en la APK). No se enlaza: `onnxruntimeloader.cpp` la carga con `dlopen` al separar (`ORT_API_MANUAL_INIT`).
+- **Spleeter** (`spleeterseparator.cpp`): STFT 4096/1024 (FFTW float), bloques de 512 tramas (11,9 s), un modelo por stem y filtro de Wiener multicanal de una iteración, igual que `norbert.wiener(..., iterations=1, use_softmask=False)`. Arreglo del bajo: por debajo de 86 Hz el bajo se queda con todo menos la batería, con transición hasta 151 Hz. Sale en streaming, ~250 MB.
+- **HTDemucs** (`htdemucsseparator.cpp`): segmentos de 343 980 muestras con 25 % de solape y pesos triangulares, normalizado con media y desviación de la pista entera. Se detiene si `MemAvailable` baja de 300 MB (error `memory`).
+- **Cola** (`stemsmanager.cpp`, hilo «Stems» con `nice 10` también para los hilos de ONNX Runtime): una pista a la vez, guardada en `[Stems],Queue` y restaurada en pausa al arrancar. 4 hilos, o 2 si suena un deck al empezar. Opciones `[Stems]`: `DefaultModel`, `FileSize` (96/128/192 kbps por pista AAC), `WhilePlaying` (`slow`/`pause`), `ChargingOnly`, `Speed_<modelo>` (medido con ⏱ MEDIR: 20 s de audio generado). `StemsService.java` es un servicio en primer plano (`dataSync`) con notificación y wake lock parcial mientras hay trabajo.
+- **Interfaz:** `Library/StemsPopup.qml`, `StemsQueue.qml`, `Settings/Stems.qml`, `stems.js` (textos de error), indicador y cola en `+android/MainWindow.qml`, pestaña STEM de los pads en `Deck/+android/HotcueAndStem.qml` (toque = silenciar, pulsación larga = solo, − / + = volumen a pasos de 25 %). Singleton QML `Mixxx.Stems` (`qmlstemsproxy.cpp`).
+- **Medido en la Lenovo Tab M11 (6 GB):** Spleeter + Wiener ~76 s por pista de 5 min (una de 6:10 tardó ~2 min con decodificación y guardado); HTDemucs ~15 min por pista de 5 min, con picos de ~2,3 GB (quedaron ~870 MB libres).
+- **Manual de uso:** `docs/stems/MANUAL_STEMS_es.md` y `docs/stems/STEMS_MANUAL_en.md`. Actualizarlos si cambia la interfaz o los textos.
+- **Rama:** se desarrolla en `stems`, aparte de `android-stable`.
+- **Pendiente / ideas:** ONNX Runtime recortado a los operadores de los modelos (APK más pequeña); compartir el pool de hilos entre las 4 sesiones de Spleeter.
 
 > _Fin de la sección escrita por IA._

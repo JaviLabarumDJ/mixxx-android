@@ -45,6 +45,18 @@ Esta edición de Mixxx para Android nace de una necesidad personal como DJ: tene
         <translation>Toca cualquier red para abrir el perfil y ver sesiones, trucos, novedades y actualizaciones:</translation>
     </message>
     <message>
+        <source>THANKS</source>
+        <translation>GRACIAS</translation>
+    </message>
+    <message>
+        <source>Live stems in Mixxx: his mixxx-stems project inspired the stem separation of this app.</source>
+        <translation>Stems en directo en Mixxx: su proyecto mixxx-stems inspiró la separación de stems de esta app.</translation>
+    </message>
+    <message>
+        <source>Beatgrid editing, Rekordbox playlists and dates, library backups and controller navigation.</source>
+        <translation>Edición de la rejilla, playlists y fechas de Rekordbox, copias de seguridad de la biblioteca y navegación con la controladora.</translation>
+    </message>
+    <message>
         <source>Based on the open source Mixxx project. Mobile adaptation by JaviLabarum.</source>
         <translation>Basado en el proyecto Open Source Mixxx. Adaptación móvil por JaviLabarum.</translation>
     </message>
@@ -735,6 +747,25 @@ Cue</translation>
     <message>
         <source>FX Assign</source>
         <translation>Asignar FX</translation>
+    </message>
+</context>
+<context>
+    <name>HotcueAndStem</name>
+    <message>
+        <source>DRUMS</source>
+        <translation>BATERÍA</translation>
+    </message>
+    <message>
+        <source>BASS</source>
+        <translation>BAJO</translation>
+    </message>
+    <message>
+        <source>VOCALS</source>
+        <translation>VOZ</translation>
+    </message>
+    <message>
+        <source>OTHER</source>
+        <translation>RESTO</translation>
     </message>
 </context>
 <context>
@@ -1540,6 +1571,22 @@ Aborting the operation to avoid library inconsistencies</source>
         <source>Edit</source>
         <translation>Editar</translation>
     </message>
+    <message>
+        <source>🎚 Stems queue</source>
+        <translation>🎚 Cola de stems</translation>
+    </message>
+    <message>
+        <source>CLOSE</source>
+        <translation>CERRAR</translation>
+    </message>
+    <message>
+        <source>🎚 Stems ready: %1. If it is loaded on a deck, load it again to use them.</source>
+        <translation>🎚 Stems listos: %1. Si está cargada en un deck, vuelve a cargarla para usarlos.</translation>
+    </message>
+    <message>
+        <source>🎚 %1 couldn't be separated: %2</source>
+        <translation>🎚 No se pudo separar %1: %2</translation>
+    </message>
 </context>
 <context>
     <name>MicrophoneDuckingPanel</name>
@@ -1777,6 +1824,14 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>Theme, Decks, Display</source>
         <translation>Tema, Decks, Visualización</translation>
+    </message>
+    <message>
+        <source>Stems</source>
+        <translation>Stems</translation>
+    </message>
+    <message>
+        <source>Drums, bass, vocals with AI</source>
+        <translation>Batería, bajo y voz con IA</translation>
     </message>
     <message>
         <source>About</source>
@@ -2145,6 +2200,343 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
 </context>
 <context>
+    <name>Stems</name>
+    <message>
+        <source>Stems</source>
+        <translation>Stems</translation>
+    </message>
+    <message>
+        <source>The download of %1 failed: %2</source>
+        <translation>Falló la descarga de %1: %2</translation>
+    </message>
+    <message>
+        <source>🎚 STEMS</source>
+        <translation>🎚 STEMS</translation>
+    </message>
+    <message>
+        <source>Splits the tracks you choose into drums, bass, vocals and the rest, so that you can mute or mix each part on the deck. In the library, select a track or open a list and tap 🎚 STEMS. The stems are saved next to each track, in a hidden .stems folder, and they are used whenever you load the track. If its folder can't be written, they stay in the app.</source>
+        <translation>Separa las pistas que elijas en batería, bajo, voz y el resto, para silenciar o mezclar cada parte en el deck. En la biblioteca, selecciona una pista o abre una lista y pulsa 🎚 STEMS. Los stems se guardan junto a cada pista, en una carpeta oculta .stems, y se usan siempre que cargues la pista. Si no se puede escribir en su carpeta, se quedan en la app.</translation>
+    </message>
+    <message>
+        <source>⚠ Separating uses a lot of CPU. While you play it may cause audio dropouts: better prepare your tracks before the session.</source>
+        <translation>⚠ Separar usa mucha CPU. Mientras pinchas puede provocar cortes de audio: mejor prepara tus pistas antes de la sesión.</translation>
+    </message>
+    <message>
+        <source>🧠 MODELS</source>
+        <translation>🧠 MODELOS</translation>
+    </message>
+    <message>
+        <source>Download the models you want to use. The times are for a 5 minute track and depend a lot on the device: tap MEASURE to know yours.</source>
+        <translation>Descarga los modelos que quieras usar. Los tiempos son para una pista de 5 minutos y dependen mucho del dispositivo: pulsa MEDIR para saber los del tuyo.</translation>
+    </message>
+    <message>
+        <source>Fast and light. Good quality, the vocals may sound a bit metallic. Its bass is reinforced with the low end of the track.</source>
+        <translation>Rápido y ligero. Buena calidad, la voz puede sonar algo metálica. Su bajo se refuerza con los graves de la pista.</translation>
+    </message>
+    <message>
+        <source>1–4 min per track · ~250 MB of memory</source>
+        <translation>1–4 min por pista · ~250 MB de memoria</translation>
+    </message>
+    <message>
+        <source>The best quality: cleaner vocals and bass. Slow and memory hungry: best to prepare playlists with the charger plugged in and without playing.</source>
+        <translation>La mejor calidad: voz y bajo más limpios. Lento y consume mucha memoria: mejor para preparar playlists con el cargador puesto y sin pinchar.</translation>
+    </message>
+    <message>
+        <source>8–30 min per track · 2–2.5 GB of memory</source>
+        <translation>8–30 min por pista · 2–2,5 GB de memoria</translation>
+    </message>
+    <message>
+        <source>This device has %1 GB of memory: HTDemucs may not fit.</source>
+        <translation>Este dispositivo tiene %1 GB de memoria: puede que HTDemucs no quepa.</translation>
+    </message>
+    <message>
+        <source>⚙️ OPTIONS</source>
+        <translation>⚙️ OPCIONES</translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation>Modelo</translation>
+    </message>
+    <message>
+        <source>ASK</source>
+        <translation>PREGUNTAR</translation>
+    </message>
+    <message>
+        <source>Size of the stem files</source>
+        <translation>Tamaño de los archivos de stems</translation>
+    </message>
+    <message>
+        <source>Per 5 minute track</source>
+        <translation>Por pista de 5 minutos</translation>
+    </message>
+    <message>
+        <source>LIGHT ~18 MB</source>
+        <translation>LIGERO ~18 MB</translation>
+    </message>
+    <message>
+        <source>NORMAL ~24 MB</source>
+        <translation>NORMAL ~24 MB</translation>
+    </message>
+    <message>
+        <source>HIGH ~36 MB</source>
+        <translation>ALTO ~36 MB</translation>
+    </message>
+    <message>
+        <source>While a deck plays</source>
+        <translation>Mientras suena un deck</translation>
+    </message>
+    <message>
+        <source>The queue waits until the decks stop</source>
+        <translation>La cola espera a que paren los decks</translation>
+    </message>
+    <message>
+        <source>Separates with half the CPU, more slowly</source>
+        <translation>Separa con la mitad de CPU, más despacio</translation>
+    </message>
+    <message>
+        <source>GO ON SLOWER</source>
+        <translation>SEGUIR MÁS LENTO</translation>
+    </message>
+    <message>
+        <source>PAUSE</source>
+        <translation>PAUSAR</translation>
+    </message>
+    <message>
+        <source>Only while charging</source>
+        <translation>Solo con el cargador</translation>
+    </message>
+    <message>
+        <source>YES</source>
+        <translation>SÍ</translation>
+    </message>
+    <message>
+        <source>NO</source>
+        <translation>NO</translation>
+    </message>
+    <message>
+        <source>📋 QUEUE</source>
+        <translation>📋 COLA</translation>
+    </message>
+    <message>
+        <source>💾 STORAGE</source>
+        <translation>💾 ALMACENAMIENTO</translation>
+    </message>
+    <message>
+        <source>Stems kept in the app (tracks of folders that can't be written): %1 MB. The stems next to your tracks are deleted from the library, with 🎚 STEMS.</source>
+        <translation>Stems guardados en la app (pistas de carpetas en las que no se puede escribir): %1 MB. Los stems que están junto a tus pistas se borran desde la biblioteca, con 🎚 STEMS.</translation>
+    </message>
+    <message>
+        <source>DELETE</source>
+        <translation>BORRAR</translation>
+    </message>
+    <message>
+        <source>This device: ~%1 per 5 minute track</source>
+        <translation>Este dispositivo: ~%1 por pista de 5 minutos</translation>
+    </message>
+    <message>
+        <source>Downloading… %1%</source>
+        <translation>Descargando… %1%</translation>
+    </message>
+    <message>
+        <source>MEASURING…</source>
+        <translation>MIDIENDO…</translation>
+    </message>
+    <message>
+        <source>⏱ MEASURE</source>
+        <translation>⏱ MEDIR</translation>
+    </message>
+    <message>
+        <source>CANCEL</source>
+        <translation>CANCELAR</translation>
+    </message>
+    <message>
+        <source>⬇ %1 MB</source>
+        <translation>⬇ %1 MB</translation>
+    </message>
+</context>
+<context>
+    <name>StemsPopup</name>
+    <message>
+        <source>Nothing to separate: the tracks are already in the queue or can't be read.</source>
+        <translation>Nada que separar: las pistas ya están en la cola o no se pueden leer.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n track(s) added to the queue. Follow the progress in the top bar (🎚) or in Settings → Stems.</source>
+        <translation><numerusform>%n pista añadida a la cola. Sigue el progreso en la barra superior (🎚) o en Ajustes → Stems.</numerusform><numerusform>%n pistas añadidas a la cola. Sigue el progreso en la barra superior (🎚) o en Ajustes → Stems.</numerusform></translation>
+    </message>
+    <message>
+        <source>🎚 Separate into stems</source>
+        <translation>🎚 Separar en stems</translation>
+    </message>
+    <message>
+        <source>SELECTED TRACK</source>
+        <translation>PISTA SELECCIONADA</translation>
+    </message>
+    <message>
+        <source>WHOLE LIST</source>
+        <translation>TODA LA LISTA</translation>
+    </message>
+    <message>
+        <source>%1 · already has stems</source>
+        <translation>%1 · ya tiene stems</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n track(s) in the list</source>
+        <translation><numerusform>%n pista en la lista</numerusform><numerusform>%n pistas en la lista</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n with stems</source>
+        <translation><numerusform>%n con stems</numerusform><numerusform>%n con stems</numerusform></translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation>Modelo</translation>
+    </message>
+    <message>
+        <source>Fast and light</source>
+        <translation>Rápido y ligero</translation>
+    </message>
+    <message>
+        <source>1–4 min per track</source>
+        <translation>1–4 min por pista</translation>
+    </message>
+    <message>
+        <source>Best quality, slow</source>
+        <translation>La mejor calidad, lento</translation>
+    </message>
+    <message>
+        <source>8–30 min per track · 2.5 GB of memory</source>
+        <translation>8–30 min por pista · 2,5 GB de memoria</translation>
+    </message>
+    <message>
+        <source>⚠ Only %1 GB of memory is free now: HTDemucs may run out of memory. Close other apps or use Spleeter.</source>
+        <translation>⚠ Ahora solo hay %1 GB de memoria libres: HTDemucs puede quedarse sin memoria. Cierra otras apps o usa Spleeter.</translation>
+    </message>
+    <message>
+        <source>⚠ A deck is playing: the queue will wait until you stop the decks.</source>
+        <translation>⚠ Hay un deck sonando: la cola esperará a que pares los decks.</translation>
+    </message>
+    <message>
+        <source>⚠ A deck is playing: separating now may cause audio dropouts. It will go slower to leave CPU to the audio. You can make it wait in Settings → Stems.</source>
+        <translation>⚠ Hay un deck sonando: separar ahora puede provocar cortes de audio. Irá más lento para dejar CPU al audio. Puedes hacer que espere en Ajustes → Stems.</translation>
+    </message>
+    <message>
+        <source>Separate again the tracks that have stems</source>
+        <translation>Volver a separar las pistas que ya tienen stems</translation>
+    </message>
+    <message>
+        <source>YES</source>
+        <translation>SÍ</translation>
+    </message>
+    <message>
+        <source>NO</source>
+        <translation>NO</translation>
+    </message>
+    <message>
+        <source>🗑 DELETE STEMS</source>
+        <translation>🗑 BORRAR STEMS</translation>
+    </message>
+    <message>
+        <source>🗑 DELETE STEMS (%1)</source>
+        <translation>🗑 BORRAR STEMS (%1)</translation>
+    </message>
+    <message numerus="yes">
+        <source>Deleted the stems of %n track(s).</source>
+        <translation><numerusform>Borrados los stems de %n pista.</numerusform><numerusform>Borrados los stems de %n pistas.</numerusform></translation>
+    </message>
+    <message>
+        <source>CLOSE</source>
+        <translation>CERRAR</translation>
+    </message>
+    <message>
+        <source>🎚 SEPARATE %1</source>
+        <translation>🎚 SEPARAR %1</translation>
+    </message>
+    <message>
+        <source>🎚 SEPARATE</source>
+        <translation>🎚 SEPARAR</translation>
+    </message>
+    <message>
+        <source>This device: ~%1 per 5 minute track</source>
+        <translation>Este dispositivo: ~%1 por pista de 5 minutos</translation>
+    </message>
+    <message>
+        <source>%1% · CANCEL</source>
+        <translation>%1% · CANCELAR</translation>
+    </message>
+    <message>
+        <source>⬇ DOWNLOAD %1 MB</source>
+        <translation>⬇ DESCARGAR %1 MB</translation>
+    </message>
+</context>
+<context>
+    <name>StemsQueue</name>
+    <message>
+        <source>Reading the audio</source>
+        <translation>Leyendo el audio</translation>
+    </message>
+    <message>
+        <source>Loading the model</source>
+        <translation>Cargando el modelo</translation>
+    </message>
+    <message>
+        <source>Saving</source>
+        <translation>Guardando</translation>
+    </message>
+    <message>
+        <source>Separating</source>
+        <translation>Separando</translation>
+    </message>
+    <message>
+        <source>Paused</source>
+        <translation>En pausa</translation>
+    </message>
+    <message>
+        <source>Waiting until the decks stop playing</source>
+        <translation>Esperando a que paren los decks</translation>
+    </message>
+    <message>
+        <source>Waiting for the charger</source>
+        <translation>Esperando al cargador</translation>
+    </message>
+    <message>
+        <source>Queue finished</source>
+        <translation>Cola terminada</translation>
+    </message>
+    <message>
+        <source>No tracks in the queue. Choose a track or a list in the library and tap 🎚 STEMS.</source>
+        <translation>No hay pistas en la cola. Elige una pista o una lista en la biblioteca y pulsa 🎚 STEMS.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n track(s) waiting</source>
+        <translation><numerusform>%n pista pendiente</numerusform><numerusform>%n pistas pendientes</numerusform></translation>
+    </message>
+    <message>
+        <source>CANCEL ALL</source>
+        <translation>CANCELAR TODO</translation>
+    </message>
+    <message>
+        <source>▶ RESUME</source>
+        <translation>▶ REANUDAR</translation>
+    </message>
+    <message>
+        <source>⏸ PAUSE</source>
+        <translation>⏸ PAUSAR</translation>
+    </message>
+    <message>
+        <source>CLEAR DONE</source>
+        <translation>LIMPIAR TERMINADAS</translation>
+    </message>
+    <message>
+        <source>%1 left</source>
+        <translation>quedan %1</translation>
+    </message>
+    <message>
+        <source>Ready: reload the track to use its stems</source>
+        <translation>Listo: vuelve a cargar la pista para usar sus stems</translation>
+    </message>
+</context>
+<context>
     <name>StreamingHub</name>
     <message>
         <source>🔥 AUDIUS (free)</source>
@@ -2396,6 +2788,14 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>+ ALL</source>
         <translation>+ TODAS</translation>
+    </message>
+    <message>
+        <source>🎚 STEMS ✓</source>
+        <translation>🎚 STEMS ✓</translation>
+    </message>
+    <message>
+        <source>🎚 STEMS</source>
+        <translation>🎚 STEMS</translation>
     </message>
     <message>
         <source>⬇ COPY</source>
@@ -3153,6 +3553,60 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>Could not save the downloaded track</source>
         <translation>No se pudo guardar la pista descargada</translation>
+    </message>
+</context>
+<context>
+    <name>mixxx::stems::StemsManager</name>
+    <message>
+        <source>Track %1 of %2: %3%</source>
+        <translation>Pista %1 de %2: %3%</translation>
+    </message>
+    <message>
+        <source>Separating stems</source>
+        <translation>Separando stems</translation>
+    </message>
+</context>
+<context>
+    <name>stems</name>
+    <message>
+        <source>Canceled</source>
+        <translation>Cancelada</translation>
+    </message>
+    <message>
+        <source>The model is missing or damaged: download it again in Settings → Stems</source>
+        <translation>Falta el modelo o está dañado: vuelve a descargarlo en Ajustes → Stems</translation>
+    </message>
+    <message>
+        <source>The file can't be found</source>
+        <translation>No se encuentra el archivo</translation>
+    </message>
+    <message>
+        <source>The audio of the file can't be read</source>
+        <translation>No se puede leer el audio del archivo</translation>
+    </message>
+    <message>
+        <source>Too long: up to 20 minutes per track</source>
+        <translation>Demasiado larga: hasta 20 minutos por pista</translation>
+    </message>
+    <message>
+        <source>The stem file can't be saved</source>
+        <translation>No se puede guardar el archivo de stems</translation>
+    </message>
+    <message>
+        <source>Not enough memory: close other apps or use Spleeter</source>
+        <translation>No hay memoria suficiente: cierra otras apps o usa Spleeter</translation>
+    </message>
+    <message>
+        <source>The AI engine can't be loaded on this device</source>
+        <translation>El motor de IA no se puede cargar en este dispositivo</translation>
+    </message>
+    <message>
+        <source>%1 s</source>
+        <translation>%1 s</translation>
+    </message>
+    <message>
+        <source>%1 min</source>
+        <translation>%1 min</translation>
     </message>
 </context>
 </TS>

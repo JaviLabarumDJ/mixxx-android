@@ -13,7 +13,47 @@ Item {
     required property var currentTrack
     required property string group
 
-    property int activePadMode: 0 // 0: Hotcue, 1: Loop
+    property int activePadMode: 0 // 0: Hotcue, 1: Loop, 2: Stems
+
+    // The names of the stems of the stem files made by the app
+    function stemName(label) {
+        switch (label) {
+        case "Drums":
+            return qsTr("DRUMS");
+        case "Bass":
+            return qsTr("BASS");
+        case "Vocals":
+            return qsTr("VOCALS");
+        case "Other":
+            return qsTr("OTHER");
+        default:
+            return label.toUpperCase();
+        }
+    }
+
+    // Plays only one stem, or all again if it is the only one playing
+    function soloStem(index) {
+        let soloed = true;
+        for (let i = 0; i < stemRepeater.count; ++i) {
+            const muted = stemRepeater.itemAt(i).muteControl.value > 0;
+            if (muted !== (i !== index))
+                soloed = false;
+        }
+        for (let i = 0; i < stemRepeater.count; ++i)
+            stemRepeater.itemAt(i).muteControl.value = soloed ? 0 : (i === index ? 0 : 1);
+    }
+
+    Mixxx.ControlProxy {
+        id: stemCountControl
+
+        group: root.group
+        key: "stem_count"
+
+        onValueChanged: {
+            if (value <= 0 && root.activePadMode === 2)
+                root.activePadMode = 0;
+        }
+    }
 
     Rectangle {
         color: '#0E0E0E'
@@ -236,6 +276,110 @@ Item {
             }
         }
 
+        // The stems of the track: tap to mute, hold to play only that one
+        RowLayout {
+            id: stemTab
+
+            anchors.fill: parent
+            anchors.margins: root.width < 260 ? 4 : 8
+            spacing: root.width < 260 ? 3 : 6
+            visible: root.activePadMode === 2
+
+            Repeater {
+                id: stemRepeater
+
+                model: root.currentTrack ? root.currentTrack.stemsModel : 0
+
+                ColumnLayout {
+                    id: stem
+
+                    required property int index
+                    required property color color
+                    required property string label
+                    readonly property string group: `${root.group.substr(0, root.group.length - 1)}_Stem${index + 1}]`
+                    readonly property bool muted: muteControl.value > 0
+                    property alias muteControl: muteControl
+
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    // The stems share the width equally
+                    Layout.preferredWidth: 1
+                    Layout.minimumWidth: 0
+                    spacing: 3
+
+                    Mixxx.ControlProxy {
+                        id: muteControl
+
+                        group: stem.group
+                        key: "mute"
+                    }
+                    Mixxx.ControlProxy {
+                        id: volumeControl
+
+                        group: stem.group
+                        key: "volume"
+                    }
+
+                    Rectangle {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        radius: 5
+                        color: stem.muted ? "#1a1d24" : Qt.darker(stem.color, stemMouse.pressed ? 1.6 : 1.2)
+                        border.color: stem.color
+                        border.width: stem.muted ? 1 : 2
+
+                        Text {
+                            anchors.centerIn: parent
+                            width: parent.width - 4
+                            horizontalAlignment: Text.AlignHCenter
+                            // Long names shrink to fit narrow decks
+                            fontSizeMode: Text.HorizontalFit
+                            minimumPixelSize: 7
+                            text: root.stemName(stem.label)
+                            color: stem.muted ? "#607d8b" : "#ffffff"
+                            font.bold: true
+                            font.pixelSize: root.width < 260 ? 9 : 11
+                            font.strikeout: stem.muted
+                        }
+
+                        MouseArea {
+                            id: stemMouse
+
+                            anchors.fill: parent
+                            onClicked: muteControl.value = stem.muted ? 0 : 1
+                            onPressAndHold: root.soloStem(stem.index)
+                        }
+                    }
+
+                    // Volume in steps
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: false
+                        Layout.preferredHeight: 22
+                        Layout.maximumHeight: 22
+                        spacing: 2
+
+                        VolumeStep {
+                            step: -0.25
+                            control: volumeControl
+                        }
+                        Text {
+                            Layout.fillWidth: true
+                            Layout.minimumWidth: 0
+                            horizontalAlignment: Text.AlignHCenter
+                            elide: Text.ElideRight
+                            text: `${Math.round(volumeControl.value * 100)}%`
+                            color: "#cfd8dc"
+                            font.pixelSize: 9
+                        }
+                        VolumeStep {
+                            step: 0.25
+                            control: volumeControl
+                        }
+                    }
+                }
+            }
+        }
     }
     ColumnLayout {
         id: tabs
@@ -345,6 +489,62 @@ Item {
                     root.activePadMode = 1;
                 }
             }
+        }
+
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            visible: stemCountControl.value > 0
+            radius: 5
+            color: root.activePadMode === 2 ? "#6a1b9a" : (stemsTabMouse.pressed ? "#2e3440" : "#181c24")
+            border.color: root.activePadMode === 2 ? "#ffffff" : "#2c3544"
+            border.width: root.activePadMode === 2 ? 1.5 : 1
+
+            Text {
+                anchors.centerIn: parent
+                text: "STEM"
+                font.bold: true
+                font.pixelSize: 9
+                color: root.activePadMode === 2 ? "#ffffff" : "#8293a7"
+            }
+
+            MouseArea {
+                id: stemsTabMouse
+                anchors.fill: parent
+                onClicked: {
+                    root.activePadMode = 2;
+                }
+            }
+        }
+    }
+
+    // Changes the volume of a stem by a step
+    component VolumeStep: Rectangle {
+        id: volumeStep
+
+        property real step
+        property var control
+
+        Layout.preferredWidth: 18
+        Layout.minimumWidth: 14
+        Layout.fillHeight: true
+        radius: 4
+        color: volumeStepMouse.pressed ? "#2e3440" : "#181c24"
+        border.color: "#2c3544"
+
+        Text {
+            anchors.centerIn: parent
+            text: volumeStep.step < 0 ? "−" : "+"
+            color: "#cfd8dc"
+            font.bold: true
+            font.pixelSize: 12
+        }
+
+        MouseArea {
+            id: volumeStepMouse
+
+            anchors.fill: parent
+            onClicked: volumeStep.control.value = Math.max(0, Math.min(1, volumeStep.control.value + volumeStep.step))
         }
     }
 }

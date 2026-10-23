@@ -5,8 +5,8 @@
 ![Android Version](https://img.shields.io/badge/Android-10.0%2B%20(API%2029--35)-brightgreen?logo=android&logoColor=white)
 ![Architecture](https://img.shields.io/badge/Arch-ARM64%20(arm64--v8a)-blue?logo=arm)
 ![Framework](https://img.shields.io/badge/Qt-6.8%20%7C%20QML-41cd52?logo=qt)
-[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.4.2-android)
-[![Download APK](https://img.shields.io/badge/Download-APK%20(249%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.4.2-android/mixxx-android-v1.4.2.apk)
+[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.5.0-android)
+[![Download APK](https://img.shields.io/badge/Download-APK%20(283%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.5.0-android/mixxx-android-v1.5.0.apk)
 ![License](https://img.shields.io/badge/License-GPL%20v2-orange.svg)
 
 **The world's premier open-source DJ software, fully ported, modernized, and touch-optimized for Android smartphones, tablets, and standalone hardware setups.**
@@ -28,7 +28,15 @@ Whether you're performing live sets using a USB DJ controller, mixing on the go 
 <!-- START_AI_GENERATED_DISCLAIMER -->
 <!-- This section was written with the assistance of an AI Agent (Claude). -->
 
-## 🆕 What's New in v1.4.2
+## 🆕 What's New in v1.5.0
+
+* **Stems with AI** (inspired by [Dani Roman](https://www.instagram.com/danigiavanni)'s [mixxx-stems](https://github.com/dromangdev/mixxx-stems)): split the tracks you choose into **drums, bass, vocals and the rest**, then mute, solo or turn down each part from the new **STEM** pads of the deck. Tap **🎚 STEMS** in the library to separate the selected track or a whole list; a queue in the top bar shows the progress, with pause, resume and cancel.
+* **Two models to choose from**, downloaded from the app (*Settings → Stems*): **Spleeter + Wiener** (fast and light, ~250 MB of memory, its bass reinforced with the low end of the track) and **HTDemucs** (the best quality, slow, 2–2.5 GB of memory). **⏱ MEASURE** tells how long your device takes: on a Lenovo Tab M11, about 76 s and 15 min for a 5 minute track.
+* **The stems stay next to your tracks** in a hidden `.stems` folder (`Song.mp3.stem.mp4`, the Native Instruments stem format), and keep the cues and beatgrid of the track. Tracks of read-only drives keep their stems in the app.
+* **Safe while you play:** the separation runs at low priority, uses half the CPU while a deck plays (or waits, if you prefer), can wait for the charger, and keeps going with the screen off.
+* 📖 **Full stems manual:** [English](../docs/stems/STEMS_MANUAL_en.md) · [Castellano](../docs/stems/MANUAL_STEMS_es.md)
+
+## 🗂️ What was new in v1.4.2
 
 * **Rekordbox "date added"** (by [morpheasgr](https://github.com/morpheasgr)): the *Added* column of Rekordbox sticks and stick backups shows the day each track was added to the Rekordbox collection, and tracks that **⬇ COPY**, **+ ALL** or **+ PLAYLIST** bring into the library keep that date.
 * **Playlist order:** a new **#** column shows each track's position in playlists, history and Rekordbox playlists, and a playlist opens in its own order. A whole USB drive opens newest first.
@@ -144,7 +152,7 @@ This release merges the work of **[morpheasgr (Angelos Exarchos)](https://github
 ## 🚀 Installation & Quick Start
 
 ### Option A: Install Pre-Built Signed APK
-1. Download [**mixxx-android-v1.4.2.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.4.2-android/mixxx-android-v1.4.2.apk) from the [Official GitHub Release v1.4.2](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.4.2-android).
+1. Download [**mixxx-android-v1.5.0.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.5.0-android/mixxx-android-v1.5.0.apk) from the [Official GitHub Release v1.5.0](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.5.0-android).
 2. Enable *"Install unknown apps"* in your Android device settings.
 3. Install and launch **MIXXX**.
 4. Grant storage and audio permissions when prompted.
@@ -209,6 +217,9 @@ $ANDROID_SDK/build-tools/35.0.0/apksigner sign \
 
 * **Android Port & Touch UI Enhancements:** [Javier Sáenz (JaviLabarumDJ)](https://github.com/JaviLabarumDJ)
 * **Contributions (v1.4.0 – v1.4.2):** [morpheasgr (Angelos Exarchos)](https://github.com/morpheasgr) — *merged from [morpheasgr/mixxx-android (android-stable)](https://github.com/morpheasgr/mixxx-android/tree/android-stable): Rekordbox playlist copies, library and stick backups, controller library navigation, upstream-friendly architecture, beatgrid corrections from the deck, and Rekordbox dates and playlist order.*
+<!-- START_AI_GENERATED_DISCLAIMER --><!-- The next line was written with the assistance of an AI Agent (Claude). -->
+* **Stems:** inspired by the live stems of [Dani Roman (@danigiavanni)](https://www.instagram.com/danigiavanni) in [dromangdev/mixxx-stems](https://github.com/dromangdev/mixxx-stems). Models: [Spleeter](https://github.com/deezer/spleeter) by Deezer and [HTDemucs](https://github.com/facebookresearch/demucs) by Meta (both MIT), run with [ONNX Runtime](https://onnxruntime.ai).
+<!-- END_AI_GENERATED_DISCLAIMER -->
 * **Upstream Project:** [Mixxx DJ Development Team](https://github.com/mixxxdj/mixxx) - *Free & Open Source DJ Software*
 
 ## 📄 License

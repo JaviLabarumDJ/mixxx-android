@@ -447,6 +447,21 @@ Rectangle {
                 onClicked: playlistPopup.openFor(quickLoadBar.hasTrack ? quickLoadBar.selectedUrls[0] : "")
             }
 
+            // Separates the selected track or the whole list into stems
+            Skin.Button {
+                Layout.preferredHeight: 38
+                Layout.preferredWidth: 100
+                activeColor: Theme.accentColor
+                backgroundColor: quickLoadBar.hasTracks ? "#2e3440" : "#262930"
+                normalColor: quickLoadBar.hasTracks ? "#ffffff" : "#78909c"
+                enabled: quickLoadBar.hasTracks
+                font.bold: true
+                // Marked when the selected track has stems
+                text: quickLoadBar.hasTrack && Mixxx.Stems.jobs && Mixxx.Stems.hasStems(quickLoadBar.selectedUrls[0]) ? qsTr("🎚 STEMS ✓") : qsTr("🎚 STEMS")
+
+                onClicked: stemsPopup.openFor(quickLoadBar.hasTrack ? quickLoadBar.selectedUrls[0] : "")
+            }
+
             // Copies a Rekordbox playlist of a USB drive to the device
             Skin.Button {
                 Layout.preferredHeight: 38
@@ -497,6 +512,13 @@ Rectangle {
                 }
             }
         }
+    }
+
+    LibraryComponent.StemsPopup {
+        id: stemsPopup
+
+        parent: Overlay.overlay
+        trackList: view.model
     }
 
     Popup {

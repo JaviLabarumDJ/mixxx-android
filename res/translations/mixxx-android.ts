@@ -39,6 +39,18 @@ This edition of Mixxx for Android was born from a personal need as a DJ: to have
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>THANKS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Live stems in Mixxx: his mixxx-stems project inspired the stem separation of this app.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Beatgrid editing, Rekordbox playlists and dates, library backups and controller navigation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Based on the open source Mixxx project. Mobile adaptation by JaviLabarum.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -720,6 +732,25 @@ Button</source>
     <name>FXAssign</name>
     <message>
         <source>FX Assign</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>HotcueAndStem</name>
+    <message>
+        <source>DRUMS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BASS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VOCALS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OTHER</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1526,6 +1557,22 @@ Aborting the operation to avoid library inconsistencies</source>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>🎚 Stems queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CLOSE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>🎚 Stems ready: %1. If it is loaded on a deck, load it again to use them.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>🎚 %1 couldn&apos;t be separated: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MicrophoneDuckingPanel</name>
@@ -1762,6 +1809,14 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>Theme, Decks, Display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stems</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drums, bass, vocals with AI</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2131,6 +2186,353 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
 </context>
 <context>
+    <name>Stems</name>
+    <message>
+        <source>Stems</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The download of %1 failed: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>🎚 STEMS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Splits the tracks you choose into drums, bass, vocals and the rest, so that you can mute or mix each part on the deck. In the library, select a track or open a list and tap 🎚 STEMS. The stems are saved next to each track, in a hidden .stems folder, and they are used whenever you load the track. If its folder can&apos;t be written, they stay in the app.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>⚠ Separating uses a lot of CPU. While you play it may cause audio dropouts: better prepare your tracks before the session.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>🧠 MODELS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download the models you want to use. The times are for a 5 minute track and depend a lot on the device: tap MEASURE to know yours.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fast and light. Good quality, the vocals may sound a bit metallic. Its bass is reinforced with the low end of the track.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1–4 min per track · ~250 MB of memory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The best quality: cleaner vocals and bass. Slow and memory hungry: best to prepare playlists with the charger plugged in and without playing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8–30 min per track · 2–2.5 GB of memory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This device has %1 GB of memory: HTDemucs may not fit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>⚙️ OPTIONS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ASK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size of the stem files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Per 5 minute track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LIGHT ~18 MB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NORMAL ~24 MB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HIGH ~36 MB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>While a deck plays</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The queue waits until the decks stop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Separates with half the CPU, more slowly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GO ON SLOWER</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PAUSE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only while charging</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>YES</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NO</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>📋 QUEUE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>💾 STORAGE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stems kept in the app (tracks of folders that can&apos;t be written): %1 MB. The stems next to your tracks are deleted from the library, with 🎚 STEMS.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DELETE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This device: ~%1 per 5 minute track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Downloading… %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MEASURING…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>⏱ MEASURE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CANCEL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>⬇ %1 MB</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StemsPopup</name>
+    <message>
+        <source>Nothing to separate: the tracks are already in the queue or can&apos;t be read.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n track(s) added to the queue. Follow the progress in the top bar (🎚) or in Settings → Stems.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>🎚 Separate into stems</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SELECTED TRACK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WHOLE LIST</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 · already has stems</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n track(s) in the list</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n with stems</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fast and light</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1–4 min per track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Best quality, slow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8–30 min per track · 2.5 GB of memory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>⚠ Only %1 GB of memory is free now: HTDemucs may run out of memory. Close other apps or use Spleeter.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>⚠ A deck is playing: the queue will wait until you stop the decks.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>⚠ A deck is playing: separating now may cause audio dropouts. It will go slower to leave CPU to the audio. You can make it wait in Settings → Stems.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Separate again the tracks that have stems</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>YES</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NO</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>🗑 DELETE STEMS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>🗑 DELETE STEMS (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Deleted the stems of %n track(s).</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>CLOSE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>🎚 SEPARATE %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>🎚 SEPARATE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This device: ~%1 per 5 minute track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1% · CANCEL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>⬇ DOWNLOAD %1 MB</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StemsQueue</name>
+    <message>
+        <source>Reading the audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loading the model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saving</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Separating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waiting until the decks stop playing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waiting for the charger</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Queue finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No tracks in the queue. Choose a track or a list in the library and tap 🎚 STEMS.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n track(s) waiting</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>CANCEL ALL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>▶ RESUME</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>⏸ PAUSE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CLEAR DONE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ready: reload the track to use its stems</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>StreamingHub</name>
     <message>
         <source>🔥 AUDIUS (free)</source>
@@ -2381,6 +2783,14 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>+ ALL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>🎚 STEMS ✓</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>🎚 STEMS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3138,6 +3548,60 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>Could not save the downloaded track</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>mixxx::stems::StemsManager</name>
+    <message>
+        <source>Track %1 of %2: %3%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Separating stems</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>stems</name>
+    <message>
+        <source>Canceled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The model is missing or damaged: download it again in Settings → Stems</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The file can&apos;t be found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The audio of the file can&apos;t be read</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too long: up to 20 minutes per track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The stem file can&apos;t be saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not enough memory: close other apps or use Spleeter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The AI engine can&apos;t be loaded on this device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 min</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -7,6 +7,7 @@ import QtQuick.Window
 import QtQuick.Shapes
 import Qt5Compat.GraphicalEffects
 import "Theme"
+import "stems.js" as StemsText
 
 Item {
     id: root
@@ -223,11 +224,43 @@ Item {
                 }
             }
 
+            // Progress of the stem separation, opens its queue
+            Skin.Button {
+                id: stemsIndicator
+
+                readonly property bool active: Mixxx.Stems.pendingCount > 0
+
+                anchors.right: showPreferencesButton.left
+                anchors.rightMargin: active ? 6 : 0
+                anchors.verticalCenter: parent.verticalCenter
+                visible: active
+                height: 30
+                width: active ? stemsIndicatorMetrics.width + 20 : 0
+                activeColor: Theme.accentColor
+                backgroundColor: Mixxx.Stems.hold !== "" ? "#4a3a12" : "#1e3a5f"
+                normalColor: "#ffffff"
+                font.bold: true
+                font.pixelSize: 11
+                text: Mixxx.Stems.hold !== ""
+                        ? `🎚 ⏸ ${Mixxx.Stems.pendingCount}`
+                        : `🎚 ${Math.round(Mixxx.Stems.progress * 100)}% · ${Mixxx.Stems.pendingCount}`
+
+                onClicked: stemsQueuePopup.open()
+
+                TextMetrics {
+                    id: stemsIndicatorMetrics
+
+                    font.bold: true
+                    font.pixelSize: 11
+                    text: stemsIndicator.text
+                }
+            }
+
             Flickable {
                 id: toolbarFlickable
                 anchors.left: logoText.right
                 anchors.leftMargin: 8
-                anchors.right: showPreferencesButton.left
+                anchors.right: stemsIndicator.left
                 anchors.rightMargin: 8
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
@@ -1041,6 +1074,127 @@ Item {
         width: root.applicationWindow.isMobile ? parent.width : Math.min(1400, parent.width)
         x: root.applicationWindow.isMobile ? 0 : Math.round((parent.width - width) / 2)
         y: root.applicationWindow.isMobile ? 0 : Math.round((parent.height - height) / 2)
+    }
+
+    // The queue of the stem separation
+    Popup {
+        id: stemsQueuePopup
+
+        anchors.centerIn: parent
+        width: Math.min(640, parent.width - 20)
+        height: Math.min(stemsQueueColumn.implicitHeight + 40, parent.height - 20)
+        modal: true
+        padding: 16
+
+        background: Rectangle {
+            color: "#14171f"
+            radius: 10
+            border.color: "#2a3648"
+            border.width: 1
+        }
+
+        Flickable {
+            anchors.fill: parent
+            contentHeight: stemsQueueColumn.implicitHeight
+            clip: true
+            boundsBehavior: Flickable.StopAtBounds
+
+            ColumnLayout {
+                id: stemsQueueColumn
+
+                width: parent.width
+                spacing: 10
+
+                RowLayout {
+                    Layout.fillWidth: true
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: qsTr("🎚 Stems queue")
+                        color: "#ffffff"
+                        font.bold: true
+                        font.pixelSize: 15
+                    }
+                    Skin.Button {
+                        implicitWidth: 90
+                        implicitHeight: 32
+                        activeColor: Theme.accentColor
+                        backgroundColor: "#2e3440"
+                        normalColor: "#ffffff"
+                        font.bold: true
+                        text: qsTr("CLOSE")
+                        onClicked: stemsQueuePopup.close()
+                    }
+                }
+
+                Skin.StemsQueue {
+                    Layout.fillWidth: true
+                }
+            }
+        }
+    }
+
+    // Tells when a track was separated into stems
+    Rectangle {
+        id: stemsToast
+
+        property string text: ""
+        property bool isError: false
+
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 60
+        z: 95
+        visible: opacity > 0
+        opacity: stemsToastTimer.running ? 1 : 0
+        width: Math.min(560, parent.width - 40)
+        implicitHeight: stemsToastText.implicitHeight + 20
+        radius: 8
+        color: isError ? "#4a1e1e" : "#1e3a2a"
+        border.color: isError ? "#ef5350" : "#66bb6a"
+        border.width: 1
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 250
+            }
+        }
+
+        Text {
+            id: stemsToastText
+
+            anchors.fill: parent
+            anchors.margins: 10
+            wrapMode: Text.WordWrap
+            color: "#ffffff"
+            font.pixelSize: 12
+            text: stemsToast.text
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: stemsToastTimer.stop()
+        }
+
+        Timer {
+            id: stemsToastTimer
+
+            interval: 5000
+        }
+
+        Connections {
+            target: Mixxx.Stems
+
+            function onTrackFinished(location, name, error) {
+                if (error === "canceled")
+                    return;
+                stemsToast.isError = error !== "";
+                stemsToast.text = error === ""
+                        ? qsTr("🎚 Stems ready: %1. If it is loaded on a deck, load it again to use them.").arg(name)
+                        : qsTr("🎚 %1 couldn't be separated: %2").arg(name).arg(StemsText.errorText(error));
+                stemsToastTimer.restart();
+            }
+        }
     }
 
     Skin.XYPad {

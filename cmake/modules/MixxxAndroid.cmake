@@ -116,3 +116,71 @@ add_custom_target(
 )
 add_dependencies(mixxx-android-qml-overrides copy-resource-android)
 add_dependencies(mixxx mixxx-android-qml-overrides)
+
+# Stem separation: splits tracks into .stem.mp4 files with ONNX models that
+# the app downloads (see src/stems/). ONNX Runtime is only loaded when a
+# track is separated, so it is packaged but not linked.
+if(STEM)
+  set(MIXXX_ONNXRUNTIME_VERSION 1.31.0)
+  set(
+    MIXXX_ONNXRUNTIME_AAR
+    "${CMAKE_CURRENT_BINARY_DIR}/onnxruntime-android-${MIXXX_ONNXRUNTIME_VERSION}.aar"
+  )
+  set(MIXXX_ONNXRUNTIME_DIR "${CMAKE_CURRENT_BINARY_DIR}/onnxruntime")
+  if(NOT EXISTS "${MIXXX_ONNXRUNTIME_DIR}/headers/onnxruntime_cxx_api.h")
+    file(
+      DOWNLOAD
+        "https://repo1.maven.org/maven2/com/microsoft/onnxruntime/onnxruntime-android/${MIXXX_ONNXRUNTIME_VERSION}/onnxruntime-android-${MIXXX_ONNXRUNTIME_VERSION}.aar"
+        "${MIXXX_ONNXRUNTIME_AAR}"
+      EXPECTED_HASH
+        SHA256=72683787a80d0608a3121b967d8e1239aef48286826661c953211626690540a7
+      SHOW_PROGRESS
+    )
+    file(MAKE_DIRECTORY "${MIXXX_ONNXRUNTIME_DIR}")
+    file(
+      ARCHIVE_EXTRACT
+      INPUT "${MIXXX_ONNXRUNTIME_AAR}"
+      DESTINATION "${MIXXX_ONNXRUNTIME_DIR}"
+      PATTERNS "headers/*" "jni/${ANDROID_ABI}/libonnxruntime.so"
+    )
+    file(REMOVE "${MIXXX_ONNXRUNTIME_AAR}")
+  endif()
+
+  target_compile_definitions(mixxx-lib PUBLIC __STEM_SEPARATION__)
+  target_include_directories(
+    mixxx-lib
+    SYSTEM
+    PRIVATE "${MIXXX_ONNXRUNTIME_DIR}/headers"
+  )
+  target_sources(
+    mixxx-lib
+    PRIVATE
+      src/stems/htdemucsseparator.cpp
+      src/stems/onnxruntimeloader.cpp
+      src/stems/spleeterseparator.cpp
+      src/stems/stemcompanion.cpp
+      src/stems/stemfilewriter.cpp
+      src/stems/stemmodels.cpp
+      src/stems/stemseparator.cpp
+      src/stems/stemsmanager.cpp
+      src/stems/stemsworker.cpp
+  )
+  # The STFT of Spleeter
+  target_link_libraries(mixxx-lib PRIVATE "${FFTW3_INCLUDE_DIR}/../lib/libfftw3f.a")
+  set_property(
+    TARGET mixxx
+    APPEND
+    PROPERTY
+      QT_ANDROID_EXTRA_LIBS
+        "${MIXXX_ONNXRUNTIME_DIR}/jni/${ANDROID_ABI}/libonnxruntime.so"
+  )
+  if(QML)
+    target_compile_definitions(mixxx-qml-lib PUBLIC __STEM_SEPARATION__)
+    target_include_directories(
+      mixxx-qml-lib
+      SYSTEM
+      PRIVATE "${MIXXX_ONNXRUNTIME_DIR}/headers"
+    )
+    target_sources(mixxx-qml-lib PRIVATE src/qml/qmlstemsproxy.cpp)
+  endif()
+endif()
