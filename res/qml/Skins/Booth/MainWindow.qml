@@ -8,7 +8,9 @@ import QtQuick.Controls
 // for landscape phones and tablets. The waveforms are stacked over the
 // whole width, the deck displays are below them and BEAT FX (effect unit 1)
 // is on the right. BROWSE shows the skin's browser (BoothBrowse.qml) in
-// place of the waveforms; LOAD 1/2 open it for one deck. UTILITY opens the
+// place of the waveforms; LOAD 1/2 open it for one deck. DJ shows touch
+// controls for playing without a controller (BoothDjView.qml), and is
+// shown when no controller is used; XY the XY pad. UTILITY opens the
 // shared settings in the skin's frame.
 //
 // A skin is a folder in res/qml/Skins with a MainWindow.qml whose root item
@@ -19,9 +21,23 @@ Item {
     required property ApplicationWindow applicationWindow
     property var menuBar: null
 
-    // 2: the browser is shown (BROWSE)
+    // 1: waveforms (WAVE), 2: the browser (BROWSE), 3: touch controls
+    // (DJ), 4: the XY pad (XY)
     property int viewMode: 1
     readonly property bool browsing: viewMode === 2
+    readonly property bool djView: viewMode === 3
+    readonly property bool xyView: viewMode === 4
+    // A controller with an enabled mapping is connected. Without one the DJ
+    // view is shown, as the decks can't be played otherwise.
+    readonly property bool controllerConnected: {
+        const devices = Mixxx.ControllerManager.knownDevices;
+        for (let i = 0; i < devices.length; ++i) {
+            if (devices[i].enabled) {
+                return true;
+            }
+        }
+        return false;
+    }
     // The deck LOAD 1/2 opened the browser for, or "". Loading a track into
     // it returns to the waveforms.
     property string loadTarget: ""
@@ -69,13 +85,35 @@ Item {
         root.loadTarget = (group && group.length > 0) ? group : "[Channel1]";
         root.viewMode = 2;
     }
-    function showWaveforms() {
+    // The view to return to after browsing
+    property int playView: 1
+
+    function showPlayView() {
         root.loadTarget = "";
-        root.viewMode = 1;
+        root.viewMode = root.playView;
+    }
+    function showView(mode) {
+        root.loadTarget = "";
+        root.viewMode = mode;
+        root.playView = mode;
+    }
+
+    Component.onCompleted: {
+        if (!root.controllerConnected) {
+            root.showView(3);
+        }
+    }
+    // A controller plugged in or out mid-set: its view
+    onControllerConnectedChanged: {
+        if (!root.controllerConnected && root.viewMode === 1) {
+            root.showView(3);
+        } else if (root.controllerConnected && root.viewMode === 3) {
+            root.showView(1);
+        }
     }
     function toggleLibraryView() {
         if (root.browsing && root.loadTarget.length === 0) {
-            root.showWaveforms();
+            root.showPlayView();
         } else {
             root.loadTarget = "";
             root.viewMode = 2;
@@ -85,7 +123,7 @@ Item {
     Connections {
         function onTrackChanged() {
             if (root.browsing) {
-                root.showWaveforms();
+                root.showPlayView();
             }
         }
 
@@ -350,9 +388,14 @@ Item {
             spacing: 6
 
             Tab {
-                active: !root.browsing
+                active: root.viewMode === 1
                 label: qsTr("WAVE")
-                onClicked: root.showWaveforms()
+                onClicked: root.showView(1)
+            }
+            Tab {
+                active: root.djView
+                label: "DJ"
+                onClicked: root.showView(3)
             }
             Tab {
                 active: root.browsing && root.loadTarget.length === 0
@@ -378,9 +421,14 @@ Item {
             spacing: 6
 
             Tab {
+                active: root.xyView
+                label: "XY"
+                onClicked: root.xyView ? root.showView(root.controllerConnected ? 1 : 3) : root.showView(4)
+            }
+            Tab {
                 active: root.beatFxShown
                 label: "BEAT FX"
-                visible: root.compact && !root.browsing
+                visible: root.compact && !root.browsing && !root.xyView
                 onClicked: root.beatFxShown = !root.beatFxShown
             }
             Tab {
@@ -394,32 +442,47 @@ Item {
         Row {
             id: deckPanels
 
-            anchors.bottom: parent.bottom
+            anchors.bottom: root.djView ? djView.top : parent.bottom
             anchors.bottomMargin: content.gap
             anchors.left: parent.left
             anchors.leftMargin: content.gap
             anchors.right: parent.right
             anchors.rightMargin: content.gap
-            height: root.browsing ? (root.compact ? 64 : 84) : Math.round(root.height * (root.compact ? 0.36 : 0.3))
+            height: root.viewMode !== 1 ? (root.compact ? 58 : 84) : Math.round(root.height * (root.compact ? 0.36 : 0.3))
             spacing: content.gap
 
             Booth.BoothDeckPanel {
                 deckNumber: 1
                 group: "[Channel1]"
                 height: parent.height
-                slim: root.browsing
+                slim: root.viewMode !== 1
                 width: (parent.width - parent.spacing) / 2
             }
             Booth.BoothDeckPanel {
                 deckNumber: 2
                 group: "[Channel2]"
                 height: parent.height
-                slim: root.browsing
+                slim: root.viewMode !== 1
                 width: (parent.width - parent.spacing) / 2
             }
         }
 
-        // ---- Waveforms, or the library while browsing ----
+        // ---- Touch controls ----
+        Booth.BoothDjView {
+            id: djView
+
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: content.gap
+            anchors.left: parent.left
+            anchors.leftMargin: content.gap
+            anchors.right: parent.right
+            anchors.rightMargin: content.gap
+            compact: root.compact
+            height: Math.round(root.height * (root.compact ? 0.5 : 0.46))
+            visible: root.djView
+        }
+
+        // ---- Waveforms, the library while browsing, or the XY pad ----
         Item {
             id: middle
 
@@ -432,7 +495,7 @@ Item {
 
             Item {
                 anchors.fill: parent
-                visible: !root.browsing
+                visible: !root.browsing && !root.xyView
 
                 Column {
                     id: deckInfos
@@ -442,7 +505,8 @@ Item {
                     anchors.leftMargin: content.gap
                     anchors.top: parent.top
                     spacing: content.gap
-                    width: root.compact ? 86 : 124
+                    visible: !(root.djView && root.compact)
+                    width: visible ? (root.compact ? 86 : 124) : 0
 
                     DeckInfo {
                         deckNumber: 1
@@ -483,6 +547,8 @@ Item {
                 Booth.BoothBeatFx {
                     id: beatFx
 
+                    // The DJ view leaves less height
+                    compact: root.djView
                     anchors.bottom: parent.bottom
                     anchors.right: parent.right
                     anchors.rightMargin: content.gap
@@ -514,6 +580,29 @@ Item {
                 }
             }
 
+            // The XY pad of the Classic skin, in the colors of this one
+            Skin.XYPad {
+                anchors.fill: parent
+                accentColor: "#2f9bff"
+                border.color: "#2a2c30"
+                buttonBorderColor: "#3a3c40"
+                buttonColor: "#141518"
+                buttonTextColor: "#9a9ea6"
+                closable: false
+                color: "#0c0d0f"
+                controlRadius: 2
+                deck1Color: "#1f6fd1"
+                deck2Color: "#e8650f"
+                holdColor: "#ff6a13"
+                radius: 0
+                surfaceBorderColor: "#2a2c30"
+                surfaceColor: "#000000"
+                surfaceRadius: 0
+                title: qsTr("XY PAD")
+                visible: root.xyView
+                wetColor: "#d4e157"
+            }
+
             // BEAT FX of phones, over the waveforms
             Booth.BoothBeatFx {
                 anchors.bottom: parent.bottom
@@ -521,7 +610,7 @@ Item {
                 anchors.rightMargin: content.gap
                 anchors.top: parent.top
                 compact: true
-                visible: root.compact && root.beatFxShown && !root.browsing
+                visible: root.compact && root.beatFxShown && !root.browsing && !root.xyView
                 width: 190
                 z: 10
             }

@@ -416,6 +416,67 @@ Use the advanced mode to view them</source>
     </message>
 </context>
 <context>
+    <name>BoothDjView</name>
+    <message>
+        <source>MIXING</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LEVEL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MASTER</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BoothMixer</name>
+    <message>
+        <source>TRIM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HIGH</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LOW</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BoothPerformanceDeck</name>
+    <message>
+        <source>FINE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BEAT JUMP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BEAT LOOP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HOT CUE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SLIP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MASTER</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BoothSourceTree</name>
     <message>
         <source>TRACK</source>
@@ -1688,6 +1749,10 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>UTILITY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>XY PAD</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

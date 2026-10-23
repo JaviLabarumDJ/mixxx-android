@@ -427,6 +427,67 @@ Usa el modo avanzado para verla</translation>
     </message>
 </context>
 <context>
+    <name>BoothDjView</name>
+    <message>
+        <source>MIXING</source>
+        <translation>MIXING</translation>
+    </message>
+    <message>
+        <source>LEVEL</source>
+        <translation>LEVEL</translation>
+    </message>
+    <message>
+        <source>MASTER</source>
+        <translation>MASTER</translation>
+    </message>
+</context>
+<context>
+    <name>BoothMixer</name>
+    <message>
+        <source>TRIM</source>
+        <translation>TRIM</translation>
+    </message>
+    <message>
+        <source>HIGH</source>
+        <translation>HIGH</translation>
+    </message>
+    <message>
+        <source>MID</source>
+        <translation>MID</translation>
+    </message>
+    <message>
+        <source>LOW</source>
+        <translation>LOW</translation>
+    </message>
+</context>
+<context>
+    <name>BoothPerformanceDeck</name>
+    <message>
+        <source>FINE</source>
+        <translation>FINE</translation>
+    </message>
+    <message>
+        <source>BEAT JUMP</source>
+        <translation>BEAT JUMP</translation>
+    </message>
+    <message>
+        <source>BEAT LOOP</source>
+        <translation>BEAT LOOP</translation>
+    </message>
+    <message>
+        <source>HOT CUE</source>
+        <translation>HOT CUE</translation>
+    </message>
+    <message>
+        <source>SLIP</source>
+        <translation>SLIP</translation>
+    </message>
+    <message>
+        <source>MASTER</source>
+        <translation>MASTER</translation>
+    </message>
+</context>
+<context>
     <name>BoothSourceTree</name>
     <message>
         <source>TRACK</source>
@@ -1704,6 +1765,10 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>UTILITY</source>
         <translation>UTILITY</translation>
+    </message>
+    <message>
+        <source>XY PAD</source>
+        <translation>XY PAD</translation>
     </message>
 </context>
 <context>

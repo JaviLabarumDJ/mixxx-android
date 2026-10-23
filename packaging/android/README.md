@@ -145,6 +145,20 @@ open the browser for one deck and return to the waveforms once a track is
 loaded into it. UTILITY opens the shared settings with the skin's title and
 colors (`title`, `headerColor` and `backgroundColor` of `Settings.qml`).
 
+DJ (`BoothDjView.qml`) is for playing without a controller, in the style of
+the PERFORMANCE layout of rekordbox: for each deck pads for hot cues, beat
+jump (the left half of a pad back, the right half forward) or beat loops,
+the loop size, SYNC, CUE, PLAY, SLIP, Q, MT, a jog that scratches and the
+tempo (`BoothPerformanceDeck.qml`), a mixer with TRIM, EQ, headphones CUE,
+meters and channel faders between them (`BoothMixer.qml`), and the
+headphones, crossfader and master level below. The skin starts in it when
+no controller with an enabled mapping is connected
+(`Mixxx.ControllerManager.knownDevices`), and switches between it and the
+waveforms when one is plugged in or out. Its knobs and faders
+(`BoothKnob.qml`, `BoothFader.qml`) use pointer handlers, so several can be
+moved at once. XY shows the XY pad of the Classic skin in the colors of the
+skin (`XYPad.qml` has properties for its colors, and `closable`).
+
 > _End of AI-written section._
 
 ## Merging upstream Mixxx

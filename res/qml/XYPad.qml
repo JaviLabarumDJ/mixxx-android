@@ -13,12 +13,29 @@ Rectangle {
     property real currentX: 0.5 // 0.0 (LPF) ... 0.5 (Neutral) ... 1.0 (HPF)
     property real currentY: 0.0 // 0.0 (Dry) ... 1.0 (Wet)
     property bool isTouching: false
+    // Shown as a page of its own instead of over the decks
+    property bool closable: true
+
+    // The look, for the skins
+    property string title: qsTr("⚡ XY TOUCH PAD")
+    property color accentColor: "#00e5ff"
+    property color deck1Color: "#00b0ff"
+    property color deck2Color: "#ff6d00"
+    property color wetColor: "#e040fb"
+    property color holdColor: "#ab47bc"
+    property color buttonColor: "#1a222d"
+    property color buttonBorderColor: "#303e4f"
+    property color buttonTextColor: "#90a4ae"
+    property color surfaceColor: "#080b10"
+    property color surfaceBorderColor: "#1f2937"
+    property int controlRadius: 4
+    property int surfaceRadius: 8
 
     signal closeRequested()
 
     color: "#e60a0d14"
     radius: 12
-    border.color: "#00e5ff66"
+    border.color: Qt.alpha(root.accentColor, 0.4)
     border.width: 1
 
     Mixxx.ControlProxy {
@@ -164,11 +181,11 @@ Rectangle {
             spacing: 8
 
             Text {
-                text: qsTr("⚡ XY TOUCH PAD")
+                text: root.title
                 font.bold: true
                 font.pixelSize: 13
                 font.letterSpacing: 1
-                color: "#00e5ff"
+                color: root.accentColor
             }
 
             Item { Layout.fillWidth: true }
@@ -177,9 +194,9 @@ Rectangle {
             Rectangle {
                 Layout.preferredHeight: 28
                 Layout.preferredWidth: 64
-                radius: 4
-                color: root.targetDeck === "[Channel1]" ? "#00b0ff" : "#1a222d"
-                border.color: root.targetDeck === "[Channel1]" ? "#ffffff" : "#303e4f"
+                radius: root.controlRadius
+                color: root.targetDeck === "[Channel1]" ? root.deck1Color : root.buttonColor
+                border.color: root.targetDeck === "[Channel1]" ? "#ffffff" : root.buttonBorderColor
                 border.width: 1
 
                 Text {
@@ -187,7 +204,7 @@ Rectangle {
                     text: "DECK 1"
                     font.bold: true
                     font.pixelSize: 10
-                    color: root.targetDeck === "[Channel1]" ? "#001018" : "#90a4ae"
+                    color: root.targetDeck === "[Channel1]" ? "#001018" : root.buttonTextColor
                 }
 
                 MouseArea {
@@ -199,9 +216,9 @@ Rectangle {
             Rectangle {
                 Layout.preferredHeight: 28
                 Layout.preferredWidth: 64
-                radius: 4
-                color: root.targetDeck === "[Channel2]" ? "#ff6d00" : "#1a222d"
-                border.color: root.targetDeck === "[Channel2]" ? "#ffffff" : "#303e4f"
+                radius: root.controlRadius
+                color: root.targetDeck === "[Channel2]" ? root.deck2Color : root.buttonColor
+                border.color: root.targetDeck === "[Channel2]" ? "#ffffff" : root.buttonBorderColor
                 border.width: 1
 
                 Text {
@@ -209,7 +226,7 @@ Rectangle {
                     text: "DECK 2"
                     font.bold: true
                     font.pixelSize: 10
-                    color: root.targetDeck === "[Channel2]" ? "#000000" : "#90a4ae"
+                    color: root.targetDeck === "[Channel2]" ? "#000000" : root.buttonTextColor
                 }
 
                 MouseArea {
@@ -222,9 +239,9 @@ Rectangle {
             Rectangle {
                 Layout.preferredHeight: 28
                 Layout.preferredWidth: 62
-                radius: 4
-                color: root.holdMode ? "#ab47bc" : "#1a222d"
-                border.color: root.holdMode ? "#ffffff" : "#303e4f"
+                radius: root.controlRadius
+                color: root.holdMode ? root.holdColor : root.buttonColor
+                border.color: root.holdMode ? "#ffffff" : root.buttonBorderColor
                 border.width: 1
 
                 Text {
@@ -232,7 +249,7 @@ Rectangle {
                     text: root.holdMode ? "🔒 HOLD" : "SNAP"
                     font.bold: true
                     font.pixelSize: 10
-                    color: root.holdMode ? "#ffffff" : "#90a4ae"
+                    color: root.holdMode ? "#ffffff" : root.buttonTextColor
                 }
 
                 MouseArea {
@@ -245,7 +262,7 @@ Rectangle {
             Rectangle {
                 Layout.preferredHeight: 28
                 Layout.preferredWidth: 54
-                radius: 4
+                radius: root.controlRadius
                 color: resetMouse.pressed ? "#455a64" : "#263238"
                 border.color: "#455a64"
                 border.width: 1
@@ -267,6 +284,7 @@ Rectangle {
 
             // Close Button
             Rectangle {
+                visible: root.closable
                 Layout.preferredHeight: 28
                 Layout.preferredWidth: 28
                 radius: 14
@@ -298,9 +316,9 @@ Rectangle {
             id: touchSurface
             Layout.fillWidth: true
             Layout.fillHeight: true
-            radius: 8
-            color: "#080b10"
-            border.color: root.isTouching ? "#00e5ff" : "#1f2937"
+            radius: root.surfaceRadius
+            color: root.surfaceColor
+            border.color: root.isTouching ? root.accentColor : root.surfaceBorderColor
             border.width: 1
             clip: true
 
@@ -311,7 +329,7 @@ Rectangle {
                 y: 0
                 width: 1
                 height: touchSurface.height
-                color: "#00e5ff33"
+                color: Qt.alpha(root.accentColor, 0.2)
             }
 
             Rectangle {
@@ -320,7 +338,7 @@ Rectangle {
                 y: touchSurface.height * 0.5 - 0.5
                 width: touchSurface.width
                 height: 1
-                color: "#ffffff15"
+                color: Qt.rgba(1, 1, 1, 0.08)
             }
 
             // Subtle quadrant cross lines
@@ -331,7 +349,7 @@ Rectangle {
                     y: 0
                     width: 1
                     height: touchSurface.height
-                    color: "#ffffff08"
+                    color: Qt.rgba(1, 1, 1, 0.03)
                     visible: index !== 1
                 }
             }
@@ -344,7 +362,7 @@ Rectangle {
                 text: qsTr("◀ LOW PASS")
                 font.bold: true
                 font.pixelSize: 11
-                color: "#00b0ff66"
+                color: Qt.alpha(root.deck1Color, 0.4)
             }
 
             Text {
@@ -354,7 +372,7 @@ Rectangle {
                 text: qsTr("HIGH PASS ▶")
                 font.bold: true
                 font.pixelSize: 11
-                color: "#ff6d0066"
+                color: Qt.alpha(root.deck2Color, 0.4)
             }
 
             Text {
@@ -364,7 +382,7 @@ Rectangle {
                 text: "▲ FX WET (100%)"
                 font.bold: true
                 font.pixelSize: 10
-                color: "#e040fb88"
+                color: Qt.alpha(root.wetColor, 0.53)
             }
 
             Text {
@@ -374,7 +392,7 @@ Rectangle {
                 text: "▼ FX DRY (0%)"
                 font.bold: true
                 font.pixelSize: 10
-                color: "#90a4ae66"
+                color: Qt.alpha(root.buttonTextColor, 0.4)
             }
 
             // Current Coordinates Crosshair lines
@@ -383,7 +401,7 @@ Rectangle {
                 y: 0
                 width: 1
                 height: touchSurface.height
-                color: root.isTouching ? "#00e5ff" : "#00e5ff66"
+                color: root.isTouching ? root.accentColor : Qt.alpha(root.accentColor, 0.4)
             }
 
             Rectangle {
@@ -391,7 +409,7 @@ Rectangle {
                 y: Math.round((1.0 - root.currentY) * touchSurface.height) - 0.5
                 width: touchSurface.width
                 height: 1
-                color: root.isTouching ? "#e040fb" : "#e040fb66"
+                color: root.isTouching ? root.wetColor : Qt.alpha(root.wetColor, 0.4)
             }
 
             // Glowing Touch Puck
@@ -402,8 +420,8 @@ Rectangle {
                 width: root.isTouching ? 44 : 32
                 height: width
                 radius: width / 2
-                color: "#00e5ff33"
-                border.color: "#00e5ff"
+                color: Qt.alpha(root.accentColor, 0.2)
+                border.color: root.accentColor
                 border.width: 2
 
                 Behavior on width {
@@ -415,7 +433,7 @@ Rectangle {
                     width: 12
                     height: 12
                     radius: 6
-                    color: root.isTouching ? "#ffffff" : "#00e5ff"
+                    color: root.isTouching ? "#ffffff" : root.accentColor
                 }
             }
 
@@ -493,7 +511,7 @@ Rectangle {
                 }
                 font.bold: true
                 font.pixelSize: 11
-                color: root.currentX < 0.48 ? "#00b0ff" : (root.currentX > 0.52 ? "#ff6d00" : "#90a4ae")
+                color: root.currentX < 0.48 ? root.deck1Color : (root.currentX > 0.52 ? root.deck2Color : root.buttonTextColor)
             }
 
             Item { Layout.fillWidth: true }
@@ -502,7 +520,7 @@ Rectangle {
                 text: qsTr("FX DEPTH: %1%").arg(Math.round(root.currentY * 100))
                 font.bold: true
                 font.pixelSize: 11
-                color: root.currentY > 0.05 ? "#e040fb" : "#90a4ae"
+                color: root.currentY > 0.05 ? root.wetColor : root.buttonTextColor
             }
         }
     }
