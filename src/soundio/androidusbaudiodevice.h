@@ -123,6 +123,14 @@ class AndroidUsbAudioDevice {
     bool claimInterface(int interfaceNumber);
     void queryUac2SampleRates();
     bool setSampleRate(const usbaudio::StreamFormat& format, int sampleRate);
+    /// The sample rate the device reports, or 0 if it can't be read
+    int readSampleRate(const usbaudio::StreamFormat& format);
+    /// Sets the rate of the output (and its implicit feedback capture) with
+    /// the altsettings active as the device needs them
+    void applySampleRate(int sampleRate);
+    /// Measures the rate the device actually plays at from its clock, and
+    /// logs it once per start
+    void measureClock(uint64_t framesPerPacket16_16);
     void startEventThread();
     void stopEventThread();
     void markDisconnected();
@@ -176,6 +184,10 @@ class AndroidUsbAudioDevice {
     std::vector<libusb_transfer*> m_feedbackTransfers;
     std::atomic<int> m_feedbackTransfersPending;
     std::deque<int> m_implicitPacketFrames;
+    // Clock measurement of the first second, on the event thread
+    uint64_t m_measuredFrames16_16;
+    int m_measuredPackets;
+    bool m_clockLogged;
 
     // MIDI input
     MidiCallback m_midiCallback;
