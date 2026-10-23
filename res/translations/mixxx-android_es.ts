@@ -327,6 +327,30 @@ Usa el modo avanzado para verla</translation>
 <context>
     <name>BoothBrowse</name>
     <message>
+        <source>TRACK</source>
+        <translation>TRACK</translation>
+    </message>
+    <message>
+        <source>PLAYLIST</source>
+        <translation>PLAYLIST</translation>
+    </message>
+    <message>
+        <source>CRATE</source>
+        <translation>CRATE</translation>
+    </message>
+    <message>
+        <source>HISTORY</source>
+        <translation>HISTORY</translation>
+    </message>
+    <message>
+        <source>FOLDER</source>
+        <translation>FOLDER</translation>
+    </message>
+    <message>
+        <source>REC</source>
+        <translation>REC</translation>
+    </message>
+    <message>
         <source>STREAMING</source>
         <translation>STREAMING</translation>
     </message>
@@ -341,6 +365,10 @@ Usa el modo avanzado para verla</translation>
     <message>
         <source>SEARCH</source>
         <translation>BUSCAR</translation>
+    </message>
+    <message>
+        <source>ALL TRACKS</source>
+        <translation>TODAS LAS PISTAS</translation>
     </message>
     <message>
         <source>KEY</source>

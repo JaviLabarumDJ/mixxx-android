@@ -102,8 +102,8 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         height: 38
-        color: "#181b22"
-        border.color: "#282d3b"
+        color: Theme.librarySourceBarBackground
+        border.color: Theme.librarySourceBarBorder
         border.width: 1
 
         RowLayout {
@@ -114,9 +114,9 @@ Item {
             Skin.Button {
                 Layout.fillHeight: true
                 Layout.preferredWidth: 120
-                activeColor: "#00e5ff"
-                backgroundColor: root.librarySourceMode === 0 ? "#1e3a47" : "#222733"
-                normalColor: root.librarySourceMode === 0 ? "#00e5ff" : "#90a4ae"
+                activeColor: Theme.libraryLocalTabColor
+                backgroundColor: root.librarySourceMode === 0 ? Theme.libraryLocalTabBackground : Theme.librarySourceTabBackground
+                normalColor: root.librarySourceMode === 0 ? Theme.libraryLocalTabColor : Theme.librarySourceTabText
                 font.bold: true
                 font.pixelSize: 11
                 text: qsTr("LOCAL MUSIC")
@@ -126,9 +126,9 @@ Item {
             Skin.Button {
                 Layout.fillHeight: true
                 Layout.preferredWidth: 140
-                activeColor: "#00ffff"
-                backgroundColor: root.librarySourceMode === 1 ? "#004d40" : "#222733"
-                normalColor: root.librarySourceMode === 1 ? "#00ffff" : "#80deea"
+                activeColor: Theme.libraryStreamingTabColor
+                backgroundColor: root.librarySourceMode === 1 ? Theme.libraryStreamingTabBackground : Theme.librarySourceTabBackground
+                normalColor: root.librarySourceMode === 1 ? Theme.libraryStreamingTabColor : Theme.libraryStreamingTabText
                 font.bold: true
                 font.pixelSize: 11
                 text: qsTr("STREAMING HUB")
@@ -144,8 +144,8 @@ Item {
                 visible: root.librarySourceMode === 0
                 Layout.fillHeight: true
                 Layout.preferredWidth: 130
-                activeColor: "#ffffff"
-                normalColor: "#90a4ae"
+                activeColor: Theme.libraryActionText
+                normalColor: Theme.librarySourceTabText
                 highlight: root.showSidebar
                 font.bold: true
                 font.pixelSize: 10
@@ -331,8 +331,8 @@ Item {
                     Layout.preferredHeight: 44
                     Layout.preferredWidth: 150
                     activeColor: Theme.accentColor
-                    backgroundColor: "#1565c0"
-                    normalColor: "#ffffff"
+                    backgroundColor: Theme.libraryConfirmBackground
+                    normalColor: Theme.libraryActionText
                     font.bold: true
                     text: qsTr("GRANT PERMISSION")
                     onClicked: {

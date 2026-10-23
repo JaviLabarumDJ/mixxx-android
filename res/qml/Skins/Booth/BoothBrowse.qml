@@ -3,14 +3,18 @@ import "../../Library" as LibraryComponent
 import "../../Library/Streaming" as StreamingComponent
 import "." as Booth
 import Mixxx 1.0 as Mixxx
+import Qt5Compat.GraphicalEffects
+import QtQml.Models
 import QtQuick
 import QtQuick.Controls
 
-// BROWSE of the booth skin, laid out like the browser of a player: the
-// sources on the left, the tracks in the middle and the selected track on
-// the right. The data, the track menu, + ALL, COPY and the controller
-// browsing are the ones of the shared library (Library/), only the columns
-// and the look are the skin's (BoothSourceTree.qml).
+// BROWSE of the booth skin, laid out like the browser of a player: a column
+// of sources on the left, the tracks in the middle and the selected track
+// on the right. A source with entries (playlists, folders, drives) first
+// lists them in place of the tracks, one level at a time, with ← to go
+// back. The data, the track menu, + ALL, COPY and the controller browsing
+// are the ones of the shared library (Library/), only the columns and the
+// look are the skin's (BoothSourceTree.qml).
 //
 // LOAD 1/2 open it with a target deck (loadTarget): a double tap loads the
 // track into that deck.
@@ -31,6 +35,144 @@ Item {
     property string bpm: ""
     property string key: ""
     property string added: ""
+
+    // The entry whose entries are listed, or null
+    property var levelIndex: null
+    // The tracks are shown rather than the entries of levelIndex
+    property bool showTracks: true
+    // The row the controller's browse knob is on: in the list of entries
+    // (-1 is ALL TRACKS) or, without one, in the column of sources
+    property int cursor: 0
+    // The top level source the tracks shown belong to
+    property int activeSection: 0
+    // The name of the playlist, crate or folder whose tracks are shown
+    property string activeLabel: ""
+    // A whole USB drive (Rekordbox or Engine DJ) rather than a playlist
+    property bool activeIsDrive: false
+    readonly property bool showLevel: root.levelIndex !== null && !root.showTracks
+    // levelIndex, or the invisible root of the sources
+    readonly property var listRoot: root.levelIndex ?? root.sidebar?.index(-1, -1)
+    // Entries below a top level source can show their own tracks too
+    readonly property bool levelHasAll: root.levelIndex !== null && root.levelIndex.parent.valid
+
+    // SidebarModel::IconNameRole
+    function iconOf(index) {
+        return root.sidebar.data(index, Qt.UserRole + 1) ?? "";
+    }
+    function sectionLabel(icon, label) {
+        switch (icon) {
+        case "tracks":
+            return qsTr("TRACK");
+        case "playlist":
+            return qsTr("PLAYLIST");
+        case "crates":
+            return qsTr("CRATE");
+        case "history":
+            return qsTr("HISTORY");
+        case "computer":
+            return qsTr("FOLDER");
+        case "rekordbox":
+            return "REKORDBOX";
+        case "enginedj":
+            return "ENGINE DJ";
+        case "recordings":
+            return qsTr("REC");
+        }
+        return (label ?? "").toString().toUpperCase();
+    }
+    function isDrive(index) {
+        const parent = index.parent;
+        if (!parent.valid || parent.parent.valid) {
+            return false;
+        }
+        const icon = root.iconOf(parent);
+        return icon === "rekordbox" || icon === "enginedj";
+    }
+    // Reading the databases on USB drives needs more than the music
+    // permission, as in Library/Browser.qml
+    function checkStorageAccess(index) {
+        let section = index;
+        while (section.parent.valid) {
+            section = section.parent;
+        }
+        const icon = root.iconOf(section);
+        if (icon !== "rekordbox" && icon !== "enginedj") {
+            return;
+        }
+        if (!Mixxx.MobileLibrary.hasFullStorageAccess()) {
+            storageAccessPopup.open();
+        }
+        Mixxx.MobileLibrary.allowUsbPermissionRequests();
+    }
+    function activate(index) {
+        const label = root.sidebar.data(index, Qt.DisplayRole);
+        root.activeLabel = label ? label.toString() : "";
+        root.activeIsDrive = root.isDrive(index);
+        let section = index;
+        while (section.parent.valid) {
+            section = section.parent;
+        }
+        root.activeSection = section.row;
+        root.sidebar.activate(index);
+    }
+    // Opens a source or an entry. Returns true if its tracks are shown,
+    // false if its entries are listed.
+    function open(index) {
+        root.checkStorageAccess(index);
+        root.activate(index);
+        if (root.sidebar.canFetchMore(index)) {
+            root.sidebar.fetchMore(index);
+        }
+        // Drives list their playlists once they have been read
+        if (root.sidebar.hasChildren(index) || root.isDrive(index)) {
+            root.levelIndex = index;
+            root.showTracks = false;
+            root.cursor = root.levelHasAll ? -1 : 0;
+            return false;
+        }
+        root.showTracks = true;
+        return true;
+    }
+    function openAllTracks() {
+        root.activate(root.levelIndex);
+        root.showTracks = true;
+    }
+    function back() {
+        if (root.showTracks) {
+            if (root.levelIndex !== null) {
+                root.showTracks = false;
+            }
+            return;
+        }
+        if (root.levelIndex !== null && root.levelIndex.parent.valid) {
+            const child = root.levelIndex;
+            root.levelIndex = child.parent;
+            root.cursor = child.row;
+        }
+    }
+    // The controller's browse knob
+    function moveCursor(offset) {
+        if (root.showLevel) {
+            root.cursor = Math.max(root.levelHasAll ? -1 : 0, Math.min(levelEntries.count - 1, root.cursor + offset));
+            if (root.cursor >= 0) {
+                levelList.positionViewAtIndex(root.cursor, ListView.Contain);
+            }
+        } else {
+            root.showTracks = true;
+            root.levelIndex = null;
+            root.cursor = Math.max(0, Math.min(sections.count - 1, root.cursor + offset));
+        }
+    }
+    function activateCursor() {
+        if (root.showLevel) {
+            if (root.cursor < 0) {
+                root.openAllTracks();
+                return true;
+            }
+            return root.open(root.sidebar.index(root.cursor, 0, root.levelIndex));
+        }
+        return root.open(root.sidebar.index(root.cursor, 0));
+    }
 
     function loadSelected(tableView) {
         if (root.loadTarget.length > 0) {
@@ -58,11 +200,11 @@ Item {
         enabled: root.visible && root.acceptsController
 
         onActivateSidebarItem: {
-            if (browser.activateCurrent()) {
+            if (root.activateCursor()) {
                 focusWidget = Skin.FocusedWidgetControl.WidgetKind.LibraryView;
             }
         }
-        onCollapseSidebarItem: browser.collapseCurrent()
+        onCollapseSidebarItem: root.back()
         onFocusWidgetChanged: {
             if (!enabled) {
                 return;
@@ -73,8 +215,10 @@ Item {
                 break;
             case Skin.FocusedWidgetControl.WidgetKind.Sidebar:
                 root.streaming = false;
-                if (browser.currentRow() < 0) {
-                    browser.selectRow(0);
+                if (root.levelIndex !== null) {
+                    root.showTracks = false;
+                } else {
+                    root.cursor = root.activeSection;
                 }
                 break;
             }
@@ -90,15 +234,13 @@ Item {
             }
         }
         onMoveSidebar: offset => {
-            browser.moveSelection(offset);
+            root.moveCursor(offset);
         }
         onMoveVertical: offset => {
             trackList.moveSelectionVertical(offset);
         }
     }
     Connections {
-        target: root.sidebar
-
         function onTracklistChanged() {
             root.cover = "";
             root.title = "";
@@ -110,6 +252,31 @@ Item {
                 root.applySearch();
             }
         }
+
+        target: root.sidebar
+    }
+
+    Component.onCompleted: root.activate(root.sidebar.index(0, 0))
+
+    // A listed entry that goes away (e.g. an unplugged drive) must not be
+    // used any more: back to the top
+    Connections {
+        function onModelAboutToBeReset() {
+            root.levelIndex = null;
+            root.showTracks = true;
+        }
+        function onRowsAboutToBeRemoved(parent, first, last) {
+            for (let index = root.levelIndex; index !== null && index.valid; index = index.parent) {
+                const sameParent = index.parent.valid === parent.valid && (!parent.valid || index.parent.internalId === parent.internalId);
+                if (sameParent && index.row >= first && index.row <= last) {
+                    root.levelIndex = null;
+                    root.showTracks = true;
+                    return;
+                }
+            }
+        }
+
+        target: root.sidebar
     }
 
     Rectangle {
@@ -135,11 +302,50 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
 
+            // ← one level up, or from the tracks to their list
+            Rectangle {
+                readonly property bool usable: !root.streaming && (root.showTracks ? root.levelIndex !== null : root.levelHasAll)
+
+                anchors.verticalCenter: parent.verticalCenter
+                border.color: usable ? "#8a8d93" : "#2a2c30"
+                border.width: 1
+                color: backMouse.pressed ? "#2a2c30" : "transparent"
+                height: header.height - 8
+                width: height * 1.3
+
+                Text {
+                    anchors.centerIn: parent
+                    color: parent.usable ? "#d8dadd" : "#3a3c40"
+                    font.pixelSize: root.compact ? 14 : 17
+                    text: "←"
+                }
+                MouseArea {
+                    id: backMouse
+
+                    anchors.fill: parent
+                    enabled: parent.usable
+                    onClicked: root.back()
+                }
+            }
             Text {
                 anchors.verticalCenter: parent.verticalCenter
                 color: "#d8dadd"
+                elide: Text.ElideMiddle
                 font.pixelSize: root.compact ? 12 : 14
-                text: root.streaming ? qsTr("STREAMING") : (browser.activeLabel.length > 0 ? browser.activeLabel : qsTr("BROWSE"))
+                text: {
+                    if (root.streaming) {
+                        return qsTr("STREAMING");
+                    }
+                    if (root.showLevel) {
+                        const names = [];
+                        for (let index = root.levelIndex; index.valid; index = index.parent) {
+                            names.unshift(index.parent.valid ? root.sidebar.data(index, Qt.DisplayRole) : root.sectionLabel(root.iconOf(index), root.sidebar.data(index, Qt.DisplayRole)));
+                        }
+                        return names.join(" › ");
+                    }
+                    return root.activeLabel.length > 0 ? root.activeLabel : qsTr("BROWSE");
+                }
+                width: Math.min(implicitWidth, root.width * 0.3)
             }
             // LOAD 1/2: the deck the tracks go to
             Rectangle {
@@ -220,23 +426,204 @@ Item {
         anchors.topMargin: 3
         visible: !root.streaming
 
-        LibraryComponent.Browser {
-            id: browser
+        // The sources, as the column of a player's browser
+        Rectangle {
+            id: sectionColumn
+
+            readonly property real buttonHeight: Math.min(root.compact ? 52 : 66, height / Math.max(1, sections.count))
 
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.top: parent.top
-            highlighted: libraryControl.sidebarFocused
-            model: root.sidebar
-            width: root.compact ? 180 : 220
+            border.color: libraryControl.sidebarFocused && !root.showLevel ? "#d8dadd" : "transparent"
+            border.width: 1
+            color: "#1c1e22"
+            width: root.compact ? 64 : 78
 
-            onStorageAccessNeeded: storageAccessPopup.open()
+            Column {
+                anchors.fill: parent
+
+                Repeater {
+                    model: DelegateModel {
+                        id: sections
+
+                        model: root.sidebar
+
+                        delegate: Rectangle {
+                            id: section
+
+                            required property int index
+                            required property var model
+                            readonly property bool active: root.activeSection === index
+                            readonly property bool atCursor: libraryControl.sidebarFocused && !root.showLevel && root.cursor === index
+
+                            color: active ? "#3a3c40" : (sectionMouse.pressed ? "#2a2c30" : "transparent")
+                            height: sectionColumn.buttonHeight
+                            width: sectionColumn.width
+
+                            Rectangle {
+                                anchors.bottom: parent.bottom
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                color: "#000000"
+                                height: 1
+                            }
+                            Rectangle {
+                                anchors.fill: parent
+                                border.color: "#1e88e5"
+                                border.width: 2
+                                color: "transparent"
+                                visible: section.atCursor
+                            }
+                            Image {
+                                id: sectionIcon
+
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                anchors.top: parent.top
+                                anchors.topMargin: Math.round(parent.height * 0.14)
+                                source: section.model.icon ? "qrc:/images/library/ic_library_" + section.model.icon + ".svg" : ""
+                                sourceSize.height: Math.round(parent.height * 0.42)
+                                sourceSize.width: Math.round(parent.height * 0.42)
+                                visible: false
+                            }
+                            // White line icons, as on a player
+                            ColorOverlay {
+                                anchors.fill: sectionIcon
+                                color: section.active ? "#ffffff" : "#b0b3b8"
+                                source: sectionIcon
+                            }
+                            Text {
+                                anchors.bottom: parent.bottom
+                                anchors.bottomMargin: Math.round(parent.height * 0.08)
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                color: section.active ? "#ffffff" : "#b0b3b8"
+                                elide: Text.ElideRight
+                                font.pixelSize: root.compact ? 9 : 10
+                                horizontalAlignment: Text.AlignHCenter
+                                text: root.sectionLabel(section.model.icon, section.model.label)
+                                width: parent.width - 4
+                            }
+                            MouseArea {
+                                id: sectionMouse
+
+                                anchors.fill: parent
+                                onClicked: {
+                                    root.streaming = false;
+                                    root.cursor = section.index;
+                                    if (root.open(root.sidebar.index(section.index, 0))) {
+                                        root.levelIndex = null;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
+
+        // The entries of a source, one level at a time
+        Rectangle {
+            id: level
+
+            anchors.bottom: parent.bottom
+            anchors.left: sectionColumn.right
+            anchors.leftMargin: 3
+            anchors.right: trackList.right
+            anchors.top: parent.top
+            border.color: libraryControl.sidebarFocused ? "#d8dadd" : "transparent"
+            border.width: 1
+            color: "#0c0d0f"
+            visible: root.showLevel
+
+            ListView {
+                id: levelList
+
+                anchors.fill: parent
+                anchors.margins: 1
+                boundsBehavior: Flickable.StopAtBounds
+                clip: true
+
+                ScrollBar.vertical: ScrollBar {
+                }
+
+                // The tracks of the entry itself, e.g. all of a drive
+                header: Rectangle {
+                    color: root.cursor === -1 ? "#1e5fb4" : (allMouse.pressed ? "#2a2c30" : "#16181b")
+                    height: root.levelHasAll ? (root.compact ? 40 : 46) : 0
+                    visible: root.levelHasAll
+                    width: ListView.view.width
+
+                    Text {
+                        anchors.left: parent.left
+                        anchors.leftMargin: 14
+                        anchors.verticalCenter: parent.verticalCenter
+                        color: "#ffffff"
+                        font.pixelSize: root.compact ? 14 : 16
+                        text: "♪  " + qsTr("ALL TRACKS")
+                    }
+                    MouseArea {
+                        id: allMouse
+
+                        anchors.fill: parent
+                        onClicked: root.openAllTracks()
+                    }
+                }
+                model: DelegateModel {
+                    id: levelEntries
+
+                    model: root.sidebar
+                    rootIndex: root.listRoot
+
+                    delegate: Rectangle {
+                        id: entry
+
+                        required property int index
+                        required property var model
+                        readonly property var modelIndex: root.sidebar ? root.sidebar.index(index, 0, root.listRoot) : undefined
+
+                        color: root.cursor === index ? "#1e5fb4" : (entryMouse.pressed ? "#2a2c30" : (index % 2 === 0 ? "#0c0d0f" : "#16181b"))
+                        height: root.compact ? 40 : 46
+                        width: ListView.view.width
+
+                        Text {
+                            anchors.left: parent.left
+                            anchors.leftMargin: 14
+                            anchors.right: arrow.left
+                            anchors.verticalCenter: parent.verticalCenter
+                            color: "#ffffff"
+                            elide: Text.ElideRight
+                            font.pixelSize: root.compact ? 15 : 17
+                            text: entry.model.label ?? ""
+                        }
+                        Text {
+                            id: arrow
+
+                            anchors.right: parent.right
+                            anchors.rightMargin: 14
+                            anchors.verticalCenter: parent.verticalCenter
+                            color: "#8a8d93"
+                            font.pixelSize: root.compact ? 15 : 17
+                            text: root.sidebar && (root.sidebar.hasChildren(entry.modelIndex) || root.isDrive(entry.modelIndex)) ? "›" : ""
+                        }
+                        MouseArea {
+                            id: entryMouse
+
+                            anchors.fill: parent
+                            onClicked: {
+                                root.cursor = entry.index;
+                                root.open(entry.modelIndex);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         LibraryComponent.TrackList {
             id: trackList
 
             anchors.bottom: parent.bottom
-            anchors.left: browser.right
+            anchors.left: sectionColumn.right
             anchors.leftMargin: 3
             anchors.right: info.visible ? info.left : parent.right
             anchors.rightMargin: info.visible ? 3 : 0
@@ -244,8 +631,9 @@ Item {
             clip: true
             highlighted: libraryControl.sidebarFocused === false
             model: root.sidebar ? root.sidebar.tracklist : null
-            sortNewestFirst: browser.activeIsDrive
-            sourceName: browser.activeLabel
+            sortNewestFirst: root.activeIsDrive
+            sourceName: root.activeLabel
+            visible: !root.showLevel
         }
 
         // The selected track, like the info panel of a player

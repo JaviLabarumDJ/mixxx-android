@@ -43,6 +43,33 @@ ApplicationWindow {
         }
         return Qt.resolvedUrl("Skins/" + skin + "/MainWindow.qml");
     }
+    // The values of the Theme singleton before any skin changed them
+    property var themeDefaults: null
+
+    // A skin can change the shared colors (Theme) through a skinTheme
+    // property of its main window, e.g. {"accentColor": "#1e5fb4"}. The
+    // values of the previous skin are undone first.
+    function applySkinTheme(skinTheme) {
+        if (root.themeDefaults === null) {
+            const defaults = {};
+            for (const key in Theme) {
+                if (key !== "objectName" && typeof Theme[key] !== "function") {
+                    defaults[key] = Theme[key];
+                }
+            }
+            root.themeDefaults = defaults;
+        }
+        for (const key in root.themeDefaults) {
+            Theme[key] = root.themeDefaults[key];
+        }
+        for (const key in (skinTheme || {})) {
+            if (key in root.themeDefaults) {
+                Theme[key] = skinTheme[key];
+            } else {
+                console.warn("Unknown Theme property in the skin:", key);
+            }
+        }
+    }
     function loadSkin() {
         if (!Mixxx.Core.ready) {
             return;
@@ -80,6 +107,9 @@ ApplicationWindow {
         active: Mixxx.Core.ready
         asynchronous: true
         onStatusChanged: {
+            if (status === Loader.Ready) {
+                root.applySkinTheme(item.skinTheme);
+            }
             if (status === Loader.Error) {
                 if (Mixxx.MobileApp.skin !== "Classic") {
                     // A broken skin must not lock the user out

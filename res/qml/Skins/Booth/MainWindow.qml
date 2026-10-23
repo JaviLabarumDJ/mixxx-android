@@ -35,6 +35,35 @@ Item {
     readonly property int numPreviewDecks: 1
     readonly property int waveformOverviewTypeRgb: 2
 
+    // The colors of the shared parts (library, settings, popups) in this
+    // skin, applied by main.qml; see Theme/+android/Theme.qml
+    readonly property var skinTheme: ({
+            "accentColor": "#1e5fb4",
+            "backgroundColor": "#000000",
+            "sunkenBackgroundColor": "#0c0d0f",
+            "darkGray": "#000000",
+            "darkGray2": "#1c1e22",
+            "darkGray3": "#2a2c30",
+            "darkGray4": "#141518",
+            "textColor": "#e6e8eb",
+            "panelSplitterBackground": "#000000",
+            "libraryScrollHandle": "#3a3c40",
+            "libraryScrollHandleHovered": "#5c6068",
+            "libraryScrollHandlePressed": "#d8dadd",
+            "libraryScrollTrack": "#000000",
+            "libraryActionBackground": "#1c1e22",
+            "libraryActionDisabledBackground": "#111214",
+            "libraryActionText": "#ffffff",
+            "libraryActionDisabledText": "#5c6068",
+            "libraryDeck1Background": "#1f6fd1",
+            "libraryDeck1Pressed": "#5a9be8",
+            "libraryDeck2Background": "#e8650f",
+            "libraryDeck2Pressed": "#ff9a52",
+            "libraryConfirmBackground": "#1e5fb4",
+            "libraryKeyMatchColor": "#3ad33a",
+            "libraryKeyMatchBackground": "#1a3ad33a"
+        })
+
     // The deck loader of the Classic skin is the browser here
     function openQuickLoad(group) {
         root.loadTarget = (group && group.length > 0) ? group : "[Channel1]";

@@ -316,6 +316,30 @@ Use the advanced mode to view them</source>
 <context>
     <name>BoothBrowse</name>
     <message>
+        <source>TRACK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PLAYLIST</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CRATE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HISTORY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FOLDER</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>REC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>STREAMING</source>
         <translation type="unfinished"></translation>
     </message>
@@ -329,6 +353,10 @@ Use the advanced mode to view them</source>
     </message>
     <message>
         <source>SEARCH</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ALL TRACKS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

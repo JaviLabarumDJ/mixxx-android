@@ -123,15 +123,24 @@ with its own `MainWindow.qml`, whose root item takes the application window
 shared components (library, deck loaders, settings) by importing `"../.."`.
 If a skin fails to load, Classic is loaded instead.
 
+A skin can change the shared colors (library, settings, popups) with a
+`skinTheme` property of its main window, an object of `Theme` property
+names and values; `main.qml` applies it and undoes it when another skin is
+loaded. The colors that the library components used to write into the code
+are `library…` properties of `Theme` (`res/qml/Theme/+android/Theme.qml`),
+whose defaults are the Classic look.
+
 The **Booth** skin (`res/qml/Skins/Booth/`) is laid out like the screen of a
 booth player, for landscape phones and tablets: the two waveforms stacked
 over the whole width with quantize and slip next to them, the deck displays
 below them (remaining time, tempo, BPM with the beatgrid panel, SYNC, CUE
 and PLAY, hot cues A–H, overview) and BEAT FX (effect unit 1) on the right,
 behind a button on phones. BROWSE shows the skin's browser in place of the
-waveforms (`BoothBrowse.qml`): the shared library sources, track menu,
-+ ALL, COPY and controller browsing, with the skin's own columns and rows
-(`BoothSourceTree.qml`) and an info panel of the selected track. LOAD 1/2
+waveforms (`BoothBrowse.qml`): a column of sources, whose entries
+(playlists, folders, drives) are listed one level at a time in place of the
+tracks, the skin's own track columns and rows (`BoothSourceTree.qml`) and
+an info panel of the selected track. It uses the shared library sources,
+track menu, + ALL, COPY and controller browsing. LOAD 1/2
 open the browser for one deck and return to the waveforms once a track is
 loaded into it. UTILITY opens the shared settings with the skin's title and
 colors (`title`, `headerColor` and `backgroundColor` of `Settings.qml`).
