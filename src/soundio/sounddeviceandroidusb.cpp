@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 
+#include "control/controlobject.h"
 #include "soundio/androidusbaudiodevice.h"
 #include "soundio/soundmanager.h"
 #include "util/math.h"
@@ -92,6 +93,16 @@ SoundDeviceStatus SoundDeviceAndroidUsb::open(bool isClkRefDevice, int syncBuffe
             std::ceil(m_framesPerBuffer * 1000.0 / sampleRate));
     const int queuedMillis = std::max(kMinQueuedMillis, bufferMillis);
     const int numTransfers = std::max(3, (queuedMillis + kTransferMillis - 1) / kTransferMillis);
+
+    if (m_isClkRef) {
+        // The engine renders at this rate. Without it, the engine kept its
+        // default of 44.1 kHz and a device opened at 48 kHz played 8.8% too
+        // fast and too high. Like SoundDevicePortAudio, also the latency for
+        // the waveforms.
+        ControlObject::set(ConfigKey(kAppGroup, QStringLiteral("samplerate")), sampleRate);
+        ControlObject::set(ConfigKey(kAppGroup, QStringLiteral("output_latency_ms")),
+                queuedMillis);
+    }
 
     m_open = true;
     if (!m_pDevice->startOutput(sampleRate,
