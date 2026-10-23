@@ -47,12 +47,14 @@ The Android UI creates `[Skin]` controls that controller mappings can use
 | ------- | ------ |
 | `[Skin],mobile_library_toggle` | Shows the LIB view, or returns to the previous view |
 | `[Skin],mobile_loader_deck1`, `[Skin],mobile_loader_deck2` | Opens the deck loader of deck 1/2 |
+| `[Skin],mobile_fx_toggle` | Shows or hides the effects (FX bar; BEAT FX in the Booth skin) |
 
 `[ChannelN],LoadSelectedTrack` (LOAD) opens the deck loader of deck 1/2 when
 no library is on screen; with a library on screen it loads the selected
 track, and closes the deck loader if it was used. The DDJ-400 and DDJ-FLX4
 mappings map SHIFT+LOAD (`0x96 0x68`/`0x7A`, measured on a DDJ-FLX4) to
-`mobile_library_toggle`.
+`mobile_library_toggle`. The DDJ-400 and DDJ-FLX4 mappings map SHIFT+BEAT ▶ (`0x94 0x6B`,
+from Pioneer's MIDI message lists) to `mobile_fx_toggle`.
 
 > _End of AI-written section._
 
@@ -106,6 +108,69 @@ The backups have a `.nomedia` file, so other music apps don't list them.
 The Rekordbox data is read by `rekordboxandroid.inc`, which is included at
 the end of the upstream `rekordboxfeature.cpp` so that it can use the ANLZ
 reader there without changing it.
+
+> _End of AI-written section._
+
+## Skins
+
+> _The following section was written by an AI agent (Claude Code)._
+
+*Settings → Interface → Skin* switches the main window at once (the decks
+keep playing) and remembers the choice (`[Config],AndroidSkin`, through
+`Mixxx.MobileApp.skin`). "Classic" is `res/qml/MainWindow.qml` (its
+`+android` override); every other skin is a folder `res/qml/Skins/<Name>/`
+with its own `MainWindow.qml`, whose root item takes the application window
+(`required property ApplicationWindow applicationWindow`) and may provide
+`menuBar` and `openQuickLoad(group)` like the Classic one. Skins reuse the
+shared components (library, deck loaders, settings) by importing `"../.."`.
+If a skin fails to load, Classic is loaded instead.
+
+A skin can change the shared colors (library, settings, popups) with a
+`skinTheme` property of its main window, an object of `Theme` property
+names and values; `main.qml` applies it and undoes it when another skin is
+loaded. The colors that the library components used to write into the code
+are `library…` properties of `Theme` (`res/qml/Theme/+android/Theme.qml`),
+whose defaults are the Classic look.
+
+Android draws ◀ and ▶ as emoji and its fonts lack ❚ and the other
+triangles, so the UI draws them: `Triangle.qml` (rotated for ▲ ▼),
+`ArrowText.qml` for a text with an arrow, and `arrowLeft`/`arrowRight` of
+the buttons (`res/qml/+android/Button.qml`). Texts don't contain them.
+
+The **Booth** skin (`res/qml/Skins/Booth/`) is laid out like the screen of a
+booth player, for landscape phones and tablets: the two waveforms stacked
+over the whole width with quantize and slip next to them, the deck displays
+below them (remaining time, tempo, BPM with the beatgrid panel, SYNC, CUE
+and PLAY, hot cues A–H, overview) and BEAT FX (effect unit 1) on the right,
+behind a button on phones. BROWSE shows the skin's browser in place of the
+waveforms (`BoothBrowse.qml`): a column of sources, whose entries
+(playlists, folders, drives) are listed one level at a time in place of the
+tracks, the skin's own track columns and rows (`BoothSourceTree.qml`) and
+an info panel of the selected track. It uses the shared library sources,
+track menu, + ALL, COPY and controller browsing. LOAD 1/2
+open the browser for one deck and return to the waveforms once a track is
+loaded into it. UTILITY opens the shared settings with the skin's title and
+colors (`title`, `headerColor` and `backgroundColor` of `Settings.qml`).
+
+DJ (`BoothDjView.qml`) is for playing without a controller, in the style of
+the PERFORMANCE layout of rekordbox: for each deck pads for hot cues, beat
+jump (the left half of a pad back, the right half forward) or beat loops,
+the loop size, SYNC, CUE, PLAY, SLIP, Q, MT, a jog that scratches and the
+tempo (`BoothPerformanceDeck.qml`), a mixer with TRIM, EQ, headphones CUE,
+meters and channel faders between them (`BoothMixer.qml`), and the
+headphones, crossfader and master level below. The skin starts in it when
+no controller with an enabled mapping is connected
+(`Mixxx.ControllerManager.knownDevices`), and switches between it and the
+waveforms when one is plugged in or out. Its knobs and faders
+(`BoothKnob.qml`, `BoothFader.qml`) use pointer handlers, so several can be
+moved at once. XY shows the XY pad of the Classic skin in the colors of the
+skin (`XYPad.qml` has properties for its colors, and `closable`).
+
+Settings → Interface → TOP BAR lists the items of the skin in use: a skin
+can list its own in a `topBarItems` property of its main window (`main.qml`
+exposes it as `skinItem`), otherwise the Classic items are listed. Booth
+shares the names of the matching Classic items (`Mixxx.MobileApp.hiddenTopBarItems`)
+and hides its tabs that are turned off.
 
 > _End of AI-written section._
 

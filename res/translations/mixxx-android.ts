@@ -262,11 +262,11 @@ Use the advanced mode to view them</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>‹ EARLIER</source>
+        <source>EARLIER</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>LATER ›</source>
+        <source>LATER</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -290,7 +290,212 @@ Use the advanced mode to view them</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>🔄 RE-ANALYZE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>CLOSE</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BoothBeatFx</name>
+    <message>
+        <source>LEVEL/DEPTH %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>EFFECT AMOUNT %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CH SELECT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MASTER</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BoothBrowse</name>
+    <message>
+        <source>TRACK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PLAYLIST</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CRATE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HISTORY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FOLDER</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>REC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>STREAMING</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BROWSE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LOAD TO DECK %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SEARCH</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ALL TRACKS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>KEY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ADDED</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Permission to read USB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To read Rekordbox and Engine DJ playlists from a USB drive, Android has to grant Mixxx access to all files. Enable it on the screen that opens, then tap the section again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NOT NOW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GRANT PERMISSION</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BoothDeckPanel</name>
+    <message>
+        <source>DECK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MASTER TEMPO</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TIME</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TEMPO</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MASTER</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>REMAIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BoothDjView</name>
+    <message>
+        <source>MIXING</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LEVEL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MASTER</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BoothMixer</name>
+    <message>
+        <source>TRIM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HIGH</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LOW</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BoothPerformanceDeck</name>
+    <message>
+        <source>FINE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BEAT JUMP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BEAT LOOP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HOT CUE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SLIP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MASTER</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BoothSourceTree</name>
+    <message>
+        <source>TRACK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ARTIST</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>KEY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ADDED</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -650,11 +855,11 @@ set another visual</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>◀ Load into DECK 1</source>
+        <source>Load into DECK 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Load into DECK 2 ▶</source>
+        <source>Load into DECK 2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -776,7 +981,7 @@ Button</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unnamed</source>
+        <source>Classic</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1075,11 +1280,7 @@ Button</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>HIDE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>PLAYLISTS</source>
+        <source>SIDEBAR</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1524,6 +1725,34 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DECK %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bars</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QUANTIZE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SLIP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BROWSE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UTILITY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>XY PAD</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2252,7 +2481,11 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>◀ Back</source>
+        <source>Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show tracks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2273,10 +2506,6 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>%1 tracks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show tracks ▶</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2313,11 +2542,11 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>◀ Load Deck 1</source>
+        <source>Load Deck 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Load Deck 2 ▶</source>
+        <source>Load Deck 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2898,11 +3127,11 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>◀ LOW PASS</source>
+        <source>LOW PASS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>HIGH PASS ▶</source>
+        <source>HIGH PASS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

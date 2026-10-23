@@ -986,6 +986,25 @@ Item {
         }
     }
 
+    // Shows or hides the effects (FX), e.g. SHIFT + BEAT ▶ of the DDJ-FLX4
+    property bool fxControlCreated: false
+
+    Mixxx.SkinControlCreator {
+        group: "[Skin]"
+        key: "mobile_fx_toggle"
+
+        Component.onCompleted: root.fxControlCreated = true
+    }
+    Mixxx.ControlProxy {
+        group: "[Skin]"
+        key: root.fxControlCreated ? "mobile_fx_toggle" : ""
+        onValueChanged: value => {
+            if (value > 0) {
+                root.showEffects = !root.showEffects;
+            }
+        }
+    }
+
     Repeater {
         model: 2
 

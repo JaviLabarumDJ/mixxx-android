@@ -9,6 +9,9 @@
 #include <QUrl>
 #include <QVariantList>
 
+#include "analyzer/analyzertrack.h"
+#include "qml/qmltrackproxy.h"
+
 namespace mixxx {
 namespace android {
 class RekordboxDriveBackup;
@@ -76,8 +79,13 @@ class QmlMobileLibraryProxy : public QObject {
     Q_INVOKABLE QStringList getSubDirectories(const QString& rawPath) const;
     Q_INVOKABLE QString defaultMusicDirectory() const;
 
+    /// Analyzes all tracks again, also their beatgrids, except locked ones
+    /// and those imported from Rekordbox
     Q_INVOKABLE void analyzeAllTracks() const;
     Q_INVOKABLE void analyzeUnanalyzedTracks() const;
+    /// Throws the beatgrid of the track away and analyzes it again. Returns
+    /// false for a locked grid.
+    Q_INVOKABLE bool reanalyzeBeats(mixxx::qml::QmlTrackProxy* pTrack) const;
 
     /// The visible playlists as a list of {id, name, locked}
     Q_INVOKABLE QVariantList playlists() const;
@@ -147,7 +155,8 @@ class QmlMobileLibraryProxy : public QObject {
     void driveBackupFinished(const QString& message, bool error);
 
   private:
-    void analyzeTracksMatching(const QString& sqlQuery) const;
+    void analyzeTracksMatching(const QString& sqlQuery,
+            AnalyzerTrack::Options options = AnalyzerTrack::Options()) const;
 
     QPointer<android::RekordboxPlaylistCopy> m_pPlaylistCopy;
     QPointer<android::RekordboxDriveBackup> m_pDriveBackup;

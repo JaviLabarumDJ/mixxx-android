@@ -2,6 +2,7 @@ import Qt5Compat.GraphicalEffects
 import QtQuick 2
 import QtQuick.Controls 2
 import "Theme"
+import "." as Skin
 
 AbstractButton {
     id: root
@@ -11,6 +12,12 @@ AbstractButton {
     property color normalColor: Theme.buttonNormalColor
     property color pressedColor: activeColor
     property color backgroundColor: "#2B2B2B"
+    // A ◀ before or a ▶ after the text, drawn as triangles: Android draws
+    // these signs as emoji
+    property bool arrowLeft: false
+    property bool arrowRight: false
+    readonly property real arrowSize: Math.round(label.font.pixelSize * 0.7)
+    readonly property real arrowSpace: Math.round(arrowSize * 0.85 + label.font.pixelSize * 0.35)
 
     implicitHeight: 26
     implicitWidth: Math.max(52, label.implicitWidth + 16)
@@ -78,9 +85,28 @@ AbstractButton {
             font.family: Theme.fontFamily
             font.pixelSize: Theme.buttonFontPixelSize
             horizontalAlignment: Text.AlignHCenter
+            // Room for the arrows, keeping them and the text centered
+            leftPadding: root.arrowLeft ? root.arrowSpace : 0
+            rightPadding: root.arrowRight ? root.arrowSpace : 0
             text: root.text
             verticalAlignment: Text.AlignVCenter
             visible: root.text != null
+        }
+        Repeater {
+            model: [root.arrowLeft ? -1 : 0, root.arrowRight ? 1 : 0].filter(side => side !== 0)
+
+            Skin.Triangle {
+                required property int modelData
+                // Where the centered text starts and ends
+                readonly property real textStart: label.leftPadding + (label.width - label.leftPadding - label.rightPadding - label.contentWidth) / 2
+
+                anchors.verticalCenter: parent.verticalCenter
+                color: label.color
+                height: root.arrowSize
+                pointsRight: modelData > 0
+                width: Math.round(root.arrowSize * 0.85)
+                x: label.text.length === 0 ? (root.width - width) / 2 : (modelData < 0 ? textStart - root.arrowSpace : textStart + label.contentWidth + root.arrowSpace - width)
+            }
         }
         Image {
             id: image

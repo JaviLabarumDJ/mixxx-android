@@ -11,6 +11,9 @@ Item {
     required property string group
     property bool splitStemTracks: false
     property bool isTouchMode: false
+    // The deck, key and title badges over the waveform; skins that show
+    // them elsewhere turn them off
+    property bool showHud: true
     readonly property int activeWaveformType: Mixxx.Config.waveformType === Mixxx.WaveformDisplay.Type.Simple || Mixxx.Config.waveformType === Mixxx.WaveformDisplay.Type.Filtered || Mixxx.Config.waveformType === Mixxx.WaveformDisplay.Type.HSV || Mixxx.Config.waveformType === Mixxx.WaveformDisplay.Type.RGB || Mixxx.Config.waveformType === Mixxx.WaveformDisplay.Type.Stacked ? Mixxx.Config.waveformType : Mixxx.WaveformDisplay.Type.RGB
     // Renderer factories are created once by QmlWaveformDisplay. Keep track
     // of the type that was used for the scene-graph stack so a change from
@@ -400,6 +403,7 @@ Item {
     Item {
         id: waveformHud
         anchors.fill: parent
+        visible: root.showHud
         z: 30
 
         // Clean, minimal Deck badge (only DECK 1 / DECK 2)

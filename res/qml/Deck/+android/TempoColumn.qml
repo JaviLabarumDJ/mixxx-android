@@ -212,8 +212,8 @@ ColumnLayout {
             activeColor: Theme.deckActiveColor
             group: root.group
             implicitHeight: 22
+            arrowLeft: true
             key: "rate_temp_down"
-            text: "◀"
         }
         Skin.ControlButton {
             Layout.fillWidth: true
@@ -229,8 +229,8 @@ ColumnLayout {
             activeColor: Theme.deckActiveColor
             group: root.group
             implicitHeight: 22
+            arrowRight: true
             key: "rate_temp_up"
-            text: "▶"
         }
     }
     Skin.RangeButton {

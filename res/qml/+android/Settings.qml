@@ -15,6 +15,10 @@ Popup {
     readonly property var manager: managerItem
     property alias sections: managerItem.data
     property var categoryItems: []
+    // Skins can give the window their own title and colors
+    property string title: qsTr("⚙️ Settings")
+    property color headerColor: Theme.darkGray3
+    property color backgroundColor: Theme.darkGray2
 
     function updateActiveCategory() {
         root.activeCategory?.deactivated();
@@ -48,7 +52,7 @@ Popup {
 
     background: Rectangle {
         anchors.fill: parent
-        color: Theme.darkGray2
+        color: root.backgroundColor
         opacity: parent.radius < 0 ? Math.max(0.1, 1 + parent.radius / 8) : 1
         radius: 8
         border.color: "#383c48"
@@ -63,7 +67,7 @@ Popup {
         Rectangle {
             Layout.fillWidth: true
             Layout.preferredHeight: 40
-            color: Theme.darkGray3
+            color: root.headerColor
             radius: 6
 
             RowLayout {
@@ -86,7 +90,7 @@ Popup {
                     font.bold: true
                     font.pixelSize: 15
                     horizontalAlignment: Text.AlignHCenter
-                    text: qsTr("⚙️ Settings")
+                    text: root.title
                 }
 
                 Skin.Button {

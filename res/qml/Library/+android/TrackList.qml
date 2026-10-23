@@ -143,21 +143,16 @@ Rectangle {
                     leftMargin: 5
                     top: parent.top
                 }
-                Label {
+                // ▲ or ▼, drawn as Android draws ▶ as an emoji
+                Skin.Triangle {
                     id: sortIndicator
 
                     anchors.centerIn: parent
                     color: "red"
-                    elide: Text.ElideRight
-                    font.bold: true
-                    font.capitalization: Font.AllUppercase
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.buttonFontPixelSize
-                    horizontalAlignment: Text.AlignRight
+                    height: Math.round(Theme.buttonFontPixelSize * 0.7)
                     rotation: horizontalHeader.sortingOrder == Qt.AscendingOrder ? 90 : -90
-                    text: "▶"
-                    verticalAlignment: Text.AlignVCenter
                     visible: horizontalHeader.sortingColumn == index
+                    width: Math.round(height * 0.85)
                 }
             }
             Rectangle {
@@ -282,11 +277,11 @@ Rectangle {
                 implicitWidth: 12
                 implicitHeight: 48
                 radius: 6
-                color: verticalScrollBar.pressed ? "#00e5ff" : (verticalScrollBar.hovered ? "#78909c" : "#546e7a")
+                color: verticalScrollBar.pressed ? Theme.libraryScrollHandlePressed : (verticalScrollBar.hovered ? Theme.libraryScrollHandleHovered : Theme.libraryScrollHandle)
             }
             background: Rectangle {
                 implicitWidth: 16
-                color: "#181a20"
+                color: Theme.libraryScrollTrack
                 opacity: 0.7
                 radius: 4
             }
@@ -438,8 +433,8 @@ Rectangle {
                 Layout.preferredHeight: 38
                 Layout.preferredWidth: 110
                 activeColor: Theme.accentColor
-                backgroundColor: quickLoadBar.hasTracks ? "#2e3440" : "#262930"
-                normalColor: quickLoadBar.hasTracks ? "#ffffff" : "#78909c"
+                backgroundColor: quickLoadBar.hasTracks ? Theme.libraryActionBackground : Theme.libraryActionDisabledBackground
+                normalColor: quickLoadBar.hasTracks ? Theme.libraryActionText : Theme.libraryActionDisabledText
                 enabled: quickLoadBar.hasTracks
                 font.bold: true
                 text: quickLoadBar.hasTrack ? qsTr("+ PLAYLIST") : qsTr("+ ALL")
@@ -453,8 +448,8 @@ Rectangle {
                 Layout.preferredWidth: 100
                 visible: root.isRekordboxPlaylist
                 activeColor: Theme.accentColor
-                backgroundColor: "#2e3440"
-                normalColor: "#ffffff"
+                backgroundColor: Theme.libraryActionBackground
+                normalColor: Theme.libraryActionText
                 font.bold: true
                 text: Mixxx.MobileLibrary.playlistCopyRunning ? "%1/%2".arg(Mixxx.MobileLibrary.playlistCopyDone).arg(Mixxx.MobileLibrary.playlistCopyTotal) : qsTr("⬇ COPY")
 
@@ -466,13 +461,14 @@ Rectangle {
 
                 Layout.preferredHeight: 38
                 Layout.preferredWidth: 115
-                activeColor: "#64b5f6"
-                backgroundColor: quickLoadBar.hasTrack ? "#1565c0" : "#262930"
-                normalColor: quickLoadBar.hasTrack ? "#ffffff" : "#78909c"
+                activeColor: Theme.libraryDeck1Pressed
+                backgroundColor: quickLoadBar.hasTrack ? Theme.libraryDeck1Background : Theme.libraryActionDisabledBackground
+                normalColor: quickLoadBar.hasTrack ? Theme.libraryActionText : Theme.libraryActionDisabledText
                 highlight: quickLoadBar.hasTrack
                 enabled: quickLoadBar.hasTrack
                 font.bold: true
-                text: "◀ DECK 1"
+                arrowLeft: true
+                text: "DECK 1"
 
                 onClicked: {
                     view.loadSelectedTrack("[Channel1]", false);
@@ -484,13 +480,14 @@ Rectangle {
 
                 Layout.preferredHeight: 38
                 Layout.preferredWidth: 115
-                activeColor: "#ffb74d"
-                backgroundColor: quickLoadBar.hasTrack ? "#e65100" : "#262930"
-                normalColor: quickLoadBar.hasTrack ? "#ffffff" : "#78909c"
+                activeColor: Theme.libraryDeck2Pressed
+                backgroundColor: quickLoadBar.hasTrack ? Theme.libraryDeck2Background : Theme.libraryActionDisabledBackground
+                normalColor: quickLoadBar.hasTrack ? Theme.libraryActionText : Theme.libraryActionDisabledText
                 highlight: quickLoadBar.hasTrack
                 enabled: quickLoadBar.hasTrack
                 font.bold: true
-                text: "DECK 2 ▶"
+                arrowRight: true
+                text: "DECK 2"
 
                 onClicked: {
                     view.loadSelectedTrack("[Channel2]", false);
@@ -567,7 +564,7 @@ Rectangle {
                 Skin.Button {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 36
-                    activeColor: "#ffffff"
+                    activeColor: Theme.libraryActionText
                     highlight: !playlistPopup.allTracks
                     text: qsTr("SELECTED TRACK")
                     onClicked: playlistPopup.allTracks = false
@@ -575,7 +572,7 @@ Rectangle {
                 Skin.Button {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 36
-                    activeColor: "#ffffff"
+                    activeColor: Theme.libraryActionText
                     highlight: playlistPopup.allTracks
                     text: qsTr("ALL TRACKS")
                     onClicked: playlistPopup.allTracks = true
@@ -594,7 +591,7 @@ Rectangle {
                     width: ListView.view.width
                     height: 44
                     enabled: !modelData.locked
-                    backgroundColor: "#262930"
+                    backgroundColor: Theme.libraryActionDisabledBackground
                     normalColor: Theme.white
                     activeColor: Theme.accentColor
                     font.pixelSize: 14
@@ -613,7 +610,7 @@ Rectangle {
             Text {
                 Layout.fillWidth: true
                 visible: playlistPopup.message.length > 0
-                color: playlistPopup.messageIsError ? Theme.red : "#69f0ae"
+                color: playlistPopup.messageIsError ? Theme.red : Theme.librarySuccessColor
                 font.pixelSize: 12
                 text: playlistPopup.message
                 wrapMode: Text.WordWrap
@@ -638,8 +635,8 @@ Rectangle {
                     Layout.preferredWidth: 90
                     enabled: newPlaylistName.text.trim().length > 0
                     activeColor: Theme.accentColor
-                    backgroundColor: "#1565c0"
-                    normalColor: "#ffffff"
+                    backgroundColor: Theme.libraryConfirmBackground
+                    normalColor: Theme.libraryActionText
                     font.bold: true
                     text: qsTr("CREATE")
 
@@ -751,7 +748,7 @@ Rectangle {
             Text {
                 Layout.fillWidth: true
                 visible: copyPopup.message.length > 0
-                color: copyPopup.messageIsError ? Theme.red : "#69f0ae"
+                color: copyPopup.messageIsError ? Theme.red : Theme.librarySuccessColor
                 font.pixelSize: 12
                 text: copyPopup.message
                 wrapMode: Text.WordWrap
@@ -780,8 +777,8 @@ Rectangle {
                     visible: !Mixxx.MobileLibrary.playlistCopyRunning
                     enabled: copyName.text.trim().length > 0 && root.isRekordboxPlaylist
                     activeColor: Theme.accentColor
-                    backgroundColor: "#1565c0"
-                    normalColor: "#ffffff"
+                    backgroundColor: Theme.libraryConfirmBackground
+                    normalColor: Theme.libraryActionText
                     font.bold: true
                     text: qsTr("COPY")
                     onClicked: {

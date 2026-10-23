@@ -44,6 +44,11 @@
 #include <QFile>
 #include <QJniObject>
 
+#include "controllers/android.h"
+#include "library/trackcollectionmanager.h"
+#include "mixer/basetrackplayer.h"
+#include "mixer/previewdeck.h"
+#include "mixer/sampler.h"
 #include "util/androidpermissions.h"
 #endif
 
@@ -114,6 +119,41 @@ void copyAssetDir(const QString& src, const QString& dst) {
     }
 }
 #endif
+#if defined(Q_OS_ANDROID)
+/// Android may end Mixxx without a regular shutdown: in the background, and
+/// when the app is closed. Saves the configuration, the effects and the
+/// tracks that are loaded, whose changes (cues, beatgrid) are otherwise only
+/// saved when they are unloaded.
+void saveForAndroid(const std::shared_ptr<mixxx::CoreServices>& pCoreServices) {
+    pCoreServices->getSettings()->save();
+    if (auto pEffectsManager = pCoreServices->getEffectsManager()) {
+        pEffectsManager->saveEffectsXml();
+    }
+    const auto pPlayerManager = pCoreServices->getPlayerManager();
+    const auto pTrackCollectionManager = pCoreServices->getTrackCollectionManager();
+    if (!pPlayerManager || !pTrackCollectionManager) {
+        return;
+    }
+    const auto save = [&](BaseTrackPlayer* pPlayer) {
+        if (!pPlayer) {
+            return;
+        }
+        if (const TrackPointer pTrack = pPlayer->getLoadedTrack()) {
+            pTrackCollectionManager->saveTrack(pTrack);
+        }
+    };
+    for (int i = 0; i < pPlayerManager->numberOfDecks(); ++i) {
+        save(pPlayerManager->getDeckBase(i));
+    }
+    for (int i = 0; i < pPlayerManager->numberOfSamplers(); ++i) {
+        save(pPlayerManager->getSampler(i));
+    }
+    for (int i = 0; i < pPlayerManager->numberOfPreviewDecks(); ++i) {
+        save(pPlayerManager->getPreviewDeck(i));
+    }
+}
+#endif
+
 } // namespace
 
 namespace mixxx {
@@ -362,17 +402,17 @@ QmlApplication::QmlApplication(
 
 #if defined(Q_OS_ANDROID)
     // Android kills apps in the background without a regular shutdown, so
-    // save the configuration and the effects whenever Mixxx leaves the
-    // foreground.
+    // save whenever Mixxx leaves the foreground, and when the app is closed
     connect(app, &QGuiApplication::applicationStateChanged, this, [this](Qt::ApplicationState state) {
         if (state != Qt::ApplicationSuspended && state != Qt::ApplicationHidden) {
             return;
         }
-        qInfo() << "Saving settings, Mixxx went to the background";
-        m_pCoreServices->getSettings()->save();
-        if (auto pEffectsManager = m_pCoreServices->getEffectsManager()) {
-            pEffectsManager->saveEffectsXml();
-        }
+        qInfo() << "Saving settings and loaded tracks, Mixxx went to the background";
+        saveForAndroid(m_pCoreServices);
+    });
+    mixxx::android::setSaveBeforeExit([this]() {
+        qInfo() << "Saving settings and loaded tracks, Mixxx is closed";
+        saveForAndroid(m_pCoreServices);
     });
 #endif
 
@@ -449,6 +489,9 @@ void QmlApplication::slotFrameSwapped() {
 }
 
 QmlApplication::~QmlApplication() {
+#if defined(Q_OS_ANDROID)
+    mixxx::android::setSaveBeforeExit({});
+#endif
     QmlApplicationProxy::registerReloadCallback({});
     // Destroy the QML engine before the waveform factory. Scene-graph nodes
     // owned by the engine may still reference QML waveform renderers and the

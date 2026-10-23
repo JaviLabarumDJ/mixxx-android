@@ -10,6 +10,7 @@
 #include <QSet>
 #include <QtCore/private/qandroidextras_p.h>
 #include <chrono>
+#include <cmath>
 #include <condition_variable>
 #include <cstring>
 
@@ -22,6 +23,8 @@ namespace {
 
 constexpr uint8_t kRequestCur = 0x01;
 constexpr uint8_t kRequestRange = 0x02;
+// UAC1 has separate request codes for reading
+constexpr uint8_t kRequestGetCurUac1 = 0x81;
 // UAC1 endpoint control / UAC2 clock source control
 constexpr uint16_t kSamplingFreqControl = 0x0100;
 
@@ -114,6 +117,9 @@ AndroidUsbAudioDevice::AndroidUsbAudioDevice(const QJniObject& usbDevice)
           m_framesPerPacket(0),
           m_fractionalFrames(0),
           m_feedbackTransfersPending(0),
+          m_measuredFrames16_16(0),
+          m_measuredPackets(0),
+          m_clockLogged(false),
           m_pMidiInTransfer(nullptr),
           m_midiInRunning(false),
           m_midiInPending(false) {
@@ -491,6 +497,82 @@ bool AndroidUsbAudioDevice::setSampleRate(const usbaudio::StreamFormat& format, 
     return true;
 }
 
+int AndroidUsbAudioDevice::readSampleRate(const usbaudio::StreamFormat& format) {
+    unsigned char data[4] = {};
+    int received = 0;
+    if (format.uacVersion == 2) {
+        const usbaudio::ControlInterface* pControl = m_description.controlFor(format);
+        const int clockId = pControl ? pControl->clockSourceForTerminal(format.terminalLink) : -1;
+        if (clockId < 0) {
+            return 0;
+        }
+        received = libusb_control_transfer(m_pHandle,
+                LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE,
+                kRequestCur,
+                kSamplingFreqControl,
+                static_cast<uint16_t>((clockId << 8) | pControl->interfaceNumber),
+                data,
+                4,
+                kControlTimeoutMillis);
+    } else {
+        received = libusb_control_transfer(m_pHandle,
+                LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_ENDPOINT,
+                kRequestGetCurUac1,
+                kSamplingFreqControl,
+                format.endpoint,
+                data,
+                3,
+                kControlTimeoutMillis);
+    }
+    if (received < 3) {
+        return 0;
+    }
+    return static_cast<int>(readLittleEndian(data, std::min(received, 4)));
+}
+
+void AndroidUsbAudioDevice::applySampleRate(int sampleRate) {
+    // UAC2: the clock is set before the interface, UAC1: the endpoint control
+    // needs the altsetting to be active
+    if (m_outputFormat.uacVersion == 2) {
+        setSampleRate(m_outputFormat, sampleRate);
+    }
+    libusb_set_interface_alt_setting(
+            m_pHandle, m_outputFormat.interfaceNumber, m_outputFormat.altSetting);
+    if (m_outputFormat.uacVersion == 1) {
+        setSampleRate(m_outputFormat, sampleRate);
+    }
+    if (m_hasImplicitFeedback) {
+        if (m_implicitFormat.interfaceNumber != m_outputFormat.interfaceNumber) {
+            libusb_set_interface_alt_setting(m_pHandle,
+                    m_implicitFormat.interfaceNumber,
+                    m_implicitFormat.altSetting);
+        }
+        if (m_implicitFormat.uacVersion == 1) {
+            setSampleRate(m_implicitFormat, sampleRate);
+        }
+    }
+}
+
+void AndroidUsbAudioDevice::measureClock(uint64_t framesPerPacket16_16) {
+    if (m_clockLogged) {
+        return;
+    }
+    m_measuredFrames16_16 += framesPerPacket16_16;
+    ++m_measuredPackets;
+    if (m_measuredPackets < m_packetsPerSecond) {
+        return;
+    }
+    m_clockLogged = true;
+    const double rate = static_cast<double>(m_measuredFrames16_16) / 65536.0 *
+            m_packetsPerSecond / m_measuredPackets;
+    if (std::abs(rate - m_sampleRate) > m_sampleRate * 0.02) {
+        qWarning() << m_productName << "plays at about" << qRound(rate) << "Hz instead of"
+                   << m_sampleRate << "Hz: the music is too fast or too slow";
+    } else {
+        qInfo() << m_productName << "plays at about" << qRound(rate) << "Hz";
+    }
+}
+
 void AndroidUsbAudioDevice::startEventThread() {
     if (m_eventThreadRunning) {
         return;
@@ -545,8 +627,13 @@ bool AndroidUsbAudioDevice::startOutput(int sampleRate,
         qWarning() << m_productName << "does not support" << sampleRate << "Hz";
         return false;
     }
-    // UAC2: the clock is set before the interface, UAC1: the endpoint control
-    // needs the altsetting to be active
+    // Start from stopped streams: the device keeps its state, e.g. the rate
+    // Android's own driver or the last session set, until it is unplugged
+    libusb_set_interface_alt_setting(m_pHandle, m_outputFormat.interfaceNumber, 0);
+    if (m_hasImplicitFeedback &&
+            m_implicitFormat.interfaceNumber != m_outputFormat.interfaceNumber) {
+        libusb_set_interface_alt_setting(m_pHandle, m_implicitFormat.interfaceNumber, 0);
+    }
     if (m_outputFormat.uacVersion == 2) {
         setSampleRate(m_outputFormat, sampleRate);
     }
@@ -574,6 +661,25 @@ bool AndroidUsbAudioDevice::startOutput(int sampleRate,
             setSampleRate(m_implicitFormat, sampleRate);
         }
     }
+    // A device that didn't take the rate plays everything too fast or too
+    // slow, so check it and try once more
+    int deviceRate = readSampleRate(m_outputFormat);
+    if (deviceRate > 0 && deviceRate != sampleRate) {
+        qWarning() << m_productName << "is at" << deviceRate << "Hz instead of" << sampleRate
+                   << "Hz, setting the rate again";
+        libusb_set_interface_alt_setting(m_pHandle, m_outputFormat.interfaceNumber, 0);
+        if (m_hasImplicitFeedback &&
+                m_implicitFormat.interfaceNumber != m_outputFormat.interfaceNumber) {
+            libusb_set_interface_alt_setting(m_pHandle, m_implicitFormat.interfaceNumber, 0);
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        applySampleRate(sampleRate);
+        deviceRate = readSampleRate(m_outputFormat);
+    }
+    qInfo() << m_productName << "reports a rate of" << deviceRate << "Hz (0: unknown)";
+    m_measuredFrames16_16 = 0;
+    m_measuredPackets = 0;
+    m_clockLogged = false;
 
     m_packetsPerSecond = usbaudio::packetsPerSecond(m_outputFormat.bInterval, isHighSpeed());
     const int packetsPerTransfer = std::max(1, transferMillis * m_packetsPerSecond / 1000);
@@ -744,6 +850,7 @@ void AndroidUsbAudioDevice::feedbackTransferCallback(libusb_transfer* pTransfer)
                     raw, bytes, pThis->m_nominalFramesPerPacket);
             if (framesPerPacket != 0) {
                 pThis->m_framesPerPacket = framesPerPacket;
+                pThis->measureClock(framesPerPacket);
             }
         }
     } else if (pTransfer->status == LIBUSB_TRANSFER_NO_DEVICE) {
@@ -767,9 +874,10 @@ void AndroidUsbAudioDevice::implicitTransferCallback(libusb_transfer* pTransfer)
             if (packet.status != LIBUSB_TRANSFER_COMPLETED || frameBytes <= 0) {
                 continue;
             }
+            const int frames = static_cast<int>(packet.actual_length) / frameBytes;
+            pThis->measureClock(static_cast<uint64_t>(frames) << 16);
             if (pThis->m_implicitPacketFrames.size() < kMaxImplicitQueue) {
-                pThis->m_implicitPacketFrames.push_back(
-                        static_cast<int>(packet.actual_length) / frameBytes);
+                pThis->m_implicitPacketFrames.push_back(frames);
             }
         }
     } else if (pTransfer->status == LIBUSB_TRANSFER_NO_DEVICE) {

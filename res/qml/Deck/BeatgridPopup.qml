@@ -15,6 +15,8 @@ Popup {
     readonly property bool trackLoaded: trackLoadedProxy.value > 0
     readonly property bool locked: bpmLockProxy.value > 0
     readonly property bool editable: root.trackLoaded && !root.locked
+    // Kept in a property, or the player object can be collected
+    readonly property var player: Mixxx.PlayerManager.getPlayer(root.group)
 
     // Pressing a button of the grid controls: they act when set to 1
     component GridButton: Skin.Button {
@@ -82,6 +84,12 @@ Popup {
         group: root.group
         key: "beats_undo_possible"
     }
+    Mixxx.ControlProxy {
+        id: playProxy
+
+        group: root.group
+        key: "play"
+    }
 
     contentItem: ColumnLayout {
         spacing: 8
@@ -141,12 +149,13 @@ Popup {
             }
             GridButton {
                 key: "beats_translate_earlier"
-                // Not ◀ ▶ (drawn as emoji on Android) nor ◄ ▸ (missing from its fonts)
-                text: qsTr("‹ EARLIER")
+                arrowLeft: true
+                text: qsTr("EARLIER")
             }
             GridButton {
                 key: "beats_translate_later"
-                text: qsTr("LATER ›")
+                arrowRight: true
+                text: qsTr("LATER")
             }
             GridButton {
                 key: "beats_set_halve"
@@ -179,6 +188,18 @@ Popup {
                 font.bold: true
                 text: qsTr("🔒 LOCK GRID")
                 onClicked: bpmLockProxy.value = 1
+            }
+            // Analyzes the track again, e.g. to get the grid lined up with
+            // the kicks by the current analyzer; only while the deck is stopped
+            Skin.Button {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 40
+                visible: root.trackLoaded && !root.locked
+                enabled: playProxy.value === 0
+                activeColor: Theme.accentColor
+                font.bold: true
+                text: qsTr("🔄 RE-ANALYZE")
+                onClicked: Mixxx.MobileLibrary.reanalyzeBeats(root.player.currentTrack)
             }
             Skin.Button {
                 Layout.fillWidth: true

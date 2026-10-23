@@ -216,7 +216,8 @@ QString QmlMobileLibraryProxy::defaultMusicDirectory() const {
 #endif
 }
 
-void QmlMobileLibraryProxy::analyzeTracksMatching(const QString& sqlQuery) const {
+void QmlMobileLibraryProxy::analyzeTracksMatching(
+        const QString& sqlQuery, AnalyzerTrack::Options options) const {
     if (!trackCollectionManager()) {
         return;
     }
@@ -233,7 +234,7 @@ void QmlMobileLibraryProxy::analyzeTracksMatching(const QString& sqlQuery) const
     while (query.next()) {
         TrackId id(query.value(0));
         if (id.isValid()) {
-            tracks.append(id);
+            tracks.append(AnalyzerScheduledTrack(id, options));
         }
     }
     if (!tracks.isEmpty()) {
@@ -242,7 +243,21 @@ void QmlMobileLibraryProxy::analyzeTracksMatching(const QString& sqlQuery) const
 }
 
 void QmlMobileLibraryProxy::analyzeAllTracks() const {
-    analyzeTracksMatching(QStringLiteral("SELECT id FROM library WHERE mixxx_deleted = 0"));
+    // Also the beatgrids, except locked ones and those of Rekordbox
+    AnalyzerTrack::Options options;
+    options.redoBeats = true;
+    analyzeTracksMatching(QStringLiteral("SELECT id FROM library WHERE mixxx_deleted = 0"), options);
+}
+
+bool QmlMobileLibraryProxy::reanalyzeBeats(QmlTrackProxy* pTrackProxy) const {
+    const TrackPointer pTrack = pTrackProxy ? pTrackProxy->internal() : TrackPointer();
+    if (!pTrack || pTrack->isBpmLocked()) {
+        return false;
+    }
+    // Like "Reanalyze" in the track menu of the desktop UI
+    pTrack->trySetBeats(mixxx::BeatsPointer());
+    emit QmlLibraryProxy::get() -> analyzeTracks({AnalyzerScheduledTrack(pTrack->getId())});
+    return true;
 }
 
 void QmlMobileLibraryProxy::analyzeUnanalyzedTracks() const {

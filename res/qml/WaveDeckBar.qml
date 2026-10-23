@@ -33,7 +33,8 @@ Item {
 
     component NudgeButton: Rectangle {
         required property var control
-        required property string label
+        // ▶, else ◀
+        required property bool pointsRight
 
         Layout.preferredWidth: 24
         radius: 4
@@ -41,11 +42,13 @@ Item {
         border.color: "#37474f"
         border.width: 1
 
-        Text {
+        // Drawn, as Android draws ◀ ▶ as emoji
+        Skin.Triangle {
             anchors.centerIn: parent
-            text: parent.label
-            font.pixelSize: 10
             color: "#b0bec5"
+            height: 8
+            pointsRight: parent.pointsRight
+            width: 7
         }
 
         MouseArea {
@@ -251,7 +254,7 @@ Item {
                 NudgeButton {
                     Layout.preferredHeight: parent.height
                     control: rateTempDownControl
-                    label: "◀"
+                    pointsRight: false
                 }
 
                 // Pitch / Tempo Percentage
@@ -290,7 +293,7 @@ Item {
                 NudgeButton {
                     Layout.preferredHeight: parent.height
                     control: rateTempUpControl
-                    label: "▶"
+                    pointsRight: true
                 }
 
                 // BPM Box (Hero display)
@@ -404,12 +407,30 @@ Item {
                     border.color: "#00e676"
                     border.width: 1
 
-                    Text {
+                    // Drawn, as the fonts of Android lack the pause sign and
+                    // draw the play sign as an emoji
+                    Row {
                         anchors.centerIn: parent
-                        text: playControl.value > 0 ? "❚❚" : "▶"
-                        font.bold: true
-                        font.pixelSize: 12
-                        color: playControl.value > 0 ? "#000000" : "#00e676"
+                        spacing: 3
+                        visible: playControl.value > 0
+
+                        Repeater {
+                            model: 2
+
+                            Rectangle {
+                                color: "#000000"
+                                height: 11
+                                width: 3
+                            }
+                        }
+                    }
+                    Skin.Triangle {
+                        anchors.centerIn: parent
+                        anchors.horizontalCenterOffset: 1
+                        color: "#00e676"
+                        height: 12
+                        visible: playControl.value <= 0
+                        width: 10
                     }
 
                     MouseArea {

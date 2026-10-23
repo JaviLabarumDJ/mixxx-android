@@ -325,8 +325,8 @@ Mixxx.LibrarySourceTree {
             width: Math.min(parent.width - 6, keyText.implicitWidth + (keyCell.compat === 2 ? 22 : 14))
             height: 24
             radius: 4
-            color: keyCell.compat === 2 ? "#00c85333" : (keyCell.compat === 1 ? "#00b0ff22" : "transparent")
-            border.color: keyCell.compat === 2 ? "#00e676" : (keyCell.compat === 1 ? "#00b0ff" : "transparent")
+            color: keyCell.compat === 2 ? Theme.libraryKeyMatchBackground : (keyCell.compat === 1 ? Theme.libraryKeyHarmonicBackground : "transparent")
+            border.color: keyCell.compat === 2 ? Theme.libraryKeyMatchColor : (keyCell.compat === 1 ? Theme.libraryKeyHarmonicColor : "transparent")
             border.width: keyCell.compat > 0 ? 1 : 0
 
             Row {
@@ -337,14 +337,14 @@ Mixxx.LibrarySourceTree {
                     visible: keyCell.compat === 2
                     text: "★"
                     font.pixelSize: 10
-                    color: "#00e676"
+                    color: Theme.libraryKeyMatchColor
                 }
 
                 Text {
                     id: keyText
                     font.bold: keyCell.compat > 0
                     font.pixelSize: 12
-                    color: keyCell.compat === 2 ? "#00e676" : (keyCell.compat === 1 ? "#00e5ff" : Theme.textColor)
+                    color: keyCell.compat === 2 ? Theme.libraryKeyMatchColor : (keyCell.compat === 1 ? Theme.libraryKeyHarmonicText : Theme.textColor)
                     text: display ?? ""
                 }
             }

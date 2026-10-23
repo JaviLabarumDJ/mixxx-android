@@ -273,11 +273,19 @@ Category {
                             RowLayout {
                                 Layout.fillWidth: true
                                 Text { Layout.fillWidth: true; text: qsTr("Skin"); color: Theme.white; font.pixelSize: 13 }
+                                // Applied immediately, like the language: the
+                                // interface is reloaded with the other skin
                                 Skin.ComboBox {
                                     id: skinInput
+
+                                    readonly property var skins: Mixxx.MobileApp.skinsIn(Qt.resolvedUrl("../Skins/"))
+
                                     Layout.preferredWidth: 180
-                                    model: [qsTr("Unnamed")]
-                                    onCurrentIndexChanged: themeColorTab.dirty = true
+                                    model: skins.map(skin => skin === "Classic" ? qsTr("Classic") : skin)
+                                    currentIndex: Math.max(0, skins.indexOf(Mixxx.MobileApp.skin))
+                                    onActivated: index => {
+                                        Mixxx.MobileApp.skin = skins[index];
+                                    }
                                 }
                             }
 
@@ -379,7 +387,11 @@ Category {
                                 spacing: 6
 
                                 Repeater {
-                                    model: [
+                                    id: topBarItems
+
+                                    // The items of the Classic skin; other skins list theirs
+                                    // in a topBarItems property of their main window
+                                    readonly property var classicItems: [
                                         {name: "dj", label: "DJ", view: true},
                                         {name: "wave", label: qsTr("WAVE"), view: true},
                                         {name: "lib", label: qsTr("LIB"), view: true},
@@ -392,11 +404,14 @@ Category {
                                         {name: "rec", label: "REC", view: false},
                                         {name: "4d", label: "4D", view: false}
                                     ]
+                                    readonly property var skinItems: ApplicationWindow.window?.skinItem?.topBarItems
+
+                                    model: skinItems ?? classicItems
 
                                     Skin.Button {
                                         required property var modelData
                                         readonly property bool shown: Mixxx.MobileApp.hiddenTopBarItems.indexOf(modelData.name) < 0
-                                        readonly property int shownViews: ["dj", "wave", "lib", "ctl"].filter(name => Mixxx.MobileApp.hiddenTopBarItems.indexOf(name) < 0).length
+                                        readonly property int shownViews: topBarItems.model.filter(item => item.view && Mixxx.MobileApp.hiddenTopBarItems.indexOf(item.name) < 0).length
 
                                         implicitWidth: 72
                                         implicitHeight: 34

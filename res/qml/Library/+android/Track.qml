@@ -2,6 +2,7 @@ import Mixxx 1.0 as Mixxx
 import QtQuick
 import QtQuick.Controls 2.15
 import "../Theme"
+import ".." as Skin
 
 Item {
     id: root
@@ -58,12 +59,32 @@ Item {
                 title: qsTr("File")
 
                 MenuItem {
-                    text: qsTr("◀ Load Deck 1")
+                    id: loadDeck1Item
+
+                    text: qsTr("Load Deck 1")
                     onTriggered: root.loadToDeck("[Channel1]")
+
+                    // The arrow drawn, as Android draws ◀ ▶ as emoji
+                    contentItem: Skin.ArrowText {
+                        arrowLeft: true
+                        color: loadDeck1Item.highlighted ? loadDeck1Item.palette.highlightedText : loadDeck1Item.palette.windowText
+                        font: loadDeck1Item.font
+                        text: loadDeck1Item.text
+                    }
                 }
                 MenuItem {
-                    text: qsTr("Load Deck 2 ▶")
+                    id: loadDeck2Item
+
+                    text: qsTr("Load Deck 2")
                     onTriggered: root.loadToDeck("[Channel2]")
+
+                    // The arrow drawn, as Android draws ◀ ▶ as emoji
+                    contentItem: Skin.ArrowText {
+                        arrowRight: true
+                        color: loadDeck2Item.highlighted ? loadDeck2Item.palette.highlightedText : loadDeck2Item.palette.windowText
+                        font: loadDeck2Item.font
+                        text: loadDeck2Item.text
+                    }
                 }
                 MenuSeparator {
                 }

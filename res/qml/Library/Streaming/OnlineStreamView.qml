@@ -399,7 +399,8 @@ Item {
                             normalColor: "#ffffff"
                             font.bold: true
                             font.pixelSize: 11
-                            text: "◀ D1"
+                            arrowLeft: true
+                            text: "D1"
                             enabled: !trackDelegate.isDownloading
                             onClicked: {
                                 Mixxx.StreamingManager.downloadAndLoad(
@@ -417,7 +418,8 @@ Item {
                             normalColor: "#ffffff"
                             font.bold: true
                             font.pixelSize: 11
-                            text: "D2 ▶"
+                            arrowRight: true
+                            text: "D2"
                             enabled: !trackDelegate.isDownloading
                             onClicked: {
                                 Mixxx.StreamingManager.downloadAndLoad(
