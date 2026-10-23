@@ -44,8 +44,23 @@ Item {
     readonly property var loadTargetPlayer: loadTarget.length > 0 ? Mixxx.PlayerManager.getPlayer(loadTarget) : null
     // Landscape phones
     readonly property bool compact: height < 520
-    // BEAT FX is always shown on tablets, on demand on phones
+    // BEAT FX is shown on demand on phones, and can be hidden on tablets
     property bool beatFxShown: false
+    property bool beatFxPanelShown: true
+
+    // [Skin],mobile_fx_toggle, e.g. SHIFT + BEAT ▶ of the DDJ-FLX4
+    function toggleBeatFx() {
+        if (root.compact) {
+            if (root.browsing || root.xyView) {
+                root.showPlayView();
+                root.beatFxShown = true;
+            } else {
+                root.beatFxShown = !root.beatFxShown;
+            }
+        } else {
+            root.beatFxPanelShown = !root.beatFxPanelShown;
+        }
+    }
     readonly property int numDecks: 4
     readonly property int numSamplers: 16
     readonly property int numPreviewDecks: 1
@@ -624,7 +639,7 @@ Item {
                     anchors.right: parent.right
                     anchors.rightMargin: content.gap
                     anchors.top: parent.top
-                    visible: !root.compact && root.itemShown("fx")
+                    visible: !root.compact && root.itemShown("fx") && root.beatFxPanelShown
                     width: 180
                 }
             }
@@ -707,9 +722,9 @@ Item {
 
     // ================= CONTROLLER ACCESS TO THE SCREENS =================
     // The same [Skin] controls as the Classic skin (see its MainWindow.qml):
-    // mobile_library_toggle switches BROWSE, mobile_loader_deck1/2 open the
-    // browser for a deck, and LOAD does that too when the browser isn't
-    // shown.
+    // mobile_library_toggle switches BROWSE, mobile_fx_toggle BEAT FX,
+    // mobile_loader_deck1/2 open the browser for a deck, and LOAD does that
+    // too when the browser isn't shown.
     property bool mobileControlsCreated: false
 
     Mixxx.SkinControlCreator {
@@ -724,6 +739,23 @@ Item {
         onValueChanged: value => {
             if (value > 0) {
                 root.toggleLibraryView();
+            }
+        }
+    }
+    property bool fxControlCreated: false
+
+    Mixxx.SkinControlCreator {
+        group: "[Skin]"
+        key: "mobile_fx_toggle"
+
+        Component.onCompleted: root.fxControlCreated = true
+    }
+    Mixxx.ControlProxy {
+        group: "[Skin]"
+        key: root.fxControlCreated ? "mobile_fx_toggle" : ""
+        onValueChanged: value => {
+            if (value > 0) {
+                root.toggleBeatFx();
             }
         }
     }

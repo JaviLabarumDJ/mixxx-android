@@ -47,12 +47,14 @@ The Android UI creates `[Skin]` controls that controller mappings can use
 | ------- | ------ |
 | `[Skin],mobile_library_toggle` | Shows the LIB view, or returns to the previous view |
 | `[Skin],mobile_loader_deck1`, `[Skin],mobile_loader_deck2` | Opens the deck loader of deck 1/2 |
+| `[Skin],mobile_fx_toggle` | Shows or hides the effects (FX bar; BEAT FX in the Booth skin) |
 
 `[ChannelN],LoadSelectedTrack` (LOAD) opens the deck loader of deck 1/2 when
 no library is on screen; with a library on screen it loads the selected
 track, and closes the deck loader if it was used. The DDJ-400 and DDJ-FLX4
 mappings map SHIFT+LOAD (`0x96 0x68`/`0x7A`, measured on a DDJ-FLX4) to
-`mobile_library_toggle`.
+`mobile_library_toggle`. The DDJ-FLX4 mapping maps SHIFT+BEAT ▶ (`0x94 0x6B`,
+from Pioneer's MIDI message list) to `mobile_fx_toggle`.
 
 > _End of AI-written section._
 
