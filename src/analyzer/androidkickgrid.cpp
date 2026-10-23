@@ -20,18 +20,17 @@ constexpr std::size_t kMinKicks = 4;
 // Phases in beats
 constexpr double kAgreement = 0.06;
 constexpr double kMinMove = 0.03;
-constexpr double kMinBpmToHalve = 150;
+// Doubled house and techno; drum & bass (~175 BPM, kicks often on every
+// second beat) is left alone
+constexpr double kMinBpmToHalve = 200;
+constexpr double kHalveGain = 1.5;
+// The best position must have this much more kick than the current one
+constexpr double kMinGain = 1.2;
 
 // The phase of a position on the grid, between -0.5 and 0.5 beats
 double phaseOf(double position, double firstBeat, double beatLength) {
     const double beats = (position - firstBeat) / beatLength + 0.5;
     return beats - std::floor(beats) - 0.5;
-}
-
-double median(std::vector<double> values) {
-    std::sort(values.begin(), values.end());
-    const std::size_t middle = values.size() / 2;
-    return values.size() % 2 ? values[middle] : (values[middle - 1] + values[middle]) / 2;
 }
 
 } // namespace
@@ -99,7 +98,8 @@ BeatsPointer KickGrid::correct(const BeatsPointer& pBeats) const {
     if (start + 1 >= onset.size()) {
         return pBeats;
     }
-    // The first strong onsets from there: the intro kicks
+    // The first strong onsets from there: without a few, there's no kick to
+    // follow
     const std::size_t windowEnd = std::min(onset.size(),
             start + static_cast<std::size_t>(kStrongOnsetWindowSeconds * m_sampleRate.value() / kHopFrames));
     const double threshold = kStrongOnset *
@@ -123,41 +123,64 @@ BeatsPointer KickGrid::correct(const BeatsPointer& pBeats) const {
     }
     double beatLength = 60.0 * m_sampleRate.value() / bpm.value();
 
-    // A doubled BPM: the intro kicks come every second beat
-    std::vector<double> intervals;
-    for (std::size_t i = 1; i < kicks.size(); ++i) {
-        intervals.push_back(kicks[i] - kicks[i - 1]);
-    }
-    if (bpm.value() >= kMinBpmToHalve &&
-            std::abs(median(intervals) / beatLength - 2) < 0.1) {
-        const auto halved = pResult->tryScale(Beats::BpmScale::Halve);
-        if (halved) {
-            pResult = *halved;
-            beatLength *= 2;
-            qDebug() << "KickGrid: halved the BPM of" << bpm.value();
-        }
-    }
-
-    // Move the grid onto the kicks if they and the track start agree
+    // Score each position of the grid between two beats by the low-frequency
+    // onsets on its beats, over all of the kept audio, and move the grid to
+    // the best one if it clearly beats the current position and agrees with
+    // the start of the track (tracks start on a beat)
     if (!pResult->firstBeat().isValid()) {
         return pResult;
     }
-    const double firstBeat = pResult->firstBeat().value();
-    std::vector<double> phases;
-    for (double kick : kicks) {
-        phases.push_back(phaseOf(kick, firstBeat, beatLength));
+    double firstBeat = pResult->firstBeat().value();
+    const auto scoreAt = [&](double phase, double length) {
+        double score = 0;
+        for (double position = firstBeat + phase * length;
+                position < onset.size() * static_cast<double>(kHopFrames);
+                position += length) {
+            const auto hop = static_cast<std::size_t>(std::max(0.0, position) / kHopFrames);
+            double best = 0;
+            for (std::size_t i = hop > 0 ? hop - 1 : 0; i <= hop + 1 && i < onset.size(); ++i) {
+                best = std::max(best, onset[i]);
+            }
+            score += best;
+        }
+        return score;
+    };
+    // A doubled BPM: the kicks are on every second beat only, so one half of
+    // the beats has much more kick than the other
+    if (bpm.value() >= kMinBpmToHalve) {
+        const double even = scoreAt(0, 2 * beatLength);
+        const double odd = scoreAt(0.5, 2 * beatLength);
+        if (std::max(even, odd) > kHalveGain * std::min(even, odd)) {
+            const auto halved = pResult->tryScale(Beats::BpmScale::Halve);
+            if (halved) {
+                pResult = *halved;
+                beatLength *= 2;
+                firstBeat = pResult->firstBeat().value();
+                qDebug() << "KickGrid: halved the BPM of" << bpm.value();
+            }
+        }
     }
-    const double move = median(phases);
-    const auto agreeing = std::count_if(phases.begin(), phases.end(), [move](double phase) {
-        return std::abs(phase - move) < kAgreement;
-    });
+
+    const double step = static_cast<double>(kHopFrames) / beatLength;
+    double bestPhase = 0;
+    double bestScore = scoreAt(0, beatLength);
+    const double currentScore = bestScore;
+    for (double phase = -0.5; phase < 0.5; phase += step) {
+        const double score = scoreAt(phase, beatLength);
+        if (score > bestScore) {
+            bestScore = score;
+            bestPhase = phase;
+        }
+    }
     const bool startAgrees =
-            std::abs(phaseOf(trackStart, firstBeat, beatLength) - move) < kAgreement;
-    if (agreeing >= 0.75 * phases.size() && startAgrees && std::abs(move) > kMinMove) {
-        const auto moved = pResult->tryTranslateBeats(move);
+            std::abs(phaseOf(trackStart, firstBeat, beatLength) - bestPhase) < kAgreement;
+    qDebug() << "KickGrid: best position" << bestPhase << "beats, score" << bestScore
+             << "against" << currentScore << "; track start agrees:" << startAgrees;
+    if (std::abs(bestPhase) > kMinMove && bestScore > kMinGain * currentScore && startAgrees) {
+        const auto moved = pResult->tryTranslateBeats(bestPhase);
         if (moved) {
             pResult = *moved;
-            qDebug() << "KickGrid: moved the beatgrid by" << move << "beats onto the kicks";
+            qDebug() << "KickGrid: moved the beatgrid by" << bestPhase << "beats onto the kicks";
         }
     }
     return pResult;
