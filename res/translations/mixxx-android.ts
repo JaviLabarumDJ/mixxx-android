@@ -1097,11 +1097,7 @@ Button</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>HIDE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>PLAYLISTS</source>
+        <source>SIDEBAR</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

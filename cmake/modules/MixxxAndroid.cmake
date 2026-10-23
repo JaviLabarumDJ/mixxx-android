@@ -16,6 +16,7 @@ target_sources(
     src/util/androidbackup.cpp
     src/util/androidcrashreport.cpp
     src/util/androidpermissions.cpp
+    src/track/androidautocue.cpp
 )
 
 if(QML)

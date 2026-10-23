@@ -103,7 +103,9 @@ Item {
 
         required property string group
         required property int deckNumber
-        readonly property var currentTrack: Mixxx.PlayerManager.getPlayer(group)?.currentTrack
+        // Kept in a property, or the player object can be collected
+        readonly property var deckPlayer: Mixxx.PlayerManager.getPlayer(group)
+        readonly property var currentTrack: deckPlayer?.currentTrack
         readonly property bool loaded: loadedControl.value > 0
         readonly property real rowHeight: Math.max(18, Math.min(34, (height - header.height) / 4))
         // Bars and beats to the end of the track, as a player counts down to
@@ -114,7 +116,8 @@ Item {
             }
             const seconds = durationControl.value * (1 - Math.max(0, Math.min(1, positionControl.value)));
             const beats = Math.floor(seconds * bpmControl.value / 60);
-            return ("0" + Math.floor(beats / 4)).slice(-2) + "." + (beats % 4 + 1);
+            const bars = Math.floor(beats / 4);
+            return (bars < 10 ? "0" : "") + bars + "." + (beats % 4 + 1);
         }
 
         Mixxx.ControlProxy {

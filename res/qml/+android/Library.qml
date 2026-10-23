@@ -135,22 +135,23 @@ Item {
                 onClicked: root.librarySourceMode = 1
             }
 
+            Item { Layout.fillWidth: true }
+
             // Shows or hides the sidebar (playlists, crates, history...),
-            // remembered across restarts
+            // remembered across restarts. A toggle rather than a tab: always
+            // the same label, lit while the sidebar is shown.
             Skin.Button {
                 visible: root.librarySourceMode === 0
                 Layout.fillHeight: true
-                Layout.preferredWidth: 92
-                activeColor: Theme.accentColor
-                checkable: true
-                checked: root.showSidebar
+                Layout.preferredWidth: 130
+                activeColor: "#ffffff"
+                normalColor: "#90a4ae"
+                highlight: root.showSidebar
                 font.bold: true
                 font.pixelSize: 10
-                text: root.showSidebar ? qsTr("HIDE") : qsTr("PLAYLISTS")
+                text: qsTr("SIDEBAR")
                 onClicked: Mixxx.MobileLibrary.sidebarVisible = !Mixxx.MobileLibrary.sidebarVisible
             }
-
-            Item { Layout.fillWidth: true }
         }
     }
 

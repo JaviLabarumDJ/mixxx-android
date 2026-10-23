@@ -164,18 +164,19 @@ Rectangle {
             anchors.left: parent.left
             anchors.leftMargin: 6
             anchors.verticalCenter: parent.verticalCenter
+            spacing: -Math.round(root.unit * 0.2)
 
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: "#9a9ea6"
-                font.pixelSize: Math.round(root.unit * 0.75)
+                font.pixelSize: Math.round(root.unit * 0.62)
                 text: qsTr("DECK")
             }
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: root.playing ? "#ff6a13" : "#ffffff"
                 font.bold: true
-                font.pixelSize: Math.round(root.unit * 1.15)
+                font.pixelSize: Math.round(root.unit * 1.0)
                 text: root.playing ? `((${root.deckNumber}))` : root.deckNumber
             }
         }
