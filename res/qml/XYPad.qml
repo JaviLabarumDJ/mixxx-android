@@ -355,21 +355,23 @@ Rectangle {
             }
 
             // Axis Labels
-            Text {
+            Skin.ArrowText {
+                arrowLeft: true
                 anchors.left: parent.left
                 anchors.leftMargin: 10
                 anchors.verticalCenter: parent.verticalCenter
-                text: qsTr("◀ LOW PASS")
+                text: qsTr("LOW PASS")
                 font.bold: true
                 font.pixelSize: 11
                 color: Qt.alpha(root.deck1Color, 0.4)
             }
 
-            Text {
+            Skin.ArrowText {
+                arrowRight: true
                 anchors.right: parent.right
                 anchors.rightMargin: 10
                 anchors.verticalCenter: parent.verticalCenter
-                text: qsTr("HIGH PASS ▶")
+                text: qsTr("HIGH PASS")
                 font.bold: true
                 font.pixelSize: 11
                 color: Qt.alpha(root.deck2Color, 0.4)

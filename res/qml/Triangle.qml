@@ -1,7 +1,7 @@
 import QtQuick
 
 // A ◀ or ▶ drawn as a triangle: Android draws these signs as emoji, and
-// its fonts lack the other triangles.
+// its fonts lack the other triangles. Rotate it for ▲ and ▼.
 Canvas {
     id: root
 

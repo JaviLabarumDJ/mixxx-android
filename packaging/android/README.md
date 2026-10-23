@@ -130,6 +130,11 @@ loaded. The colors that the library components used to write into the code
 are `library…` properties of `Theme` (`res/qml/Theme/+android/Theme.qml`),
 whose defaults are the Classic look.
 
+Android draws ◀ and ▶ as emoji and its fonts lack ❚ and the other
+triangles, so the UI draws them: `Triangle.qml` (rotated for ▲ ▼),
+`ArrowText.qml` for a text with an arrow, and `arrowLeft`/`arrowRight` of
+the buttons (`res/qml/+android/Button.qml`). Texts don't contain them.
+
 The **Booth** skin (`res/qml/Skins/Booth/`) is laid out like the screen of a
 booth player, for landscape phones and tablets: the two waveforms stacked
 over the whole width with quantize and slip next to them, the deck displays

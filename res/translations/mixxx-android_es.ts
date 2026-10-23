@@ -273,12 +273,12 @@ Usa el modo avanzado para verla</translation>
         <translation>PRIMER TIEMPO AQUÍ</translation>
     </message>
     <message>
-        <source>‹ EARLIER</source>
-        <translation>‹ ANTES</translation>
+        <source>EARLIER</source>
+        <translation>ANTES</translation>
     </message>
     <message>
-        <source>LATER ›</source>
-        <translation>DESPUÉS ›</translation>
+        <source>LATER</source>
+        <translation>DESPUÉS</translation>
     </message>
     <message>
         <source>BPM ÷2</source>
@@ -868,12 +868,12 @@ poner otra imagen</translation>
         <translation>Título opcional (ej: Future Rave Set)</translation>
     </message>
     <message>
-        <source>◀ Load into DECK 1</source>
-        <translation>◀ Cargar en DECK 1</translation>
+        <source>Load into DECK 1</source>
+        <translation>Cargar en DECK 1</translation>
     </message>
     <message>
-        <source>Load into DECK 2 ▶</source>
-        <translation>Cargar en DECK 2 ▶</translation>
+        <source>Load into DECK 2</source>
+        <translation>Cargar en DECK 2</translation>
     </message>
 </context>
 <context>
@@ -2496,8 +2496,12 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation>Buscando...</translation>
     </message>
     <message>
-        <source>◀ Back</source>
-        <translation>◀ Volver</translation>
+        <source>Back</source>
+        <translation>Volver</translation>
+    </message>
+    <message>
+        <source>Show tracks</source>
+        <translation>Ver Pistas</translation>
     </message>
     <message>
         <source>💾 Ready</source>
@@ -2518,10 +2522,6 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>%1 tracks</source>
         <translation>%1 pistas</translation>
-    </message>
-    <message>
-        <source>Show tracks ▶</source>
-        <translation>Ver Pistas ▶</translation>
     </message>
     <message>
         <source>Loading %1...</source>
@@ -2557,12 +2557,12 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation>Archivo</translation>
     </message>
     <message>
-        <source>◀ Load Deck 1</source>
-        <translation>◀ Cargar en Deck 1</translation>
+        <source>Load Deck 1</source>
+        <translation>Cargar en Deck 1</translation>
     </message>
     <message>
-        <source>Load Deck 2 ▶</source>
-        <translation>Cargar en Deck 2 ▶</translation>
+        <source>Load Deck 2</source>
+        <translation>Cargar en Deck 2</translation>
     </message>
     <message>
         <source>Load to</source>
@@ -3142,12 +3142,12 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation>RESET</translation>
     </message>
     <message>
-        <source>◀ LOW PASS</source>
-        <translation>◀ PASO BAJO</translation>
+        <source>LOW PASS</source>
+        <translation>PASO BAJO</translation>
     </message>
     <message>
-        <source>HIGH PASS ▶</source>
-        <translation>PASO ALTO ▶</translation>
+        <source>HIGH PASS</source>
+        <translation>PASO ALTO</translation>
     </message>
     <message>
         <source>FILTER: NEUTRAL</source>

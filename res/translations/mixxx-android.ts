@@ -262,11 +262,11 @@ Use the advanced mode to view them</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>‹ EARLIER</source>
+        <source>EARLIER</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>LATER ›</source>
+        <source>LATER</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -855,11 +855,11 @@ set another visual</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>◀ Load into DECK 1</source>
+        <source>Load into DECK 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Load into DECK 2 ▶</source>
+        <source>Load into DECK 2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2481,7 +2481,11 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>◀ Back</source>
+        <source>Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show tracks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2502,10 +2506,6 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>%1 tracks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show tracks ▶</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2542,11 +2542,11 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>◀ Load Deck 1</source>
+        <source>Load Deck 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Load Deck 2 ▶</source>
+        <source>Load Deck 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3127,11 +3127,11 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>◀ LOW PASS</source>
+        <source>LOW PASS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>HIGH PASS ▶</source>
+        <source>HIGH PASS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -1,3 +1,4 @@
+import "../.." as Skin
 import Mixxx 1.0 as Mixxx
 import QtQuick
 import QtQuick.Controls
@@ -138,7 +139,7 @@ Rectangle {
                 color: prevMouse.pressed ? "#2a2d33" : "#141518"
                 radius: 3
 
-                BoothArrow {
+                Skin.Triangle {
                     anchors.centerIn: parent
                     height: 11
                     pointsRight: false
@@ -179,7 +180,7 @@ Rectangle {
                 color: nextMouse.pressed ? "#2a2d33" : "#141518"
                 radius: 3
 
-                BoothArrow {
+                Skin.Triangle {
                     anchors.centerIn: parent
                     height: 11
                     pointsRight: true

@@ -385,7 +385,8 @@ Item {
                     backgroundColor: "#2e4053"
                     normalColor: "#ffffff"
                     font.bold: true
-                    text: qsTr("◀ Back")
+                    arrowLeft: true
+                    text: qsTr("Back")
                     onClicked: root.activeMode = "playlists"
                 }
 
@@ -552,7 +553,8 @@ Item {
                             normalColor: "#ffffff"
                             font.bold: true
                             font.pixelSize: 11
-                            text: "◀ D1"
+                            arrowLeft: true
+                            text: "D1"
                             enabled: !trackDelegate.isDownloading
                             onClicked: {
                                 Mixxx.StreamingManager.downloadAndLoad(
@@ -570,7 +572,8 @@ Item {
                             normalColor: "#ffffff"
                             font.bold: true
                             font.pixelSize: 11
-                            text: "D2 ▶"
+                            arrowRight: true
+                            text: "D2"
                             enabled: !trackDelegate.isDownloading
                             onClicked: {
                                 Mixxx.StreamingManager.downloadAndLoad(
@@ -676,7 +679,8 @@ Item {
                             normalColor: "#ffffff"
                             font.bold: true
                             font.pixelSize: 11
-                            text: qsTr("Show tracks ▶")
+                            arrowRight: true
+                            text: qsTr("Show tracks")
                             onClicked: {
                                 root.currentPlaylistName = modelData.name;
                                 root.isBusy = true;

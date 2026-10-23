@@ -1,3 +1,4 @@
+import "../.." as Skin
 import "../../Deck" as DeckComponent
 import Mixxx 1.0 as Mixxx
 import QtQuick
@@ -276,7 +277,7 @@ Rectangle {
         Repeater {
             model: root.padMode === "beatjump" ? [false, true] : []
 
-            BoothArrow {
+            Skin.Triangle {
                 required property bool modelData
 
                 anchors.left: modelData ? undefined : parent.left
@@ -543,27 +544,13 @@ Rectangle {
                         }
                     }
                 }
-                Canvas {
-                    id: playSign
-
+                Skin.Triangle {
                     anchors.centerIn: parent
                     anchors.horizontalCenterOffset: Math.round(width * 0.1)
+                    color: "#6ab86a"
                     height: Math.round(parent.height * 0.36)
                     visible: playControl.value <= 0
-                    width: height
-
-                    onHeightChanged: requestPaint()
-                    onPaint: {
-                        const ctx = getContext("2d");
-                        ctx.reset();
-                        ctx.fillStyle = "#6ab86a";
-                        ctx.beginPath();
-                        ctx.moveTo(width * 0.1, 0);
-                        ctx.lineTo(width, height / 2);
-                        ctx.lineTo(width * 0.1, height);
-                        ctx.closePath();
-                        ctx.fill();
-                    }
+                    width: Math.round(height * 0.9)
                 }
                 TapHandler {
                     id: playTap

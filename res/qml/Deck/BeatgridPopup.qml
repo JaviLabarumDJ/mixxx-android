@@ -149,12 +149,13 @@ Popup {
             }
             GridButton {
                 key: "beats_translate_earlier"
-                // Not ◀ ▶ (drawn as emoji on Android) nor ◄ ▸ (missing from its fonts)
-                text: qsTr("‹ EARLIER")
+                arrowLeft: true
+                text: qsTr("EARLIER")
             }
             GridButton {
                 key: "beats_translate_later"
-                text: qsTr("LATER ›")
+                arrowRight: true
+                text: qsTr("LATER")
             }
             GridButton {
                 key: "beats_set_halve"

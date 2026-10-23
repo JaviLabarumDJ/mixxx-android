@@ -143,21 +143,16 @@ Rectangle {
                     leftMargin: 5
                     top: parent.top
                 }
-                Label {
+                // ▲ or ▼, drawn as Android draws ▶ as an emoji
+                Skin.Triangle {
                     id: sortIndicator
 
                     anchors.centerIn: parent
                     color: "red"
-                    elide: Text.ElideRight
-                    font.bold: true
-                    font.capitalization: Font.AllUppercase
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.buttonFontPixelSize
-                    horizontalAlignment: Text.AlignRight
+                    height: Math.round(Theme.buttonFontPixelSize * 0.7)
                     rotation: horizontalHeader.sortingOrder == Qt.AscendingOrder ? 90 : -90
-                    text: "▶"
-                    verticalAlignment: Text.AlignVCenter
                     visible: horizontalHeader.sortingColumn == index
+                    width: Math.round(height * 0.85)
                 }
             }
             Rectangle {
@@ -472,7 +467,8 @@ Rectangle {
                 highlight: quickLoadBar.hasTrack
                 enabled: quickLoadBar.hasTrack
                 font.bold: true
-                text: "◀ DECK 1"
+                arrowLeft: true
+                text: "DECK 1"
 
                 onClicked: {
                     view.loadSelectedTrack("[Channel1]", false);
@@ -490,7 +486,8 @@ Rectangle {
                 highlight: quickLoadBar.hasTrack
                 enabled: quickLoadBar.hasTrack
                 font.bold: true
-                text: "DECK 2 ▶"
+                arrowRight: true
+                text: "DECK 2"
 
                 onClicked: {
                     view.loadSelectedTrack("[Channel2]", false);
