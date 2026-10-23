@@ -330,6 +330,15 @@ Item {
     // While the sources change no index of them may be used: the list is
     // emptied first and looked up again afterwards
     Connections {
+        // The playlists of a Rekordbox drive are added while it is read,
+        // without telling the model; only a repaint (dataChanged) follows.
+        // The list is then built again.
+        function onDataChanged() {
+            if (root.levelIndex !== null && root.sidebar.rowCount(root.levelIndex) !== levelEntries.count) {
+                root.levelIndex = null;
+                Qt.callLater(root.refreshLevel);
+            }
+        }
         function onLayoutAboutToBeChanged() {
             root.levelIndex = null;
         }
