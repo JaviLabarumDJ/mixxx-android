@@ -373,8 +373,11 @@ PioneerDDJFLX4.focusedFxGroup = function() {
     return "[EffectRack1_EffectUnit1_Effect" + focusedFx + "]";
 };
 
+// LEVEL/DEPTH changes the dry/wet of the unit and, with SHIFT, the amount
+// of the selected effect, or the other way round (mapping setting)
 PioneerDDJFLX4.beatFxLevelDepthRotate = function(_channel, _control, value) {
-    if (PioneerDDJFLX4.shiftButtonDown[0] || PioneerDDJFLX4.shiftButtonDown[1]) {
+    const shifted = PioneerDDJFLX4.shiftButtonDown[0] || PioneerDDJFLX4.shiftButtonDown[1];
+    if (shifted !== (engine.getSetting("levelDepthMode") === "meta")) {
         engine.softTakeoverIgnoreNextValue("[EffectRack1_EffectUnit1]", "mix");
         engine.setParameter(PioneerDDJFLX4.focusedFxGroup(), "meta", value / 0x7F);
     } else {

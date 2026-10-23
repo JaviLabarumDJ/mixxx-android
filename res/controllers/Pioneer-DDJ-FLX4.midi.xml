@@ -7,6 +7,17 @@
         <manual>pioneer_ddj_FLX4</manual>
         <forums>https://mixxx.discourse.group/t/pioneer-ddj-flx4</forums>
     </info>
+    <settings>
+        <group label="Beat FX">
+            <option variable="levelDepthMode" type="enum" label="LEVEL/DEPTH controls">
+                <value label="Dry/wet of the unit (SHIFT: effect amount)" default="true">mix</value>
+                <value label="Amount of the selected effect (SHIFT: dry/wet)">meta</value>
+                <description>
+                    What the LEVEL/DEPTH knob changes. With SHIFT held it changes the other one.
+                </description>
+            </option>
+        </group>
+    </settings>
     <controller id="DDJ-FLX4">
         <scriptfiles>
             <file functionprefix="PioneerDDJFLX4" filename="Pioneer-DDJ-FLX4-script.js"/>
