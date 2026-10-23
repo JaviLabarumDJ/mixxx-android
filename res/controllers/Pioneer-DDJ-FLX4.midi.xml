@@ -42,6 +42,10 @@
                 <value label="Mixxx: 0 to +3 and -3 to 0; SHIFT changes by 1-4 semitones" default="true">mixxx</value>
                 <value label="rekordbox: +4 to +7 and 0 to +3; SHIFT + pad 7/8 shifts the range">rekordbox</value>
             </option>
+            <option variable="shiftSyncMode" type="enum" label="SHIFT + BEAT SYNC">
+                <value label="Key lock (MASTER TEMPO) on/off" default="true">keylock</value>
+                <value label="Tempo range (rekordbox)">tempoRange</value>
+            </option>
             <option variable="shiftHeadphoneCue" type="enum" label="SHIFT + headphones CUE">
                 <value label="Quantize on/off" default="true">quantize</value>
                 <value label="Tap tempo (rekordbox)">tap</value>
@@ -458,9 +462,9 @@
                 </options>
             </control>
             <control>
-                <description>BEAT SYNC +SHIFT (DECK1) - press - change Tempo range</description>
+                <description>BEAT SYNC +SHIFT (DECK1) - press - key lock or Tempo range</description>
                 <group>[Channel1]</group>
-                <key>PioneerDDJFLX4.cycleTempoRange</key>
+                <key>PioneerDDJFLX4.shiftSyncPressed</key>
                 <status>0x90</status>
                 <midino>0x60</midino>
                 <options>
@@ -489,9 +493,9 @@
                 </options>
             </control>
             <control>
-                <description>BEAT SYNC +SHIFT (DECK2) - press - change Tempo range</description>
+                <description>BEAT SYNC +SHIFT (DECK2) - press - key lock or Tempo range</description>
                 <group>[Channel2]</group>
-                <key>PioneerDDJFLX4.cycleTempoRange</key>
+                <key>PioneerDDJFLX4.shiftSyncPressed</key>
                 <status>0x91</status>
                 <midino>0x60</midino>
                 <options>

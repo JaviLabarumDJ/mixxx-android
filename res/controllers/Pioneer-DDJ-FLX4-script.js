@@ -312,6 +312,8 @@ PioneerDDJFLX4.init = function() {
         engine.makeConnection("[Sampler" + i + "]", "track_loaded", PioneerDDJFLX4.samplerLoadedLED).trigger();
     }
 
+    engine.makeConnection("[Channel1]", "keylock", PioneerDDJFLX4.keylockLED).trigger();
+    engine.makeConnection("[Channel2]", "keylock", PioneerDDJFLX4.keylockLED).trigger();
     engine.makeConnection("[Channel1]", "track_loaded", PioneerDDJFLX4.trackLoadedLED);
     engine.makeConnection("[Channel2]", "track_loaded", PioneerDDJFLX4.trackLoadedLED);
 
@@ -737,6 +739,29 @@ PioneerDDJFLX4.cycleTempoRange = function(_channel, _control, value, _status, gr
         }
     }
     engine.setValue(group, "rateRange", this.tempoRanges[idx]);
+};
+
+// SHIFT + BEAT SYNC: key lock (MASTER TEMPO), or the tempo range like
+// rekordbox
+PioneerDDJFLX4.shiftSyncPressed = function(channel, control, value, status, group) {
+    if (PioneerDDJFLX4.option("shiftSyncMode") === "tempoRange") {
+        PioneerDDJFLX4.cycleTempoRange(channel, control, value, status, group);
+        return;
+    }
+    if (value === 0) { return; } // ignore release
+    script.toggleControl(group, "keylock");
+};
+
+// The BEAT SYNC button shows the key lock while SHIFT is held
+PioneerDDJFLX4.keylockLED = function(value, group, _control) {
+    if (PioneerDDJFLX4.option("shiftSyncMode") === "tempoRange") {
+        return;
+    }
+    midi.sendShortMsg(
+        0x90 + group.match(script.channelRegEx)[1] - 1,
+        0x60,
+        value > 0 ? 0x7F : 0x00
+    );
 };
 
 //
@@ -1511,6 +1536,10 @@ PioneerDDJFLX4.shutdown = function() {
     // reset vumeter
     PioneerDDJFLX4.toggleLight(PioneerDDJFLX4.lights.deck1.vuMeter, false);
     PioneerDDJFLX4.toggleLight(PioneerDDJFLX4.lights.deck2.vuMeter, false);
+
+    // key lock shown on BEAT SYNC with SHIFT
+    midi.sendShortMsg(0x90, 0x60, 0x00);
+    midi.sendShortMsg(0x91, 0x60, 0x00);
 
     // housekeeping
     // turn off all Sampler LEDs
