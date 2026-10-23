@@ -306,6 +306,48 @@ Usa el modo avanzado para verla</translation>
     </message>
 </context>
 <context>
+    <name>BoothBeatFx</name>
+    <message>
+        <source>LEVEL/DEPTH %1%</source>
+        <translation>LEVEL/DEPTH %1%</translation>
+    </message>
+    <message>
+        <source>EFFECT AMOUNT %1%</source>
+        <translation>CANTIDAD DE EFECTO %1%</translation>
+    </message>
+    <message>
+        <source>CH SELECT</source>
+        <translation>CH SELECT</translation>
+    </message>
+    <message>
+        <source>MASTER</source>
+        <translation>MASTER</translation>
+    </message>
+</context>
+<context>
+    <name>BoothDeckPanel</name>
+    <message>
+        <source>Unknown title</source>
+        <translation>Título desconocido</translation>
+    </message>
+    <message>
+        <source>No track</source>
+        <translation>Sin pista</translation>
+    </message>
+    <message>
+        <source>TIME</source>
+        <translation>TIME</translation>
+    </message>
+    <message>
+        <source>REMAIN</source>
+        <translation>REMAIN</translation>
+    </message>
+    <message>
+        <source>BPM LEADER</source>
+        <translation>BPM LÍDER</translation>
+    </message>
+</context>
+<context>
     <name>Broadcast</name>
     <message>
         <source>Broadcast</source>
@@ -1518,8 +1560,8 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation>Editar</translation>
     </message>
     <message>
-        <source>Booth skin – preview, work in progress</source>
-        <translation>Skin Booth – vista previa, en desarrollo</translation>
+        <source>BROWSE</source>
+        <translation>BROWSE</translation>
     </message>
 </context>
 <context>

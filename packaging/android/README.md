@@ -123,6 +123,14 @@ with its own `MainWindow.qml`, whose root item takes the application window
 shared components (library, deck loaders, settings) by importing `"../.."`.
 If a skin fails to load, Classic is loaded instead.
 
+The **Booth** skin (`res/qml/Skins/Booth/`) is laid out like the screen of a
+booth player, for landscape phones and tablets: the two waveforms stacked
+over the whole width with quantize and slip next to them, the deck displays
+below them (remaining time, tempo, BPM with the beatgrid panel, SYNC, CUE
+and PLAY, hot cues A–H, overview) and BEAT FX (effect unit 1) on the right,
+behind a button on phones. BROWSE shows the library in place of the
+waveforms.
+
 > _End of AI-written section._
 
 ## Merging upstream Mixxx
