@@ -8,7 +8,9 @@
 #include <QSqlQuery>
 #include <QTimer>
 #include <algorithm>
+#include <cmath>
 #include <exception>
+#include <vector>
 
 #ifdef __HID__
 #include "controllers/android.h"
@@ -127,6 +129,65 @@ bool setTrackDateAdded(
     return true;
 }
 
+namespace {
+
+/// Rekordbox stores the beats of a constant tempo in whole milliseconds,
+/// which makes a beatgrid of a varying tempo for Mixxx, on which the beat
+/// based edits (move by a part of a beat, double or halve) don't work.
+/// Replaces such a beatgrid with the constant tempo that fits it, if every
+/// beat is within the rounding of Rekordbox.
+void straightenRekordboxBeats(const TrackPointer& pTrack) {
+    const mixxx::BeatsPointer pBeats = pTrack->getBeats();
+    if (!pBeats || pBeats->hasConstantTempo() ||
+            pBeats->getSubVersion() != mixxx::rekordboxconstants::beatsSubversion) {
+        return;
+    }
+    const mixxx::audio::SampleRate sampleRate = pBeats->getSampleRate();
+    const auto endPosition = mixxx::audio::FramePos(pTrack->getDuration() * sampleRate.value());
+    const int count = pBeats->numBeatsInRange(mixxx::audio::kStartFramePos, endPosition);
+    if (count < 8) {
+        return;
+    }
+    // Least squares fit of position = first + index * length
+    std::vector<double> positions;
+    positions.reserve(count);
+    auto it = pBeats->iteratorFrom(mixxx::audio::kStartFramePos);
+    for (int i = 0; i < count; ++i, ++it) {
+        positions.push_back(it->value());
+    }
+    const double meanIndex = (count - 1) / 2.0;
+    double meanPosition = 0;
+    for (double position : positions) {
+        meanPosition += position;
+    }
+    meanPosition /= count;
+    double covariance = 0;
+    double variance = 0;
+    for (int i = 0; i < count; ++i) {
+        covariance += (i - meanIndex) * (positions[i] - meanPosition);
+        variance += (i - meanIndex) * (i - meanIndex);
+    }
+    const double beatLength = covariance / variance;
+    const double firstPosition = meanPosition - meanIndex * beatLength;
+    if (beatLength <= 0 || firstPosition < 0) {
+        return;
+    }
+    // Rounded to whole milliseconds, plus a margin
+    const double maxDeviation = 1.5 * sampleRate.value() / 1000.0;
+    for (int i = 0; i < count; ++i) {
+        if (std::abs(positions[i] - (firstPosition + i * beatLength)) > maxDeviation) {
+            return;
+        }
+    }
+    const auto bpm = mixxx::Bpm(60.0 * sampleRate.value() / beatLength);
+    pTrack->trySetBeats(mixxx::Beats::fromConstTempo(sampleRate,
+            mixxx::audio::FramePos(firstPosition),
+            bpm,
+            mixxx::rekordboxconstants::beatsSubversion));
+}
+
+} // namespace
+
 void applyRekordboxData(const TrackPointer& pTrack, const RekordboxTrack& rekordboxTrack) {
     // Same as RekordboxPlaylistModel::getTrack(), for the copy of the file
     const QString location = pTrack->getLocation();
@@ -170,6 +231,7 @@ void applyRekordboxData(const TrackPointer& pTrack, const RekordboxTrack& rekord
         // A damaged file shouldn't stop copying the playlist
         qWarning() << "Unable to read the Rekordbox analysis" << anlzPath << e.what();
     }
+    straightenRekordboxBeats(pTrack);
 
     // Unlike for a track on the drive, a missing key or color doesn't
     // replace what the file already has
