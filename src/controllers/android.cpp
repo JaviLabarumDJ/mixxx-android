@@ -10,6 +10,12 @@
 #include <map>
 #include <optional>
 
+#include <QCoreApplication>
+#include <QMetaObject>
+#include <QDebug>
+#include <QSemaphore>
+#include <memory>
+
 namespace mixxx {
 namespace android {
 std::mutex s_androidLock = {};
@@ -169,11 +175,52 @@ void notifyDevicesChanged() {
         callback();
     }
 }
+
+namespace {
+std::mutex s_saveBeforeExitLock;
+std::function<void()> s_saveBeforeExit;
+// Long enough to write the settings and a few tracks, short enough not to
+// hang the closing app if the main thread is blocked
+constexpr int kSaveBeforeExitTimeoutMillis = 3000;
+} // namespace
+
+void setSaveBeforeExit(std::function<void()> save) {
+    std::lock_guard lock(s_saveBeforeExitLock);
+    s_saveBeforeExit = std::move(save);
+}
+
+void saveBeforeExit() {
+    auto* pApp = QCoreApplication::instance();
+    if (!pApp) {
+        return;
+    }
+    auto pDone = std::make_shared<QSemaphore>();
+    QMetaObject::invokeMethod(
+            pApp,
+            [pDone]() {
+                // Looked up on the main thread, where it is unset when Mixxx
+                // shuts down
+                std::function<void()> save;
+                {
+                    std::lock_guard lock(s_saveBeforeExitLock);
+                    save = s_saveBeforeExit;
+                }
+                if (save) {
+                    save();
+                }
+                pDone->release();
+            },
+            Qt::QueuedConnection);
+    if (!pDone->tryAcquire(1, kSaveBeforeExitTimeoutMillis)) {
+        qWarning() << "Saving before exit timed out";
+    }
+}
 } // namespace android
 } // namespace mixxx
 
 Q_DECLARE_JNI_CLASS(UsbPermissionClass, "org/mixxx/UsbPermission")
 Q_DECLARE_JNI_CLASS(MidiHelperClass, "org/mixxx/MidiHelper")
+Q_DECLARE_JNI_CLASS(MainActivityClass, "org/mixxx/MainActivity")
 
 void usbDeviceAccessResult(JNIEnv*, jclass, jobject device, jboolean granted) {
     mixxx::android::usbDeviceAccessResult(device, granted);
@@ -190,6 +237,11 @@ void midiDevicesChanged(JNIEnv*, jclass) {
 }
 Q_DECLARE_JNI_NATIVE_METHOD(midiDevicesChanged)
 
+void saveBeforeExit(JNIEnv*, jclass) {
+    mixxx::android::saveBeforeExit();
+}
+Q_DECLARE_JNI_NATIVE_METHOD(saveBeforeExit)
+
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM*, void*) {
     QJniEnvironment env;
     env.registerNativeMethods<QtJniTypes::UsbPermissionClass>({
@@ -198,6 +250,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM*, void*) {
     });
     env.registerNativeMethods<QtJniTypes::MidiHelperClass>({
             Q_JNI_NATIVE_METHOD(midiDevicesChanged),
+    });
+    env.registerNativeMethods<QtJniTypes::MainActivityClass>({
+            Q_JNI_NATIVE_METHOD(saveBeforeExit),
     });
     return JNI_VERSION_1_6;
 }

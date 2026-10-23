@@ -54,12 +54,28 @@ public class MainActivity extends QtActivityBase {
         MidiHelper.init(this);
     }
 
+    /// Saves the settings and the loaded tracks on the main thread of Mixxx,
+    /// waits for it at most a few seconds
+    private static native void saveBeforeExit();
+
     @Override
     public void onDestroy() {
         try {
             unregisterReceiver(mUsbHotplugReceiver);
         } catch (IllegalArgumentException e) {
             // Receiver was not registered
+        }
+        if (isFinishing()) {
+            // Qt ends the process with System.exit() while the threads of
+            // Mixxx and Android are still running, which crashes in them at
+            // times (e.g. in Android's hwui threads). Save what Mixxx has to
+            // keep and end the process at once instead.
+            try {
+                saveBeforeExit();
+            } catch (UnsatisfiedLinkError e) {
+                // The native library isn't loaded (yet)
+            }
+            Process.killProcess(Process.myPid());
         }
         super.onDestroy();
     }
