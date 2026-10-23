@@ -290,6 +290,10 @@ Use the advanced mode to view them</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>🔄 RE-ANALYZE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>CLOSE</source>
         <translation type="unfinished"></translation>
     </message>

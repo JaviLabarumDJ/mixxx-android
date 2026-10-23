@@ -245,6 +245,17 @@ void QmlMobileLibraryProxy::analyzeAllTracks() const {
     analyzeTracksMatching(QStringLiteral("SELECT id FROM library WHERE mixxx_deleted = 0"));
 }
 
+bool QmlMobileLibraryProxy::reanalyzeBeats(QmlTrackProxy* pTrackProxy) const {
+    const TrackPointer pTrack = pTrackProxy ? pTrackProxy->internal() : TrackPointer();
+    if (!pTrack || pTrack->isBpmLocked()) {
+        return false;
+    }
+    // Like "Reanalyze" in the track menu of the desktop UI
+    pTrack->trySetBeats(mixxx::BeatsPointer());
+    emit QmlLibraryProxy::get() -> analyzeTracks({AnalyzerScheduledTrack(pTrack->getId())});
+    return true;
+}
+
 void QmlMobileLibraryProxy::analyzeUnanalyzedTracks() const {
     analyzeTracksMatching(QStringLiteral(
             "SELECT id FROM library WHERE mixxx_deleted = 0 AND "

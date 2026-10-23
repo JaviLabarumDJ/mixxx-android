@@ -301,6 +301,10 @@ Usa el modo avanzado para verla</translation>
         <translation>🔒 BLOQUEAR REJILLA</translation>
     </message>
     <message>
+        <source>🔄 RE-ANALYZE</source>
+        <translation>🔄 RE-ANALIZAR</translation>
+    </message>
+    <message>
         <source>CLOSE</source>
         <translation>CERRAR</translation>
     </message>

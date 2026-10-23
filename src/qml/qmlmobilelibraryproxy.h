@@ -9,6 +9,8 @@
 #include <QUrl>
 #include <QVariantList>
 
+#include "qml/qmltrackproxy.h"
+
 namespace mixxx {
 namespace android {
 class RekordboxDriveBackup;
@@ -78,6 +80,9 @@ class QmlMobileLibraryProxy : public QObject {
 
     Q_INVOKABLE void analyzeAllTracks() const;
     Q_INVOKABLE void analyzeUnanalyzedTracks() const;
+    /// Throws the beatgrid of the track away and analyzes it again. Returns
+    /// false for a locked grid.
+    Q_INVOKABLE bool reanalyzeBeats(mixxx::qml::QmlTrackProxy* pTrack) const;
 
     /// The visible playlists as a list of {id, name, locked}
     Q_INVOKABLE QVariantList playlists() const;
