@@ -266,6 +266,12 @@ void RekordboxPlaylistCopy::onFileDone(int sourceIndex, FileResult result) {
         if (pTrack) {
             if (!alreadyInLibrary) {
                 applyRekordboxData(pTrack, source.track);
+                // The day the track was added to the Rekordbox collection
+                const QSqlDatabase database =
+                        m_pTrackCollectionManager->internalCollection()->database();
+                setTrackDateAdded(database,
+                        pTrack->getId(),
+                        rekordboxDateAdded(database, source.track.location));
             }
             source.trackId = pTrack->getId();
         } else {

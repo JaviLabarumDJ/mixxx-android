@@ -6,6 +6,28 @@ import "../Theme"
 Mixxx.LibrarySourceTree {
     id: root
 
+    // The position in the playlist, for the sources made of playlists
+    readonly property Mixxx.TrackListColumn positionColumn: Mixxx.TrackListColumn {
+        columnIdx: Mixxx.TrackListColumn.SQLColumns.Position
+        label: qsTr("#")
+        preferredWidth: 46
+
+        delegate: DefaultDelegate {
+        }
+    }
+
+    // The default columns with the position after the cover
+    function playlistColumns() {
+        const columns = [];
+        for (let i = 0; i < root.defaultColumns.length; ++i) {
+            columns.push(root.defaultColumns[i]);
+            if (i === 0) {
+                columns.push(root.positionColumn);
+            }
+        }
+        return columns;
+    }
+
     defaultColumns: [
         Mixxx.TrackListColumn {
             autoHideWidth: 750
@@ -173,7 +195,7 @@ Mixxx.LibrarySourceTree {
         label: qsTr("All...")
     }
     Mixxx.LibraryFeatureSource {
-        columns: root.defaultColumns
+        columns: root.playlistColumns()
         feature: Mixxx.LibraryFeatureSource.Feature.Playlists
     }
     Mixxx.LibraryFeatureSource {
@@ -181,7 +203,7 @@ Mixxx.LibrarySourceTree {
         feature: Mixxx.LibraryFeatureSource.Feature.Crates
     }
     Mixxx.LibraryFeatureSource {
-        columns: root.defaultColumns
+        columns: root.playlistColumns()
         feature: Mixxx.LibraryFeatureSource.Feature.History
     }
     Mixxx.LibraryFeatureSource {
@@ -189,7 +211,7 @@ Mixxx.LibrarySourceTree {
         feature: Mixxx.LibraryFeatureSource.Feature.Browse
     }
     Mixxx.LibraryFeatureSource {
-        columns: root.defaultColumns
+        columns: root.playlistColumns()
         feature: Mixxx.LibraryFeatureSource.Feature.Rekordbox
     }
     Mixxx.LibraryFeatureSource {

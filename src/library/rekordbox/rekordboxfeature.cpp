@@ -11,6 +11,7 @@
 #include <QString>
 #include <QStringList>
 #include <QTextCodec>
+#include <QTimeZone>
 #include <QtDebug>
 
 #include "engine/engine.h"
@@ -121,7 +122,8 @@ bool createLibraryTable(QSqlDatabase& database, const QString& tableName) {
             "    rating INTEGER,"
             "    analyze_path TEXT UNIQUE,"
             "    device TEXT,"
-            "    color INTEGER"
+            "    color INTEGER,"
+            "    datetime_added TEXT"
             ");");
 
     if (!query.exec()) {
@@ -450,6 +452,13 @@ void insertTrack(
     query.bindValue(":color",
             mixxx::RgbColor::toQVariant(
                     colorFromID(static_cast<int>(track->color_id()))));
+    // The day the track was added to the Rekordbox collection, e.g.
+    // "2023-05-12". Noon UTC shows the same day in every time zone.
+    const QDate dateAdded = QDate::fromString(getText(track->date_added()), Qt::ISODate);
+    query.bindValue(":datetime_added",
+            dateAdded.isValid()
+                    ? QVariant(QDateTime(dateAdded, QTime(12, 0), QTimeZone::UTC))
+                    : QVariant());
 
     if (!query.exec()) {
         LOG_FAILED_QUERY(query);
@@ -527,10 +536,10 @@ QString parseDeviceDB(mixxx::DbConnectionPoolPtr dbConnectionPool, TreeItem* dev
     query.prepare("INSERT INTO " + kRekordboxLibraryTable +
             " (rb_id, artist, title, album, year,"
             "genre,comment,tracknumber,bpm, bitrate,duration, location,"
-            "rating,key,analyze_path,device,color) VALUES (:rb_id, :artist, "
+            "rating,key,analyze_path,device,color,datetime_added) VALUES (:rb_id, :artist, "
             ":title, :album, :year,:genre,"
             ":comment, :tracknumber,:bpm, :bitrate,:duration, :location,"
-            ":rating,:key,:analyze_path,:device,:color)");
+            ":rating,:key,:analyze_path,:device,:color,:datetime_added)");
 
     int audioFilesCount = 0;
 
@@ -1385,6 +1394,7 @@ RekordboxFeature::RekordboxFeature(
             LIBRARYTABLE_BPM,
             LIBRARYTABLE_KEY,
             LIBRARYTABLE_COLOR,
+            LIBRARYTABLE_DATETIMEADDED,
             REKORDBOX_ANALYZE_PATH};
 
     const QStringList searchColumns = {
