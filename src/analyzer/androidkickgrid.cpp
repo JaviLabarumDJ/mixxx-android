@@ -10,6 +10,8 @@ namespace android {
 namespace {
 
 constexpr double kLowPassHz = 120;
+// About 23 ms at 44.1 kHz, longer than a period of the low frequencies
+constexpr std::size_t kSmoothingHops = 4;
 // Onsets weaker than this part of the strongest one of the first seconds
 // after the track starts are not kicks
 constexpr double kStrongOnset = 0.5;
@@ -77,11 +79,24 @@ BeatsPointer KickGrid::correct(const BeatsPointer& pBeats) const {
     if (!pBeats || m_envelope.size() < 3 || !m_sampleRate.isValid()) {
         return pBeats;
     }
+    // The level over the last few hops: a hop is shorter than a period of a
+    // kick's low frequencies, so the level of single hops jumps up and down
+    // while a kick sounds, which would look like onsets after the kick
+    std::vector<double> level(m_envelope.size(), 0);
+    double sum = 0;
+    for (std::size_t i = 0; i < m_envelope.size(); ++i) {
+        sum += static_cast<double>(m_envelope[i]) * m_envelope[i];
+        if (i >= kSmoothingHops) {
+            sum -= static_cast<double>(m_envelope[i - kSmoothingHops]) *
+                    m_envelope[i - kSmoothingHops];
+        }
+        level[i] = std::sqrt(std::max(0.0, sum) / kSmoothingHops);
+    }
     // Onsets: the rise of the low frequencies from one hop to the next
     std::vector<double> onset(m_envelope.size(), 0);
     double strongest = 0;
-    for (std::size_t i = 1; i < m_envelope.size(); ++i) {
-        onset[i] = std::max(0.0, static_cast<double>(m_envelope[i] - m_envelope[i - 1]));
+    for (std::size_t i = 1; i < level.size(); ++i) {
+        onset[i] = std::max(0.0, level[i] - level[i - 1]);
         strongest = std::max(strongest, onset[i]);
     }
     if (strongest <= 0) {
