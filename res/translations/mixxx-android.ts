@@ -316,11 +316,11 @@ Use the advanced mode to view them</source>
 <context>
     <name>BoothDeckPanel</name>
     <message>
-        <source>Unknown title</source>
+        <source>DECK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No track</source>
+        <source>MASTER TEMPO</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -328,11 +328,15 @@ Use the advanced mode to view them</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>REMAIN</source>
+        <source>TEMPO</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>BPM LEADER</source>
+        <source>MASTER</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>REMAIN</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1542,6 +1546,22 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DECK %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bars</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QUANTIZE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SLIP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

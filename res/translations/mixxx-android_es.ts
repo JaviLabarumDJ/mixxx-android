@@ -327,24 +327,28 @@ Usa el modo avanzado para verla</translation>
 <context>
     <name>BoothDeckPanel</name>
     <message>
-        <source>Unknown title</source>
-        <translation>Título desconocido</translation>
+        <source>DECK</source>
+        <translation>DECK</translation>
     </message>
     <message>
-        <source>No track</source>
-        <translation>Sin pista</translation>
+        <source>MASTER TEMPO</source>
+        <translation>MASTER TEMPO</translation>
     </message>
     <message>
         <source>TIME</source>
         <translation>TIME</translation>
     </message>
     <message>
-        <source>REMAIN</source>
-        <translation>REMAIN</translation>
+        <source>TEMPO</source>
+        <translation>TEMPO</translation>
     </message>
     <message>
-        <source>BPM LEADER</source>
-        <translation>BPM LÍDER</translation>
+        <source>MASTER</source>
+        <translation>MASTER</translation>
+    </message>
+    <message>
+        <source>REMAIN</source>
+        <translation>REMAIN</translation>
     </message>
 </context>
 <context>
@@ -1558,6 +1562,22 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>Edit</source>
         <translation>Editar</translation>
+    </message>
+    <message>
+        <source>DECK %1</source>
+        <translation>DECK %1</translation>
+    </message>
+    <message>
+        <source>Bars</source>
+        <translation>Compases</translation>
+    </message>
+    <message>
+        <source>QUANTIZE</source>
+        <translation>QUANTIZE</translation>
+    </message>
+    <message>
+        <source>SLIP</source>
+        <translation>SLIP</translation>
     </message>
     <message>
         <source>BROWSE</source>
