@@ -19,14 +19,15 @@ constexpr double kTrackStartOnset = 0.1;
 constexpr double kStrongOnsetWindowSeconds = 4;
 constexpr std::size_t kMaxKicks = 8;
 constexpr std::size_t kMinKicks = 4;
-// Phases in beats
-constexpr double kAgreement = 0.06;
-constexpr double kMinMove = 0.03;
+// How far from the beat of a kick its low frequencies rise the most, in
+// beats (about 120 ms at 128 BPM)
+constexpr double kLagBefore = 0.05;
+constexpr double kLagAfter = 0.25;
 // Doubled house and techno; drum & bass (~175 BPM, kicks often on every
 // second beat) is left alone
 constexpr double kMinBpmToHalve = 200;
 constexpr double kHalveGain = 1.5;
-// The best position must have this much more kick than the current one
+// The best position must have this much more kick than half a beat away
 constexpr double kMinGain = 1.2;
 
 // The phase of a position on the grid, between -0.5 and 0.5 beats
@@ -138,10 +139,7 @@ BeatsPointer KickGrid::correct(const BeatsPointer& pBeats) const {
     }
     double beatLength = 60.0 * m_sampleRate.value() / bpm.value();
 
-    // Score each position of the grid between two beats by the low-frequency
-    // onsets on its beats, over all of the kept audio, and move the grid to
-    // the best one if it clearly beats the current position and agrees with
-    // the start of the track (tracks start on a beat)
+    // Score a position of the grid by the low-frequency onsets on its beats
     if (!pResult->firstBeat().isValid()) {
         return pResult;
     }
@@ -176,10 +174,10 @@ BeatsPointer KickGrid::correct(const BeatsPointer& pBeats) const {
         }
     }
 
+    // Where in the beat the low frequencies rise the most
     const double step = static_cast<double>(kHopFrames) / beatLength;
     double bestPhase = 0;
     double bestScore = scoreAt(0, beatLength);
-    const double currentScore = bestScore;
     for (double phase = -0.5; phase < 0.5; phase += step) {
         const double score = scoreAt(phase, beatLength);
         if (score > bestScore) {
@@ -187,15 +185,27 @@ BeatsPointer KickGrid::correct(const BeatsPointer& pBeats) const {
             bestPhase = phase;
         }
     }
-    const bool startAgrees =
-            std::abs(phaseOf(trackStart, firstBeat, beatLength) - bestPhase) < kAgreement;
-    qDebug() << "KickGrid: best position" << bestPhase << "beats, score" << bestScore
-             << "against" << currentScore << "; track start agrees:" << startAgrees;
-    if (std::abs(bestPhase) > kMinMove && bestScore > kMinGain * currentScore && startAgrees) {
-        const auto moved = pResult->tryTranslateBeats(bestPhase);
+    // The beat tracker is precise, but may follow the off-beats. The low
+    // frequencies of a kick rise some time after its attack, how long
+    // depends on the kick, so only the side of the beat is taken from them:
+    // the grid is moved by exactly half a beat if they rise just after the
+    // off-beats, and the track starts there too (tracks start on a beat).
+    const auto afterOffBeat = [&](double position) {
+        const double phase = phaseOf(position - beatLength / 2, firstBeat, beatLength);
+        return phase >= -kLagBefore && phase <= kLagAfter;
+    };
+    const double bestPosition = firstBeat + bestPhase * beatLength;
+    const bool kicksOffBeat = afterOffBeat(bestPosition);
+    const bool startOffBeat = afterOffBeat(trackStart);
+    qDebug() << "KickGrid: low frequencies rise at" << bestPhase
+             << "beats; after the off-beats:" << kicksOffBeat
+             << "; track starts after an off-beat:" << startOffBeat;
+    if (kicksOffBeat && startOffBeat &&
+            bestScore > kMinGain * scoreAt(bestPhase + 0.5, beatLength)) {
+        const auto moved = pResult->tryTranslateBeats(0.5);
         if (moved) {
             pResult = *moved;
-            qDebug() << "KickGrid: moved the beatgrid by" << bestPhase << "beats onto the kicks";
+            qDebug() << "KickGrid: moved the beatgrid by half a beat onto the kicks";
         }
     }
     return pResult;
