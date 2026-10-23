@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QQmlEngine>
 #include <QString>
+#include <QStringList>
 
 namespace mixxx {
 namespace qml {
@@ -15,6 +16,10 @@ class QmlMobileAppProxy : public QObject {
     /// The version of the installed package (versionName on Android), or
     /// the Mixxx version elsewhere
     Q_PROPERTY(QString packageVersion READ packageVersion CONSTANT)
+    /// The items of the top bar the user hid in the settings, e.g. "wave",
+    /// "xy" (see res/qml/+android/MainWindow.qml)
+    Q_PROPERTY(QStringList hiddenTopBarItems READ hiddenTopBarItems WRITE
+                    setHiddenTopBarItems NOTIFY hiddenTopBarItemsChanged)
     QML_NAMED_ELEMENT(MobileApp)
     QML_SINGLETON
 
@@ -24,6 +29,12 @@ class QmlMobileAppProxy : public QObject {
     static QmlMobileAppProxy* create(QQmlEngine* pQmlEngine, QJSEngine* pJsEngine);
 
     QString packageVersion() const;
+
+    QStringList hiddenTopBarItems() const;
+    void setHiddenTopBarItems(const QStringList& items);
+
+  signals:
+    void hiddenTopBarItemsChanged();
 };
 
 } // namespace qml

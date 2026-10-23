@@ -486,9 +486,11 @@ void CoreServices::initializeLogging() {
     }
 #ifdef Q_OS_ANDROID
     // The log is the only trace of a crash on Android, see
-    // util/androidcrashreport.h
+    // util/androidcrashreport.h. Only critical messages are flushed at once:
+    // flushing every line (e.g. warnings of the audio thread) made the audio
+    // and the UI stutter.
     const auto logLevel = std::max(m_cmdlineArgs.getLogLevel(), mixxx::LogLevel::Info);
-    const auto logFlushLevel = std::max(m_cmdlineArgs.getLogFlushLevel(), mixxx::LogLevel::Info);
+    const auto logFlushLevel = m_cmdlineArgs.getLogFlushLevel();
 #else
     const auto logLevel = m_cmdlineArgs.getLogLevel();
     const auto logFlushLevel = m_cmdlineArgs.getLogFlushLevel();

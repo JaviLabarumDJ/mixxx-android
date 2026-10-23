@@ -17,6 +17,27 @@ Item {
     property alias editDeck: editDeckButton.checked
     property var focusedDeck: null
     property int viewMode: 1
+    // Items of the top bar hidden in Settings → Interface
+    readonly property var hiddenTopBarItems: Mixxx.MobileApp.hiddenTopBarItems
+    function topBarItemShown(name) {
+        return root.hiddenTopBarItems.indexOf(name) < 0;
+    }
+    // The views of the top bar, by view mode
+    readonly property var topBarViews: [{mode: 1, name: "dj"}, {mode: 3, name: "wave"}, {mode: 2, name: "lib"}, {mode: 0, name: "ctl"}]
+    readonly property int shownTopBarViews: root.topBarViews.filter(view => root.topBarItemShown(view.name)).length
+    // A hidden view is left for the first view still shown
+    function leaveHiddenView() {
+        const current = root.topBarViews.find(view => view.mode === root.viewMode);
+        if (!current || root.topBarItemShown(current.name)) {
+            return;
+        }
+        const first = root.topBarViews.find(view => root.topBarItemShown(view.name));
+        if (first) {
+            root.viewMode = first.mode;
+        }
+    }
+    onHiddenTopBarItemsChanged: root.leaveHiddenView()
+    Component.onCompleted: root.leaveHiddenView()
     property bool maximizeLibrary: viewMode === 2
     readonly property int numDecks: 4
     readonly property int numPreviewDecks: 1
@@ -223,7 +244,8 @@ Item {
 
                     Rectangle {
                         Layout.preferredHeight: 30
-                        Layout.preferredWidth: 236
+                        Layout.preferredWidth: 236 * root.shownTopBarViews / 4
+                        visible: root.shownTopBarViews > 0
                         color: "#181a20"
                         radius: 4
                         border.color: "#2a2e39"
@@ -244,6 +266,7 @@ Item {
                                 font.bold: true
                                 font.pixelSize: 10
                                 onClicked: root.viewMode = 1
+                                visible: root.topBarItemShown("dj")
                             }
 
                             Skin.Button {
@@ -256,6 +279,7 @@ Item {
                                 font.bold: true
                                 font.pixelSize: 10
                                 onClicked: root.viewMode = 3
+                                visible: root.topBarItemShown("wave")
                             }
 
                             Skin.Button {
@@ -268,6 +292,7 @@ Item {
                                 font.bold: true
                                 font.pixelSize: 10
                                 onClicked: root.viewMode = 2
+                                visible: root.topBarItemShown("lib")
                             }
 
                             Skin.Button {
@@ -280,12 +305,14 @@ Item {
                                 font.bold: true
                                 font.pixelSize: 10
                                 onClicked: root.viewMode = 0
+                                visible: root.topBarItemShown("ctl")
                             }
                         }
                     }
 
                     Skin.Button {
                         id: quickLoadD1Button
+                        visible: root.topBarItemShown("load1")
                         Layout.preferredHeight: 30
                         Layout.preferredWidth: 62
                         activeColor: "#64b5f6"
@@ -299,6 +326,7 @@ Item {
 
                     Skin.Button {
                         id: quickLoadD2Button
+                        visible: root.topBarItemShown("load2")
                         Layout.preferredHeight: 30
                         Layout.preferredWidth: 62
                         activeColor: "#ffb74d"
@@ -312,6 +340,7 @@ Item {
 
                     Skin.Button {
                         id: showEffectsButton
+                        visible: root.topBarItemShown("fx")
                         Layout.preferredHeight: 30
                         Layout.preferredWidth: 42
                         activeColor: "#e040fb"
@@ -327,6 +356,7 @@ Item {
 
                     Skin.Button {
                         id: xyPadButton
+                        visible: root.topBarItemShown("xy")
                         Layout.preferredHeight: 30
                         Layout.preferredWidth: 54
                         activeColor: "#00e5ff"
@@ -342,6 +372,7 @@ Item {
 
                     Skin.Button {
                         id: splitCueButton
+                        visible: root.topBarItemShown("split")
                         Layout.preferredHeight: 30
                         Layout.preferredWidth: 52
                         activeColor: "#ff9100"
@@ -359,6 +390,7 @@ Item {
 
                     Rectangle {
                         id: recButton
+                        visible: root.topBarItemShown("rec")
                         Layout.preferredHeight: 30
                         Layout.preferredWidth: recordingStatusControl.value > 0 ? 76 : 50
                         radius: 4
@@ -411,7 +443,7 @@ Item {
                         activeColor: Theme.white
                         checkable: true
                         text: "4D"
-                        visible: root.height > 515
+                        visible: root.height > 515 && root.topBarItemShown("4d")
                     }
                 }
             }
