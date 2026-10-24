@@ -312,6 +312,11 @@ PioneerDDJFLX4.init = function() {
         engine.makeConnection("[Sampler" + i + "]", "track_loaded", PioneerDDJFLX4.samplerLoadedLED).trigger();
     }
 
+    engine.makeConnection("[QuickEffectRack1_[Channel1]]", "super1", PioneerDDJFLX4.cfxMoved);
+    engine.makeConnection("[QuickEffectRack1_[Channel2]]", "super1", PioneerDDJFLX4.cfxMoved);
+    PioneerDDJFLX4.smartCfxGroups.forEach(group =>
+        engine.makeConnection(group, "enabled", PioneerDDJFLX4.smartCfxLED));
+    PioneerDDJFLX4.smartCfxLED();
     engine.makeConnection("[Channel1]", "track_loaded", PioneerDDJFLX4.trackLoadedLED);
     engine.makeConnection("[Channel2]", "track_loaded", PioneerDDJFLX4.trackLoadedLED);
 
@@ -748,6 +753,86 @@ PioneerDDJFLX4.shiftSyncPressed = function(channel, control, value, status, grou
     }
     if (value === 0) { return; } // ignore release
     script.toggleControl(group, "keylock");
+};
+
+//
+// TRIM, with the TRIM / CFX guard option
+//
+
+PioneerDDJFLX4.trimMsbValue = {"[Channel1]": 0, "[Channel2]": 0};
+PioneerDDJFLX4.trimLockedUntil = {"[Channel1]": 0, "[Channel2]": 0};
+PioneerDDJFLX4.trimPickedUp = {"[Channel1]": false, "[Channel2]": false};
+PioneerDDJFLX4.trimPickupTimer = {"[Channel1]": 0, "[Channel2]": 0};
+// After CFX moved, TRIM is ignored this long
+PioneerDDJFLX4.trimCfxGuardMs = 2000;
+// TRIM changes once the knob is this close to the current value
+PioneerDDJFLX4.trimPickupDistance = 0.02;
+// After this long without TRIM, it has to be picked up again
+PioneerDDJFLX4.trimPickupHoldMs = 1000;
+
+PioneerDDJFLX4.trimMsb = function(_channel, _control, value, _status, group) {
+    PioneerDDJFLX4.trimMsbValue[group] = value;
+};
+
+PioneerDDJFLX4.trimLsb = function(_channel, _control, value, _status, group) {
+    const parameter = ((PioneerDDJFLX4.trimMsbValue[group] << 7) + value) / 0x3FFF;
+    if (!PioneerDDJFLX4.option("trimCfxGuard")) {
+        engine.setParameter(group, "pregain", parameter);
+        return;
+    }
+    // Some units send stray TRIM messages while CFX is turned
+    if (Date.now() < PioneerDDJFLX4.trimLockedUntil[group]) {
+        PioneerDDJFLX4.trimPickedUp[group] = false;
+        return;
+    }
+    if (!PioneerDDJFLX4.trimPickedUp[group]) {
+        if (Math.abs(parameter - engine.getParameter(group, "pregain")) > PioneerDDJFLX4.trimPickupDistance) {
+            return;
+        }
+        PioneerDDJFLX4.trimPickedUp[group] = true;
+    }
+    engine.setParameter(group, "pregain", parameter);
+    if (PioneerDDJFLX4.trimPickupTimer[group]) {
+        engine.stopTimer(PioneerDDJFLX4.trimPickupTimer[group]);
+    }
+    PioneerDDJFLX4.trimPickupTimer[group] = engine.beginTimer(PioneerDDJFLX4.trimPickupHoldMs, function() {
+        PioneerDDJFLX4.trimPickupTimer[group] = 0;
+        PioneerDDJFLX4.trimPickedUp[group] = false;
+    }, true);
+};
+
+// CFX of a deck moved: its TRIM is locked for a while
+PioneerDDJFLX4.cfxMoved = function(_value, group, _control) {
+    const deck = group.match(/\[Channel(\d)\]/);
+    if (!deck || !PioneerDDJFLX4.option("trimCfxGuard")) {
+        return;
+    }
+    const channelGroup = `[Channel${deck[1]}]`;
+    PioneerDDJFLX4.trimLockedUntil[channelGroup] = Date.now() + PioneerDDJFLX4.trimCfxGuardMs;
+    PioneerDDJFLX4.trimPickedUp[channelGroup] = false;
+};
+
+//
+// SMART CFX: the CFX (QuickEffect) of decks 1 and 2 on or off, with SHIFT
+// the next CFX preset
+//
+
+PioneerDDJFLX4.smartCfxGroups = ["[QuickEffectRack1_[Channel1]]", "[QuickEffectRack1_[Channel2]]"];
+
+PioneerDDJFLX4.smartCfxPressed = function(_channel, control, value) {
+    if (value === 0) { return; } // ignore release
+    const groups = PioneerDDJFLX4.smartCfxGroups;
+    if (control === 0x08) {
+        groups.forEach(group => engine.setValue(group, "next_chain_preset", 1));
+        return;
+    }
+    const on = groups.some(group => engine.getValue(group, "enabled") > 0);
+    groups.forEach(group => engine.setValue(group, "enabled", on ? 0 : 1));
+};
+
+PioneerDDJFLX4.smartCfxLED = function() {
+    const on = PioneerDDJFLX4.smartCfxGroups.some(group => engine.getValue(group, "enabled") > 0);
+    midi.sendShortMsg(0x96, 0x00, on ? 0x7F : 0x00);
 };
 
 //
@@ -1522,6 +1607,9 @@ PioneerDDJFLX4.shutdown = function() {
     // reset vumeter
     PioneerDDJFLX4.toggleLight(PioneerDDJFLX4.lights.deck1.vuMeter, false);
     PioneerDDJFLX4.toggleLight(PioneerDDJFLX4.lights.deck2.vuMeter, false);
+
+    // SMART CFX
+    midi.sendShortMsg(0x96, 0x00, 0x00);
 
     // housekeeping
     // turn off all Sampler LEDs
