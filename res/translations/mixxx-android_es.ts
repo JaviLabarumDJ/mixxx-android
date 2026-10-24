@@ -45,6 +45,14 @@ Esta edición de Mixxx para Android nace de una necesidad personal como DJ: tene
         <translation>Toca cualquier red para abrir el perfil y ver sesiones, trucos, novedades y actualizaciones:</translation>
     </message>
     <message>
+        <source>THANKS</source>
+        <translation>GRACIAS</translation>
+    </message>
+    <message>
+        <source>Contributor of this app: switchable skins and the Booth skin, beatgrid editing and corrections, Rekordbox playlists, dates and beatgrids, library and drive backups, controller navigation and the DDJ-FLX4 options.</source>
+        <translation>Colaborador de esta app: skins intercambiables y la skin Booth, edición y corrección de rejillas, playlists, fechas y rejillas de Rekordbox, copias de seguridad de la biblioteca y del USB, navegación con la controladora y las opciones de la DDJ-FLX4.</translation>
+    </message>
+    <message>
         <source>Based on the open source Mixxx project. Mobile adaptation by JaviLabarum.</source>
         <translation>Basado en el proyecto Open Source Mixxx. Adaptación móvil por JaviLabarum.</translation>
     </message>

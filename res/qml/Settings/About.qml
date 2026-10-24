@@ -235,6 +235,58 @@ Category {
                 }
             }
 
+            // ================= THANKS =================
+            Rectangle {
+                Layout.fillWidth: true
+                radius: 8
+                color: "#161b24"
+                border.color: "#2a3648"
+                border.width: 1
+                implicitHeight: thanksCol.implicitHeight + 24
+
+                ColumnLayout {
+                    id: thanksCol
+                    anchors.fill: parent
+                    anchors.margins: 12
+                    spacing: 8
+
+                    RowLayout {
+                        spacing: 8
+                        Text {
+                            text: "🙏"
+                            font.pixelSize: 15
+                        }
+                        Text {
+                            text: qsTr("THANKS")
+                            font.bold: true
+                            font.pixelSize: 12
+                            color: "#ff9100"
+                            font.letterSpacing: 0.5
+                        }
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 12
+
+                        SocialButton {
+                            Layout.preferredWidth: 200
+                            title: "Angelos Exarchos"
+                            handle: "@daedalus.music"
+                            accentColor: "#e1306c"
+                            url: "https://www.instagram.com/daedalus.music"
+                        }
+                        Text {
+                            Layout.fillWidth: true
+                            text: qsTr("Contributor of this app: switchable skins and the Booth skin, beatgrid editing and corrections, Rekordbox playlists, dates and beatgrids, library and drive backups, controller navigation and the DDJ-FLX4 options.")
+                            font.pixelSize: 10
+                            color: "#90a4ae"
+                            wrapMode: Text.WordWrap
+                        }
+                    }
+                }
+            }
+
             // ================= SECTION 3: APP INFO & VERSION =================
             Rectangle {
                 Layout.fillWidth: true
