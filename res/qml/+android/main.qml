@@ -88,12 +88,22 @@ ApplicationWindow {
             root.loadSkin();
         }
     }
-    // Switched at once; the decks keep playing
+    // Switched at once; the decks keep playing. The old skin is unloaded
+    // first: both skins create the same [Skin] controls (e.g. SHIFT + LOAD of
+    // a controller), which the new one can only create once the old one is
+    // gone, and the Loader deletes the old one later.
     Connections {
         target: Mixxx.MobileApp
         function onSkinChanged() {
-            Qt.callLater(root.loadSkin);
+            content.source = "";
+            skinSwitchTimer.restart();
         }
+    }
+    Timer {
+        id: skinSwitchTimer
+
+        interval: 150
+        onTriggered: root.loadSkin()
     }
 
     Component.onCompleted: {

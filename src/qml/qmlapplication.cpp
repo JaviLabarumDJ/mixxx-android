@@ -42,6 +42,8 @@
 
 #include <QDir>
 #include <QFile>
+#include <QSemaphore>
+#include <QThread>
 #include <QJniObject>
 
 #include "controllers/android.h"
@@ -49,6 +51,7 @@
 #include "mixer/basetrackplayer.h"
 #include "mixer/previewdeck.h"
 #include "mixer/sampler.h"
+#include "recording/recordingmanager.h"
 #include "util/androidpermissions.h"
 #endif
 
@@ -120,6 +123,11 @@ void copyAssetDir(const QString& src, const QString& dst) {
 }
 #endif
 #if defined(Q_OS_ANDROID)
+// Within the time MainActivity waits for the closing app to save, see
+// kSaveBeforeExitTimeoutMillis
+constexpr unsigned long kRecordingCloseMillis = 400;
+constexpr int kControllerShutdownMillis = 1500;
+
 /// Android may end Mixxx without a regular shutdown: in the background, and
 /// when the app is closed. Saves the configuration, the effects and the
 /// tracks that are loaded, whose changes (cues, beatgrid) are otherwise only
@@ -150,6 +158,35 @@ void saveForAndroid(const std::shared_ptr<mixxx::CoreServices>& pCoreServices) {
     }
     for (int i = 0; i < pPlayerManager->numberOfPreviewDecks(); ++i) {
         save(pPlayerManager->getPreviewDeck(i));
+    }
+}
+
+/// Before Android ends the closed app at once (see MainActivity.onDestroy()),
+/// does what the regular shutdown of Mixxx would: finishes a recording so its
+/// file stays playable, and runs the shutdown of the controller mappings,
+/// which turns off their lights.
+void shutDownForAndroid(const std::shared_ptr<mixxx::CoreServices>& pCoreServices) {
+    if (const auto pRecordingManager = pCoreServices->getRecordingManager();
+            pRecordingManager && pRecordingManager->isRecordingActive()) {
+        qInfo() << "Finishing the recording, Mixxx is closed";
+        pRecordingManager->slotSetRecording(false);
+        // The recording thread closes the file on its next round
+        QThread::msleep(kRecordingCloseMillis);
+    }
+    if (const auto pControllerManager = pCoreServices->getControllerManager()) {
+        auto pDone = std::make_shared<QSemaphore>();
+        QMetaObject::invokeMethod(
+                pControllerManager.get(),
+                [pControllerManager, pDone]() {
+                    // On the thread of the controllers the shutdown runs at
+                    // once, like when Mixxx quits
+                    emit pControllerManager->requestShutdown();
+                    pDone->release();
+                },
+                Qt::QueuedConnection);
+        if (!pDone->tryAcquire(1, kControllerShutdownMillis)) {
+            qWarning() << "Shutting the controllers down timed out";
+        }
     }
 }
 #endif
@@ -413,6 +450,7 @@ QmlApplication::QmlApplication(
     mixxx::android::setSaveBeforeExit([this]() {
         qInfo() << "Saving settings and loaded tracks, Mixxx is closed";
         saveForAndroid(m_pCoreServices);
+        shutDownForAndroid(m_pCoreServices);
     });
 #endif
 

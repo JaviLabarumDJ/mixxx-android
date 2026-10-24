@@ -39,6 +39,14 @@ This edition of Mixxx for Android was born from a personal need as a DJ: to have
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>THANKS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contributor of this app: switchable skins and the Booth skin, beatgrid editing and corrections, Rekordbox playlists, dates and beatgrids, library and drive backups, controller navigation and the DDJ-FLX4 options.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Based on the open source Mixxx project. Mobile adaptation by JaviLabarum.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -465,6 +473,18 @@ Use the advanced mode to view them</source>
     </message>
     <message>
         <source>HOT CUE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>EXIT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BEATS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GRID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1529,6 +1549,26 @@ Button</source>
     </message>
     <message>
         <source>Saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Re-analyze the whole collection?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The waveforms, keys and the rest of the analysis are done again in the background. You can keep the beatgrids or analyze them again too.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>⚠ Analyzing the beatgrids again replaces the ones you corrected by hand, unless you locked them. Locked beatgrids and those of Rekordbox are always kept.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>KEEP BEATGRIDS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ALSO BEATGRIDS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

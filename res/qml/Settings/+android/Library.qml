@@ -1024,11 +1024,7 @@ Category {
                             font.bold: true
                             font.pixelSize: 11
                             text: qsTr("🔄 Re-analyze the whole collection")
-                            onClicked: {
-                                if (Mixxx.MobileLibrary && Mixxx.MobileLibrary.analyzeAllTracks) {
-                                    Mixxx.MobileLibrary.analyzeAllTracks();
-                                }
-                            }
+                            onClicked: reanalyzePopup.open()
                         }
                     }
                 }
@@ -1184,6 +1180,98 @@ Category {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
                         root.save();
+                    }
+                }
+            }
+        }
+    }
+
+    // Re-analyzing the whole collection may replace the beatgrids corrected
+    // by hand, so it asks first
+    Popup {
+        id: reanalyzePopup
+
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(560, root.width - 40)
+        modal: true
+        dim: true
+        padding: 18
+
+        background: Rectangle {
+            color: "#181b24"
+            radius: 10
+            border.color: "#ffab40"
+            border.width: 1
+        }
+
+        contentItem: ColumnLayout {
+            spacing: 12
+
+            Text {
+                Layout.fillWidth: true
+                text: qsTr("Re-analyze the whole collection?")
+                font.bold: true
+                font.pixelSize: 15
+                color: Theme.white
+                wrapMode: Text.WordWrap
+            }
+
+            Text {
+                Layout.fillWidth: true
+                text: qsTr("The waveforms, keys and the rest of the analysis are done again in the background. You can keep the beatgrids or analyze them again too.")
+                font.pixelSize: 12
+                color: "#b0bec5"
+                wrapMode: Text.WordWrap
+            }
+
+            Text {
+                Layout.fillWidth: true
+                text: qsTr("⚠ Analyzing the beatgrids again replaces the ones you corrected by hand, unless you locked them. Locked beatgrids and those of Rekordbox are always kept.")
+                font.pixelSize: 12
+                color: "#ffcc80"
+                wrapMode: Text.WordWrap
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 10
+
+                Skin.Button {
+                    Layout.preferredHeight: 40
+                    Layout.preferredWidth: 110
+                    text: qsTr("Cancel")
+                    onClicked: reanalyzePopup.close()
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                }
+
+                Skin.Button {
+                    Layout.preferredHeight: 40
+                    Layout.preferredWidth: 170
+                    activeColor: "#ffffff"
+                    backgroundColor: "#1e5f3a"
+                    normalColor: "#ffffff"
+                    font.bold: true
+                    text: qsTr("KEEP BEATGRIDS")
+                    onClicked: {
+                        Mixxx.MobileLibrary.analyzeAllTracks(false);
+                        reanalyzePopup.close();
+                    }
+                }
+
+                Skin.Button {
+                    Layout.preferredHeight: 40
+                    Layout.preferredWidth: 170
+                    activeColor: "#ffab40"
+                    backgroundColor: "#3a2a14"
+                    normalColor: "#ffd180"
+                    font.bold: true
+                    text: qsTr("ALSO BEATGRIDS")
+                    onClicked: {
+                        Mixxx.MobileLibrary.analyzeAllTracks(true);
+                        reanalyzePopup.close();
                     }
                 }
             }

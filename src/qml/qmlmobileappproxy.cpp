@@ -71,7 +71,19 @@ void QmlMobileAppProxy::setSkin(const QString& skin) {
 
 QStringList QmlMobileAppProxy::skinsIn(const QUrl& skinsFolder) const {
     QStringList skins{kClassicSkin};
-    const QDir dir(skinsFolder.isLocalFile() ? skinsFolder.toLocalFile() : skinsFolder.path());
+    // Without full storage access the QML is loaded from the APK
+    // ("assets:/qml/..."), which QDir reads with the scheme as a prefix
+    QString path;
+    if (skinsFolder.isLocalFile()) {
+        path = skinsFolder.toLocalFile();
+    } else if (skinsFolder.scheme() == QStringLiteral("qrc")) {
+        path = QChar(':') + skinsFolder.path();
+    } else if (!skinsFolder.scheme().isEmpty()) {
+        path = skinsFolder.scheme() + QChar(':') + skinsFolder.path();
+    } else {
+        path = skinsFolder.path();
+    }
+    const QDir dir(path);
     const QStringList folders = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
     for (const QString& folder : folders) {
         if (folder != kClassicSkin &&

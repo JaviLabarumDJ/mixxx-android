@@ -5,8 +5,8 @@
 ![Android Version](https://img.shields.io/badge/Android-10.0%2B%20(API%2029--35)-brightgreen?logo=android&logoColor=white)
 ![Architecture](https://img.shields.io/badge/Arch-ARM64%20(arm64--v8a)-blue?logo=arm)
 ![Framework](https://img.shields.io/badge/Qt-6.8%20%7C%20QML-41cd52?logo=qt)
-[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.4.2-android)
-[![Download APK](https://img.shields.io/badge/Download-APK%20(249%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.4.2-android/mixxx-android-v1.4.2.apk)
+[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.5.1-android)
+[![Download APK](https://img.shields.io/badge/Download-APK%20(249%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.5.1-android/mixxx-android-v1.5.1.apk)
 ![License](https://img.shields.io/badge/License-GPL%20v2-orange.svg)
 
 **The world's premier open-source DJ software, fully ported, modernized, and touch-optimized for Android smartphones, tablets, and standalone hardware setups.**
@@ -28,7 +28,23 @@ Whether you're performing live sets using a USB DJ controller, mixing on the go 
 <!-- START_AI_GENERATED_DISCLAIMER -->
 <!-- This section was written with the assistance of an AI Agent (Claude). -->
 
-## 🆕 What's New in v1.4.2
+## 🆕 What's New in v1.5.1
+
+* **Settings → About** now thanks [Angelos Exarchos (@daedalus.music)](https://www.instagram.com/daedalus.music), [morpheasgr](https://github.com/morpheasgr) on GitHub, for his contributions to this app.
+
+## 🗂️ What was new in v1.5.0
+
+By [morpheasgr](https://github.com/morpheasgr), with fixes on top:
+
+* **Switchable skins** (*Settings → Interface → Skin*): the current interface is now **Classic**, and the new **Booth** skin is laid out like the screen of a booth player, with its own browser (BROWSE, LOAD 1/2) and a **DJ view to play without a controller**: pads, jog, tempo, loop, mixer and crossfader. The skin changes at once, the decks keep playing.
+* **Rekordbox beatgrids and cues on load:** tracks of Rekordbox drives and backups now get their Rekordbox beatgrid, cues, key and color when a deck loads them, and constant Rekordbox grids stay constant (so ½ beat, ×2 and ÷2 work on them).
+* **Better beatgrids for house and techno:** after the analysis, a grid that follows the off-beat hi-hats is moved onto the kicks, and doubled BPMs are halved. **RE-ANALYZE** in the beatgrid panel; the automatic cue lands on the beat.
+* **Re-analyze the whole collection** now asks whether to keep the beatgrids or analyze them too (beatgrids you corrected by hand are replaced unless locked; locked and Rekordbox grids are always kept).
+* **DDJ-FLX4:** options for the rekordbox behaviour (loop buttons, memory cues, keyboard mode, PAD FX, Fader Start, instant doubles…). ⚠ **SHIFT + BEAT SYNC now toggles key lock**; choose *Tempo range* in the mapping options for the previous behaviour.
+* **DDJ-400 and DDJ-FLX4:** SHIFT + BEAT ▶ shows or hides the effects.
+* **Fixes:** direct USB audio at 48 kHz no longer plays 8.8% too fast; closing the app saves the loaded tracks, finishes a running recording and turns the controller lights off; the loop area of the waveforms no longer flickers; arrows and the pause sign are drawn everywhere (no more empty boxes); XY pad colors.
+
+## 🗂️ What was new in v1.4.2
 
 * **Rekordbox "date added"** (by [morpheasgr](https://github.com/morpheasgr)): the *Added* column of Rekordbox sticks and stick backups shows the day each track was added to the Rekordbox collection, and tracks that **⬇ COPY**, **+ ALL** or **+ PLAYLIST** bring into the library keep that date.
 * **Playlist order:** a new **#** column shows each track's position in playlists, history and Rekordbox playlists, and a playlist opens in its own order. A whole USB drive opens newest first.
@@ -144,7 +160,7 @@ This release merges the work of **[morpheasgr (Angelos Exarchos)](https://github
 ## 🚀 Installation & Quick Start
 
 ### Option A: Install Pre-Built Signed APK
-1. Download [**mixxx-android-v1.4.2.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.4.2-android/mixxx-android-v1.4.2.apk) from the [Official GitHub Release v1.4.2](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.4.2-android).
+1. Download [**mixxx-android-v1.5.1.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.5.1-android/mixxx-android-v1.5.1.apk) from the [Official GitHub Release v1.5.1](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.5.1-android).
 2. Enable *"Install unknown apps"* in your Android device settings.
 3. Install and launch **MIXXX**.
 4. Grant storage and audio permissions when prompted.
@@ -208,7 +224,7 @@ $ANDROID_SDK/build-tools/35.0.0/apksigner sign \
 ## 👥 Authors & Acknowledgments
 
 * **Android Port & Touch UI Enhancements:** [Javier Sáenz (JaviLabarumDJ)](https://github.com/JaviLabarumDJ)
-* **Contributions (v1.4.0 – v1.4.2):** [morpheasgr (Angelos Exarchos)](https://github.com/morpheasgr) — *merged from [morpheasgr/mixxx-android (android-stable)](https://github.com/morpheasgr/mixxx-android/tree/android-stable): Rekordbox playlist copies, library and stick backups, controller library navigation, upstream-friendly architecture, beatgrid corrections from the deck, and Rekordbox dates and playlist order.*
+* **Contributions (v1.4.0 – v1.5.1):** [morpheasgr (Angelos Exarchos)](https://github.com/morpheasgr) — *merged from [morpheasgr/mixxx-android (android-stable)](https://github.com/morpheasgr/mixxx-android/tree/android-stable): Rekordbox playlist copies, library and stick backups, controller library navigation, upstream-friendly architecture, beatgrid corrections from the deck, Rekordbox dates and playlist order, the skins (Booth), Rekordbox grids on load, kick-based grid correction and the DDJ-FLX4 options.*
 * **Upstream Project:** [Mixxx DJ Development Team](https://github.com/mixxxdj/mixxx) - *Free & Open Source DJ Software*
 
 ## 📄 License

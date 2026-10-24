@@ -391,39 +391,95 @@ Rectangle {
             }
         }
 
-        // ---- Loop size: tap the size for a loop, the arrows halve and
-        // double it ----
+        // ---- Loop: the size turns a loop of that many beats on and off,
+        // ½ and ×2 change it, IN and OUT set a loop by hand ----
         ColumnLayout {
+            readonly property bool looping: loopEnabledControl.value > 0
+
             Layout.fillHeight: true
-            Layout.preferredWidth: Math.round(root.unit * 4.6)
+            // Layouts fill by default: a fixed width, or the pads and the
+            // jog leave the loop only a sliver
+            Layout.fillWidth: false
+            Layout.minimumWidth: Math.round(root.unit * 5.4)
+            Layout.preferredWidth: Math.round(root.unit * 5.4)
             spacing: 3
 
+            Mixxx.ControlProxy {
+                id: loopActivate
+
+                group: root.group
+                key: "beatloop_activate"
+            }
+            Mixxx.ControlProxy {
+                id: reloopToggle
+
+                group: root.group
+                key: "reloop_toggle"
+            }
+            Mixxx.ControlProxy {
+                id: loopHalve
+
+                group: root.group
+                key: "loop_halve"
+            }
+            Mixxx.ControlProxy {
+                id: loopDouble
+
+                group: root.group
+                key: "loop_double"
+            }
+            Mixxx.ControlProxy {
+                id: loopIn
+
+                group: root.group
+                key: "loop_in"
+            }
+            Mixxx.ControlProxy {
+                id: loopOut
+
+                group: root.group
+                key: "loop_out"
+            }
+
+            Text {
+                Layout.fillWidth: true
+                color: parent.looping ? "#ff6a13" : "#8a8e96"
+                font.bold: true
+                font.letterSpacing: 1
+                font.pixelSize: Math.round(root.unit * 0.95)
+                horizontalAlignment: Text.AlignHCenter
+                text: "LOOP"
+            }
+            // The size: tap for a loop of that many beats, tap again to exit
             Rectangle {
                 Layout.fillWidth: true
-                Layout.preferredHeight: Math.round(root.unit * 3.4)
-                border.color: loopEnabledControl.value > 0 ? "#ff6a13" : "#2a2c30"
-                color: loopTap.pressed ? "#2a2c30" : "#141518"
+                Layout.preferredHeight: Math.round(root.unit * 3.8)
+                border.color: parent.looping ? "#ff6a13" : "#5c6068"
+                border.width: parent.looping ? 2 : 1
+                color: loopTap.pressed ? "#5a2a08" : (parent.looping ? "#ff6a13" : "#141518")
+                radius: 3
 
-                Text {
+                Column {
                     anchors.centerIn: parent
-                    color: loopEnabledControl.value > 0 ? "#ff6a13" : "#ff9a52"
-                    font.pixelSize: Math.round(root.unit * 1.6)
-                    text: {
-                        const size = loopSizeControl.value;
-                        return size >= 1 ? Math.round(size) : "1/" + Math.round(1 / size);
+                    spacing: 0
+
+                    Text {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        color: loopEnabledControl.value > 0 ? "#000000" : "#ff9a52"
+                        font.bold: true
+                        font.pixelSize: Math.round(root.unit * 1.8)
+                        text: {
+                            const size = loopSizeControl.value;
+                            return size >= 1 ? Math.round(size) : "1/" + Math.round(1 / size);
+                        }
                     }
-                }
-                Mixxx.ControlProxy {
-                    id: loopActivate
-
-                    group: root.group
-                    key: "beatloop_activate"
-                }
-                Mixxx.ControlProxy {
-                    id: reloopToggle
-
-                    group: root.group
-                    key: "reloop_toggle"
+                    Text {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        color: loopEnabledControl.value > 0 ? "#000000" : "#8a8e96"
+                        font.bold: true
+                        font.pixelSize: Math.round(root.unit * 0.8)
+                        text: loopEnabledControl.value > 0 ? qsTr("EXIT") : qsTr("BEATS")
+                    }
                 }
                 TapHandler {
                     id: loopTap
@@ -434,36 +490,64 @@ Rectangle {
             RowLayout {
                 Layout.fillHeight: false
                 Layout.fillWidth: true
-                Layout.preferredHeight: Math.round(root.unit * 2.2)
+                Layout.preferredHeight: Math.round(root.unit * 2.4)
                 spacing: 3
 
-                Mixxx.ControlProxy {
-                    id: loopHalve
-
-                    group: root.group
-                    key: "loop_halve"
-                }
-                Mixxx.ControlProxy {
-                    id: loopDouble
-
-                    group: root.group
-                    key: "loop_double"
-                }
                 SmallButton {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
-                    label: "‹"
+                    label: "½"
                     onPressed: loopHalve.trigger()
                 }
                 SmallButton {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
-                    label: "›"
+                    label: "×2"
                     onPressed: loopDouble.trigger()
+                }
+            }
+            RowLayout {
+                Layout.fillHeight: false
+                Layout.fillWidth: true
+                Layout.preferredHeight: Math.round(root.unit * 2.4)
+                spacing: 3
+
+                SmallButton {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    label: "IN"
+                    on: loopIn.value > 0
+                    onPressed: loopIn.value = 1
+                    onReleased: loopIn.value = 0
+                }
+                SmallButton {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    label: "OUT"
+                    on: loopOut.value > 0
+                    onPressed: loopOut.value = 1
+                    onReleased: loopOut.value = 0
                 }
             }
             Item {
                 Layout.fillHeight: true
+            }
+            // The beatgrid panel, as the BPM of the WAVE view
+            SmallButton {
+                Layout.fillWidth: true
+                Layout.preferredHeight: Math.round(root.unit * 2.2)
+                label: qsTr("GRID")
+                onPressed: {
+                    if (root.loaded) {
+                        beatgridPopup.open();
+                    }
+                }
+
+                DeckComponent.BeatgridPopup {
+                    id: beatgridPopup
+
+                    group: root.group
+                }
             }
             SmallButton {
                 Layout.fillWidth: true

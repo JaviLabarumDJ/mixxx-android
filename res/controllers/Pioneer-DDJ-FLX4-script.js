@@ -589,20 +589,34 @@ PioneerDDJFLX4.loopToggle = function(value, group, control) {
 
 // IN and OUT: in rekordbox mode, pressed during a loop they adjust its in or
 // out point with the jog wheel, like SHIFT + IN/OUT
-PioneerDDJFLX4.loopInPressed = function(channel, control, value, status, group) {
-    if (PioneerDDJFLX4.option("loopButtonsMode") === "rekordbox" && engine.getValue(group, "loop_enabled")) {
-        PioneerDDJFLX4.toggleLoopAdjustIn(channel, control, value, status, group);
+// Whether the last press of IN/OUT adjusts the loop (rekordbox mode with a
+// loop on), by deck and button. The release must go the same way as the
+// press: the press may have turned a loop on, and a loop_in/loop_out press
+// that is never released leaves the engine adjusting the loop.
+PioneerDDJFLX4.loopButtonAdjusts = {};
+
+PioneerDDJFLX4.loopButtonPressed = function(key, toggleAdjust, channel, control, value, status, group) {
+    const id = `${group}${key}`;
+    if (value) {
+        PioneerDDJFLX4.loopButtonAdjusts[id] =
+                PioneerDDJFLX4.option("loopButtonsMode") === "rekordbox" &&
+                engine.getValue(group, "loop_enabled") > 0;
+    }
+    if (PioneerDDJFLX4.loopButtonAdjusts[id]) {
+        toggleAdjust(channel, control, value, status, group);
         return;
     }
-    engine.setValue(group, "loop_in", value ? 1 : 0);
+    engine.setValue(group, key, value ? 1 : 0);
+};
+
+PioneerDDJFLX4.loopInPressed = function(channel, control, value, status, group) {
+    PioneerDDJFLX4.loopButtonPressed("loop_in", PioneerDDJFLX4.toggleLoopAdjustIn,
+        channel, control, value, status, group);
 };
 
 PioneerDDJFLX4.loopOutPressed = function(channel, control, value, status, group) {
-    if (PioneerDDJFLX4.option("loopButtonsMode") === "rekordbox" && engine.getValue(group, "loop_enabled")) {
-        PioneerDDJFLX4.toggleLoopAdjustOut(channel, control, value, status, group);
-        return;
-    }
-    engine.setValue(group, "loop_out", value ? 1 : 0);
+    PioneerDDJFLX4.loopButtonPressed("loop_out", PioneerDDJFLX4.toggleLoopAdjustOut,
+        channel, control, value, status, group);
 };
 
 // 4 BEAT/EXIT: exits a playing loop; otherwise turns the last loop on again
@@ -1508,6 +1522,10 @@ PioneerDDJFLX4.pitchPadShiftPressed = function(_channel, control, value, _status
 // with SHIFT, pads 1-3 play effect unit 4. The effects are chosen in Mixxx.
 //
 
+// What each held PAD FX pad turned on, by deck and pad, released the same
+// way: SHIFT may be let go before the pad
+PioneerDDJFLX4.padFxReleases = {};
+
 PioneerDDJFLX4.padFxPressed = function(_channel, control, value, status, group) {
     if (!PioneerDDJFLX4.option("padFx")) {
         return;
@@ -1515,27 +1533,35 @@ PioneerDDJFLX4.padFxPressed = function(_channel, control, value, status, group) 
     const shift = status === 0x98 || status === 0x9A;
     const pad = control & 0x07;
     const deck = group === "[Channel1]" ? 1 : 2;
-    const held = value > 0;
+    const id = `${group}${control < 0x50 ? 1 : 2}_${pad}`;
 
-    midi.sendShortMsg(status, control, held ? 0x7F : 0x00);
+    midi.sendShortMsg(status, control, value ? 0x7F : 0x00);
 
+    if (!value) {
+        const release = PioneerDDJFLX4.padFxReleases[id];
+        delete PioneerDDJFLX4.padFxReleases[id];
+        if (release) {
+            release();
+        }
+        return;
+    }
+
+    let hold;
     if (control < 0x50) {
-        engine.setValue(group,
-            `beatlooproll_${shift ? "r" : ""}${PioneerDDJFLX4.padFxRolls[pad]}_activate`, held ? 1 : 0);
+        const key = `beatlooproll_${shift ? "r" : ""}${PioneerDDJFLX4.padFxRolls[pad]}_activate`;
+        hold = (held) => engine.setValue(group, key, held ? 1 : 0);
+    } else if (!shift && pad === 6) {
+        hold = (held) => engine.brake(deck, held);
+    } else if (!shift && pad === 7) {
+        hold = (held) => engine.spinback(deck, held);
+    } else if (shift && pad > 2) {
         return;
+    } else {
+        const unit = shift ? 4 : (pad < 3 ? 2 : 3);
+        hold = (held) => PioneerDDJFLX4.holdEffect(group, unit, pad % 3 + 1, held);
     }
-    if (!shift && pad === 6) {
-        engine.brake(deck, held);
-        return;
-    }
-    if (!shift && pad === 7) {
-        engine.spinback(deck, held);
-        return;
-    }
-    if (shift && pad > 2) {
-        return;
-    }
-    PioneerDDJFLX4.holdEffect(group, shift ? 4 : (pad < 3 ? 2 : 3), pad % 3 + 1, held);
+    hold(true);
+    PioneerDDJFLX4.padFxReleases[id] = () => hold(false);
 };
 
 // Turns an effect of an effect unit on for this deck while a pad is held,
