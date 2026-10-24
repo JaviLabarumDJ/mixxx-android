@@ -69,6 +69,15 @@
                 </description>
             </option>
         </group>
+        <group label="Mixer">
+            <option variable="trimCfxGuard" type="boolean" default="false" label="TRIM / CFX guard">
+                <description>
+                    For TRIM jumping while CFX is turned: some FLX4 units send stray TRIM messages
+                    then. TRIM is ignored for 2 seconds after CFX moves, and afterwards (or after a
+                    second without TRIM) changes only once the knob reaches the current TRIM value.
+                </description>
+            </option>
+        </group>
     </settings>
     <controller id="DDJ-FLX4">
         <scriptfiles>
@@ -163,6 +172,28 @@
                 </options>
             </control>
             <!-- BROWSER Section END -->
+            <!-- SMART CFX: the CFX (QuickEffect) of decks 1 and 2 on or off,
+                 with SHIFT the next CFX preset -->
+            <control>
+                <description>SMART CFX - press - CFX of decks 1 and 2 on or off</description>
+                <group>[Master]</group>
+                <key>PioneerDDJFLX4.smartCfxPressed</key>
+                <status>0x96</status>
+                <midino>0x00</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>SMART CFX +SHIFT - press - next CFX preset of decks 1 and 2</description>
+                <group>[Master]</group>
+                <key>PioneerDDJFLX4.smartCfxPressed</key>
+                <status>0x96</status>
+                <midino>0x08</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
             <!-- Mixxx Android: SHIFT + BEAT ▶ shows or hides the effects of the
                  skin (FX bar of the Classic skin, BEAT FX of the Booth skin) -->
             <control>
@@ -812,43 +843,43 @@
             </control>
 
             <control>
-                <description>TRIM - rotate</description>
+                <description>TRIM - rotate (script, for the TRIM / CFX guard)</description>
                 <group>[Channel1]</group>
-                <key>pregain</key>
+                <key>PioneerDDJFLX4.trimLsb</key>
                 <status>0xB0</status>
                 <midino>0x24</midino>
                 <options>
-                    <fourteen-bit-lsb/>
+                    <Script-Binding/>
                 </options>
             </control>
             <control>
-                <description>TRIM - rotate</description>
+                <description>TRIM - rotate (script, for the TRIM / CFX guard)</description>
                 <group>[Channel1]</group>
-                <key>pregain</key>
+                <key>PioneerDDJFLX4.trimMsb</key>
                 <status>0xB0</status>
                 <midino>0x04</midino>
                 <options>
-                    <fourteen-bit-msb/>
+                    <Script-Binding/>
                 </options>
             </control>
             <control>
-                <description>TRIM - rotate</description>
+                <description>TRIM - rotate (script, for the TRIM / CFX guard)</description>
                 <group>[Channel2]</group>
-                <key>pregain</key>
+                <key>PioneerDDJFLX4.trimLsb</key>
                 <status>0xB1</status>
                 <midino>0x24</midino>
                 <options>
-                    <fourteen-bit-lsb/>
+                    <Script-Binding/>
                 </options>
             </control>
             <control>
-                <description>TRIM - rotate</description>
+                <description>TRIM - rotate (script, for the TRIM / CFX guard)</description>
                 <group>[Channel2]</group>
-                <key>pregain</key>
+                <key>PioneerDDJFLX4.trimMsb</key>
                 <status>0xB1</status>
                 <midino>0x04</midino>
                 <options>
-                    <fourteen-bit-msb/>
+                    <Script-Binding/>
                 </options>
             </control>
 
