@@ -79,9 +79,10 @@ class QmlMobileLibraryProxy : public QObject {
     Q_INVOKABLE QStringList getSubDirectories(const QString& rawPath) const;
     Q_INVOKABLE QString defaultMusicDirectory() const;
 
-    /// Analyzes all tracks again, also their beatgrids, except locked ones
-    /// and those imported from Rekordbox
-    Q_INVOKABLE void analyzeAllTracks() const;
+    /// Analyzes all tracks again. With redoBeats, also their beatgrids,
+    /// except locked ones and those imported from Rekordbox: that replaces
+    /// the beatgrids corrected by hand, so the UI asks first.
+    Q_INVOKABLE void analyzeAllTracks(bool redoBeats) const;
     Q_INVOKABLE void analyzeUnanalyzedTracks() const;
     /// Throws the beatgrid of the track away and analyzes it again. Returns
     /// false for a locked grid.

@@ -377,24 +377,48 @@ Rectangle {
                 color: Qt.alpha(root.deck2Color, 0.4)
             }
 
-            Text {
+            // The arrow is drawn: Android's fonts lack ▲
+            Row {
                 anchors.top: parent.top
                 anchors.topMargin: 8
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: "▲ FX WET (100%)"
-                font.bold: true
-                font.pixelSize: 10
-                color: Qt.alpha(root.wetColor, 0.53)
+                spacing: 4
+
+                Skin.Triangle {
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: 7
+                    height: 8
+                    rotation: -90
+                    color: Qt.alpha(root.wetColor, 0.53)
+                }
+                Text {
+                    text: "FX WET (100%)"
+                    font.bold: true
+                    font.pixelSize: 10
+                    color: Qt.alpha(root.wetColor, 0.53)
+                }
             }
 
-            Text {
+            // The arrow is drawn: Android's fonts lack ▼
+            Row {
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 8
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: "▼ FX DRY (0%)"
-                font.bold: true
-                font.pixelSize: 10
-                color: Qt.alpha(root.buttonTextColor, 0.4)
+                spacing: 4
+
+                Skin.Triangle {
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: 7
+                    height: 8
+                    rotation: 90
+                    color: Qt.alpha(root.buttonTextColor, 0.4)
+                }
+                Text {
+                    text: "FX DRY (0%)"
+                    font.bold: true
+                    font.pixelSize: 10
+                    color: Qt.alpha(root.buttonTextColor, 0.4)
+                }
             }
 
             // Current Coordinates Crosshair lines

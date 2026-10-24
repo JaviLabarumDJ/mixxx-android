@@ -242,10 +242,9 @@ void QmlMobileLibraryProxy::analyzeTracksMatching(
     }
 }
 
-void QmlMobileLibraryProxy::analyzeAllTracks() const {
-    // Also the beatgrids, except locked ones and those of Rekordbox
+void QmlMobileLibraryProxy::analyzeAllTracks(bool redoBeats) const {
     AnalyzerTrack::Options options;
-    options.redoBeats = true;
+    options.redoBeats = redoBeats;
     analyzeTracksMatching(QStringLiteral("SELECT id FROM library WHERE mixxx_deleted = 0"), options);
 }
 

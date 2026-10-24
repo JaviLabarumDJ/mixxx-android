@@ -251,7 +251,10 @@ Item {
         border.width: active ? 2 : 1
         color: tabMouse.pressed ? "#1c1e22" : "#000000"
         height: parent.height
-        width: Math.max(root.compact ? 64 : 96, tabText.implicitWidth + 24)
+        // Narrow phones: smaller tabs, so that both rows of the top bar fit
+        width: root.width < 760
+                ? Math.max(44, tabText.implicitWidth + 12)
+                : Math.max(root.compact ? 64 : 96, tabText.implicitWidth + 24)
 
         Text {
             id: tabText
@@ -259,7 +262,7 @@ Item {
             anchors.centerIn: parent
             color: tab.active ? "#d4e157" : "#9a9ea6"
             font.bold: true
-            font.pixelSize: root.compact ? 11 : 13
+            font.pixelSize: root.width < 760 ? 10 : (root.compact ? 11 : 13)
             text: tab.label
         }
         MouseArea {
@@ -465,7 +468,7 @@ Item {
             anchors.top: parent.top
             anchors.topMargin: 3
             height: root.compact ? 26 : 34
-            spacing: 6
+            spacing: root.width < 760 ? 3 : 6
 
             Tab {
                 active: root.viewMode === 1

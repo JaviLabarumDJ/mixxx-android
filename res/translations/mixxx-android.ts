@@ -468,6 +468,18 @@ Use the advanced mode to view them</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>EXIT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BEATS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GRID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>SLIP</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1529,6 +1541,26 @@ Button</source>
     </message>
     <message>
         <source>Saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Re-analyze the whole collection?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The waveforms, keys and the rest of the analysis are done again in the background. You can keep the beatgrids or analyze them again too.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>⚠ Analyzing the beatgrids again replaces the ones you corrected by hand, unless you locked them. Locked beatgrids and those of Rekordbox are always kept.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>KEEP BEATGRIDS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ALSO BEATGRIDS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

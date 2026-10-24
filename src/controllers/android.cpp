@@ -179,9 +179,10 @@ void notifyDevicesChanged() {
 namespace {
 std::mutex s_saveBeforeExitLock;
 std::function<void()> s_saveBeforeExit;
-// Long enough to write the settings and a few tracks, short enough not to
-// hang the closing app if the main thread is blocked
-constexpr int kSaveBeforeExitTimeoutMillis = 3000;
+// Long enough to write the settings and a few tracks, finish a recording and
+// shut the controllers down, short enough not to hang the closing app if the
+// main thread is blocked
+constexpr int kSaveBeforeExitTimeoutMillis = 4000;
 } // namespace
 
 void setSaveBeforeExit(std::function<void()> save) {

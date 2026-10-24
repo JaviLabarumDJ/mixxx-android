@@ -14,7 +14,7 @@ Este documento recopila de manera exhaustiva el estado actual del port de **Mixx
   - **Frontend**: Qt 6.8 / QML con interfaz táctil adaptada (`res/qml/`).
   - **Subsistema de Audio**: PortAudio con el backend Android Oboe (AAudio) y, para tarjetas de sonido USB que Android no puede usar, un driver USB propio de Mixxx (libusb, ver §6.6).
   - **Subsistema de Controladoras**: MIDI nativo de Android (AMidi), USB-MIDI propio para las tarjetas que maneja el driver USB, y USB Bulk/HID. PortMidi está desactivado en Android.
-- **Versión publicada**: `v1.4.2-android` (`versionCode 7`), ver §6.9.
+- **Versión publicada**: `v1.5.0-android` (`versionCode 9`), ver §6.9. La rama `stems` (separación de stems, §6.19 en esa rama) se publicará como v1.6.0.
 - **Dispositivo objetivo de prueba**:
   - Tablet Lenovo Tab M11 (`TB331FC`), Android 13/14.
   - Conexión: ADB por Wi-Fi (depuración inalámbrica); la IP y el puerto cambian, se encuentran con `nmap -sn 192.168.0.0/24` y `nmap -p 30000-49999 <ip>`.
@@ -273,7 +273,7 @@ Nota: `make mixxx` por sí solo **no** actualiza el `.so` del proyecto Gradle; h
 - Errores del HAL de Qualcomm: `adb logcat | grep -E "PAL|AGM|AHAL"`.
 
 ### 6.9. Publicar una release
-1. Subir `android:versionCode` y `android:versionName` en `packaging/android/AndroidManifest.xml` (la v1.1.0 es `versionCode 2`, la v1.2.0 `versionCode 3`, la v1.3.0 `versionCode 4`, la v1.4.0 `versionCode 5`, la v1.4.1 `versionCode 6`, la v1.4.2 `versionCode 7`).
+1. Subir `android:versionCode` y `android:versionName` en `packaging/android/AndroidManifest.xml` (la v1.1.0 es `versionCode 2`, la v1.2.0 `versionCode 3`, la v1.3.0 `versionCode 4`, la v1.4.0 `versionCode 5`, la v1.4.1 `versionCode 6`, la v1.4.2 `versionCode 7`, la v1.5.0 `versionCode 9`; el 8 lo usó una build de prueba de la rama `stems`).
 2. Actualizar las insignias y los enlaces de descarga del `README.md`.
 3. `make -C build-android -j12 apk`, firmar como `mixxx-android-vX.Y.Z.apk` y verificar con `apksigner verify` y `aapt2 dump badging`.
 4. Según `AGENTS.md`, el commit, la etiqueta (`vX.Y.Z-android`), el push y la publicación en GitHub los hace la persona, después de probar en un equipo de DJ real. El nombre del APK adjunto debe coincidir con el enlace del README.
@@ -370,5 +370,20 @@ La v1.4.0 fusiona `morpheasgr/android-stable` (ya incluía la v1.3.0, así que l
 - **Barra superior:** `Mixxx.MobileApp.hiddenTopBarItems` (`qmlmobileappproxy.cpp`, clave `[Skin],AndroidHiddenTopBarItems`, nombres separados por comas: `dj wave lib ctl load1 load2 fx xy split rec 4d`). `+android/MainWindow.qml` oculta esos botones y salta a otra vista si la actual se oculta; la tarjeta «🧭 BARRA SUPERIOR» de `Settings/+android/Interface.qml` los activa y no deja ocultar la última vista.
 - **Altavoz atascado (no es Mixxx):** si en Híbrido no suena la tablet, medir con `dumpsys media.audio_flinger` (hilo del altavoz, «Frames written»). Se vio el altavoz a ~11–16k frames/s con Mixxx cerrado; un reinicio de la tablet lo arregla. Causa sin confirmar (sospecha: driver USB directo o el hub).
 - Pendiente: la página de Audio puede marcar «Móvil / Bluetooth» estando en Híbrido; revisar con la DDJ conectada.
+
+> _Fin de la sección escrita por IA._
+
+### 6.18. Skins, rejillas y arreglos (v1.5.0)
+
+> _La siguiente sección la ha escrito un agente de IA (Claude Code)._
+
+- Aportado por morpheasgr (PR #4, escrita con Claude Code), con arreglos encima. Ver `packaging/android/README.md` para las skins.
+- **Skins:** `+android/main.qml` carga `MainWindow.qml` (Classic) o `Skins/<nombre>/MainWindow.qml` según `[Config],AndroidSkin` (`Mixxx.MobileApp.skin`, `skinsIn()`). Al cambiar, se descarga la skin anterior y la nueva se carga 150 ms después: las dos crean los mismos controles `[Skin]` (`mobile_library_toggle`, `mobile_fx_toggle`, `mobile_loader_deck1/2`) y no pueden coexistir. `skinsIn()` acepta URLs `assets:` y `qrc:` (QML cargado desde la APK sin acceso a todos los archivos).
+- **Rejillas:** `androidkickgrid.*` corrige tras el análisis (solo con tempo fijo) una rejilla medio beat desplazada y BPM duplicados; `androidautocue.*` encaja el cue automático en el beat; `applyRekordboxDataOnLoad()` aplica una vez la rejilla y cues de Rekordbox al cargar. «Re-analizar toda la colección» pregunta si mantener las rejillas (`analyzeAllTracks(redoBeats)`); con `redoBeats` se rehacen todas salvo las bloqueadas y las de Rekordbox.
+- **Cierre de la app:** `MainActivity.onDestroy()` (si `isFinishing()`) llama a `saveBeforeExit()` (máx. 4 s) y mata el proceso. Antes: guarda ajustes, efectos y pistas cargadas, termina una grabación en curso (400 ms) y ejecuta el cierre de los mappings (`ControllerManager::slotShutdown()`, máx. 1,5 s) para apagar las luces.
+- **DDJ-FLX4:** IN/OUT en modo «rekordbox» sueltan por el mismo camino por el que se pulsaron (antes `loop_out` podía quedarse pulsado en el motor); PAD FX guarda qué activó cada pad para soltarlo aunque se suelte antes SHIFT. SHIFT + BEAT SYNC es ahora key lock por defecto (opción `shiftSyncMode`).
+- **Parpadeo de zonas en las ondas:** `rendergraph` solo subía los uniforms de un material cuando cambiaban (`clearUniformsCacheDirty()`); tras reorganizar Qt sus lotes, un nodo podía dibujarse con el color de otro (el loop alternaba verde/blanco). `BaseMaterialShader::updateUniformData()` los sube siempre que `newMaterial != oldMaterial`. Es un fallo de Mixxx, candidato a enviarse arriba.
+- **Booth, vista DJ:** bloque LOOP (tamaño que activa/sale del loop, ½, ×2, IN, OUT) y botón REJILLA/GRID para el panel de rejilla; en la vista WAVE se abre tocando el BPM.
+- **Pendiente:** portar a Booth la cola, el aviso y la pestaña STEM de los stems (rama `stems`); `applySkinTheme` reasigna todas las propiedades de `Theme` y rompe sus bindings internos (una skin debe dar los colores derivados explícitamente).
 
 > _Fin de la sección escrita por IA._
