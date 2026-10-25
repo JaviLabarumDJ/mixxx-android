@@ -5,8 +5,8 @@
 ![Android Version](https://img.shields.io/badge/Android-10.0%2B%20(API%2029--35)-brightgreen?logo=android&logoColor=white)
 ![Architecture](https://img.shields.io/badge/Arch-ARM64%20(arm64--v8a)-blue?logo=arm)
 ![Framework](https://img.shields.io/badge/Qt-6.8%20%7C%20QML-41cd52?logo=qt)
-[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.5.1-android)
-[![Download APK](https://img.shields.io/badge/Download-APK%20(249%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.5.1-android/mixxx-android-v1.5.1.apk)
+[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.5.2-android)
+[![Download APK](https://img.shields.io/badge/Download-APK%20(249%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.5.2-android/mixxx-android-v1.5.2.apk)
 ![License](https://img.shields.io/badge/License-GPL%20v2-orange.svg)
 
 **The world's premier open-source DJ software, fully ported, modernized, and touch-optimized for Android smartphones, tablets, and standalone hardware setups.**
@@ -28,7 +28,16 @@ Whether you're performing live sets using a USB DJ controller, mixing on the go 
 <!-- START_AI_GENERATED_DISCLAIMER -->
 <!-- This section was written with the assistance of an AI Agent (Claude). -->
 
-## 🆕 What's New in v1.5.1
+## 🆕 What's New in v1.5.2
+
+By [morpheasgr](https://github.com/morpheasgr):
+
+* **DDJ-FLX4 SMART CFX:** the button turns the CFX of decks 1 and 2 on or off, and lights while one is on. SHIFT + SMART CFX selects the next CFX of both decks.
+* **DDJ-FLX4 TRIM / CFX guard** (mapping option, *Mixer* group, off by default): for units whose TRIM jumps while CFX is turned. TRIM is ignored for 2 seconds after CFX moves, and then only changes once the knob reaches the current value.
+* **Rekordbox:** tracks listed twice in a Rekordbox collection no longer go missing from its playlists, and exports without `.EXT` analysis files get their beatgrids.
+* **Effects:** Echo and Reverb no longer write one sample past the end of their buffers.
+
+## 🗂️ What was new in v1.5.1
 
 * **Settings → About** now thanks [Angelos Exarchos (@daedalus.music)](https://www.instagram.com/daedalus.music), [morpheasgr](https://github.com/morpheasgr) on GitHub, for his contributions to this app.
 
@@ -160,7 +169,7 @@ This release merges the work of **[morpheasgr (Angelos Exarchos)](https://github
 ## 🚀 Installation & Quick Start
 
 ### Option A: Install Pre-Built Signed APK
-1. Download [**mixxx-android-v1.5.1.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.5.1-android/mixxx-android-v1.5.1.apk) from the [Official GitHub Release v1.5.1](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.5.1-android).
+1. Download [**mixxx-android-v1.5.2.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.5.2-android/mixxx-android-v1.5.2.apk) from the [Official GitHub Release v1.5.2](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.5.2-android).
 2. Enable *"Install unknown apps"* in your Android device settings.
 3. Install and launch **MIXXX**.
 4. Grant storage and audio permissions when prompted.
@@ -224,7 +233,7 @@ $ANDROID_SDK/build-tools/35.0.0/apksigner sign \
 ## 👥 Authors & Acknowledgments
 
 * **Android Port & Touch UI Enhancements:** [Javier Sáenz (JaviLabarumDJ)](https://github.com/JaviLabarumDJ)
-* **Contributions (v1.4.0 – v1.5.1):** [morpheasgr (Angelos Exarchos)](https://github.com/morpheasgr) — *merged from [morpheasgr/mixxx-android (android-stable)](https://github.com/morpheasgr/mixxx-android/tree/android-stable): Rekordbox playlist copies, library and stick backups, controller library navigation, upstream-friendly architecture, beatgrid corrections from the deck, Rekordbox dates and playlist order, the skins (Booth), Rekordbox grids on load, kick-based grid correction and the DDJ-FLX4 options.*
+* **Contributions (v1.4.0 – v1.5.2):** [morpheasgr (Angelos Exarchos)](https://github.com/morpheasgr) — *merged from [morpheasgr/mixxx-android (android-stable)](https://github.com/morpheasgr/mixxx-android/tree/android-stable): Rekordbox playlist copies, library and stick backups, controller library navigation, upstream-friendly architecture, beatgrid corrections from the deck, Rekordbox dates and playlist order, the skins (Booth), Rekordbox grids on load, kick-based grid correction, the DDJ-FLX4 options and SMART CFX, and effects and Rekordbox fixes.*
 * **Upstream Project:** [Mixxx DJ Development Team](https://github.com/mixxxdj/mixxx) - *Free & Open Source DJ Software*
 
 ## 📄 License

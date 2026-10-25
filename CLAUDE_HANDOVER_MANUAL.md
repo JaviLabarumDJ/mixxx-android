@@ -14,7 +14,7 @@ Este documento recopila de manera exhaustiva el estado actual del port de **Mixx
   - **Frontend**: Qt 6.8 / QML con interfaz táctil adaptada (`res/qml/`).
   - **Subsistema de Audio**: PortAudio con el backend Android Oboe (AAudio) y, para tarjetas de sonido USB que Android no puede usar, un driver USB propio de Mixxx (libusb, ver §6.6).
   - **Subsistema de Controladoras**: MIDI nativo de Android (AMidi), USB-MIDI propio para las tarjetas que maneja el driver USB, y USB Bulk/HID. PortMidi está desactivado en Android.
-- **Versión publicada**: `v1.5.1-android` (`versionCode 10`), ver §6.9. La rama `stems` (separación de stems, §6.19 en esa rama) se publicará como v1.6.0.
+- **Versión publicada**: `v1.5.2-android` (`versionCode 11`), ver §6.9. La rama `stems` (separación de stems, §6.19 en esa rama) se publicará como v1.6.0.
 - **Dispositivo objetivo de prueba**:
   - Tablet Lenovo Tab M11 (`TB331FC`), Android 13/14.
   - Conexión: ADB por Wi-Fi (depuración inalámbrica); la IP y el puerto cambian, se encuentran con `nmap -sn 192.168.0.0/24` y `nmap -p 30000-49999 <ip>`.
@@ -273,7 +273,7 @@ Nota: `make mixxx` por sí solo **no** actualiza el `.so` del proyecto Gradle; h
 - Errores del HAL de Qualcomm: `adb logcat | grep -E "PAL|AGM|AHAL"`.
 
 ### 6.9. Publicar una release
-1. Subir `android:versionCode` y `android:versionName` en `packaging/android/AndroidManifest.xml` (la v1.1.0 es `versionCode 2`, la v1.2.0 `versionCode 3`, la v1.3.0 `versionCode 4`, la v1.4.0 `versionCode 5`, la v1.4.1 `versionCode 6`, la v1.4.2 `versionCode 7`, la v1.5.0 `versionCode 9`, la v1.5.1 `versionCode 10`; el 8 lo usó una build de prueba de la rama `stems`).
+1. Subir `android:versionCode` y `android:versionName` en `packaging/android/AndroidManifest.xml` (la v1.1.0 es `versionCode 2`, la v1.2.0 `versionCode 3`, la v1.3.0 `versionCode 4`, la v1.4.0 `versionCode 5`, la v1.4.1 `versionCode 6`, la v1.4.2 `versionCode 7`, la v1.5.0 `versionCode 9`, la v1.5.1 `versionCode 10`, la v1.5.2 `versionCode 11`; el 8 lo usó una build de prueba de la rama `stems`).
 2. Actualizar las insignias y los enlaces de descarga del `README.md`.
 3. `make -C build-android -j12 apk`, firmar como `mixxx-android-vX.Y.Z.apk` y verificar con `apksigner verify` y `aapt2 dump badging`.
 4. Según `AGENTS.md`, el commit, la etiqueta (`vX.Y.Z-android`), el push y la publicación en GitHub los hace la persona, después de probar en un equipo de DJ real. El nombre del APK adjunto debe coincidir con el enlace del README.
@@ -385,6 +385,7 @@ La v1.4.0 fusiona `morpheasgr/android-stable` (ya incluía la v1.3.0, así que l
 - **Parpadeo de zonas en las ondas:** `rendergraph` solo subía los uniforms de un material cuando cambiaban (`clearUniformsCacheDirty()`); tras reorganizar Qt sus lotes, un nodo podía dibujarse con el color de otro (el loop alternaba verde/blanco). `BaseMaterialShader::updateUniformData()` los sube siempre que `newMaterial != oldMaterial`. Es un fallo de Mixxx, candidato a enviarse arriba.
 - **Booth, vista DJ:** bloque LOOP (tamaño que activa/sale del loop, ½, ×2, IN, OUT) y botón REJILLA/GRID para el panel de rejilla; en la vista WAVE se abre tocando el BPM.
 - **v1.5.1:** solo añade en Acerca de la tarjeta GRACIAS con Angelos Exarchos (@daedalus.music). Los agradecimientos a Dani Roman van con los stems (rama `stems`, que ya tiene su propia tarjeta: al fusionar, dejar una sola tarjeta con los dos).
+- **v1.5.2 (PR #5 de morpheasgr):** SMART CFX de la DDJ-FLX4 (`0x96 0x00`, con SHIFT `0x96 0x08`: CFX de los decks 1 y 2 y siguiente preset) y la opción de mapeo «TRIM / CFX guard» (grupo Mixer, apagada por defecto; el TRIM pasa por `trimMsb`/`trimLsb` del script). Rekordbox: `location` y `analyze_path` ya no son `UNIQUE` (colecciones con el mismo archivo dos veces perdían pistas en las playlists; las tablas se recrean en cada arranque) y las exportaciones sin `.EXT` leen la rejilla del `.DAT`. Efectos: el bucle que suma la señal seca en `EngineEffectChain::process()` escribía una muestra de más (`<=`), arreglado; candidato a enviarse arriba.
 - **Pendiente:** portar a Booth la cola, el aviso y la pestaña STEM de los stems (rama `stems`); `applySkinTheme` reasigna todas las propiedades de `Theme` y rompe sus bindings internos (una skin debe dar los colores derivados explícitamente).
 
 > _Fin de la sección escrita por IA._

@@ -278,7 +278,7 @@ Category {
                         }
                         Text {
                             Layout.fillWidth: true
-                            text: qsTr("Contributor of this app: switchable skins and the Booth skin, beatgrid editing and corrections, Rekordbox playlists, dates and beatgrids, library and drive backups, controller navigation and the DDJ-FLX4 options.")
+                            text: qsTr("Contributor of this app: switchable skins and the Booth skin, beatgrid editing and corrections, Rekordbox playlists, dates and beatgrids, library and drive backups, controller navigation, the DDJ-FLX4 options and SMART CFX, and fixes for the effects and Rekordbox.")
                             font.pixelSize: 10
                             color: "#90a4ae"
                             wrapMode: Text.WordWrap
