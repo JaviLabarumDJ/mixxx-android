@@ -225,6 +225,9 @@ void applyRekordboxData(const TrackPointer& pTrack, const RekordboxTrack& rekord
             }
             readAnalyze(pTrack, sampleRate, timingOffset, false, anlzPathExt);
         } else if (hasAnlz) {
+            // Without an .EXT, the .DAT has the beatgrid and the cues, which
+            // readAnalyze() reads in two passes
+            readAnalyze(pTrack, sampleRate, timingOffset, true, anlzPath);
             readAnalyze(pTrack, sampleRate, timingOffset, false, anlzPath);
         }
     } catch (const std::exception& e) {

@@ -113,14 +113,16 @@ bool createLibraryTable(QSqlDatabase& database, const QString& tableName) {
             "    year INTEGER,"
             "    genre TEXT,"
             "    tracknumber TEXT,"
-            "    location TEXT UNIQUE,"
+            // Not UNIQUE, nor analyze_path: a Rekordbox collection can list
+            // the same file twice, and playlists may use either entry
+            "    location TEXT,"
             "    comment TEXT,"
             "    duration INTEGER,"
             "    bitrate TEXT,"
             "    bpm FLOAT,"
             "    key TEXT,"
             "    rating INTEGER,"
-            "    analyze_path TEXT UNIQUE,"
+            "    analyze_path TEXT,"
             "    device TEXT,"
             "    color INTEGER,"
             "    datetime_added TEXT"
@@ -129,6 +131,11 @@ bool createLibraryTable(QSqlDatabase& database, const QString& tableName) {
     if (!query.exec()) {
         LOG_FAILED_QUERY(query);
         return false;
+    }
+    // Tracks are looked up by their file, e.g. when a deck loads one
+    if (!query.exec("CREATE INDEX IF NOT EXISTS " + tableName + "_location ON " +
+                tableName + " (location)")) {
+        LOG_FAILED_QUERY(query);
     }
 
     return true;
@@ -1337,6 +1344,9 @@ TrackPointer RekordboxPlaylistModel::getTrack(const QModelIndex& index) const {
         readAnalyze(track, sampleRate, timingOffset, true, anlzPath);
         readAnalyze(track, sampleRate, timingOffset, false, anlzPathExt);
     } else {
+        // Without an .EXT, the .DAT has the beatgrid and the cues, which
+        // readAnalyze() reads in two passes
+        readAnalyze(track, sampleRate, timingOffset, true, anlzPath);
         readAnalyze(track, sampleRate, timingOffset, false, anlzPath);
     }
 
