@@ -584,6 +584,10 @@ Usa el modo avanzado para verla</translation>
         <source>LOW</source>
         <translation>LOW</translation>
     </message>
+    <message>
+        <source>FILTER</source>
+        <translation>FILTRO</translation>
+    </message>
 </context>
 <context>
     <name>BoothPerformanceDeck</name>
@@ -1963,6 +1967,25 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>A green square</source>
         <translation>Un cuadrado verde</translation>
+    </message>
+</context>
+<context>
+    <name>MobileRecordButton</name>
+    <message>
+        <source>Stop the recording?</source>
+        <translation>¿Parar la grabación?</translation>
+    </message>
+    <message>
+        <source>%1 recorded. It is in REC of the library.</source>
+        <translation>%1 grabado. Está en REC de la biblioteca.</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
+    </message>
+    <message>
+        <source>STOP</source>
+        <translation>PARAR</translation>
     </message>
 </context>
 <context>

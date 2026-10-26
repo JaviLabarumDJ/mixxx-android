@@ -247,7 +247,7 @@ ApplicationWindow {
 
         opacity: fadingOut ? 0.0 : 1.0
         Behavior on opacity {
-            NumberAnimation { duration: 500; easing.type: Easing.InOutQuad }
+            NumberAnimation { duration: 250; easing.type: Easing.InOutQuad }
         }
 
         Timer {
@@ -255,13 +255,12 @@ ApplicationWindow {
             interval: 35
             running: !splash.fadingOut && splash.visible
             repeat: true
-            property int ticks: 0
             onTriggered: {
-                ticks++;
                 var isReady = (content.status === Loader.Ready && content.item !== null);
 
-                // Give at least 40 ticks * 35ms = 1400ms so user clearly sees startup progress
-                if (!isReady || ticks < 40) {
+                // Gone as soon as the skin is loaded: it used to stay at
+                // least 1.4 s, plus 0.3 s full and a 0.5 s fade
+                if (!isReady) {
                     if (splash.progress < 0.35) {
                         splash.progress = Math.min(0.35, splash.progress + 0.045);
                     } else if (splash.progress < 0.75) {
@@ -279,7 +278,7 @@ ApplicationWindow {
 
         Timer {
             id: dismissTimer
-            interval: 320
+            interval: 100
             repeat: false
             onTriggered: {
                 splash.fadingOut = true;

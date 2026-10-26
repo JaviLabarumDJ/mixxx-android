@@ -573,6 +573,10 @@ Use the advanced mode to view them</source>
         <source>LOW</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>FILTER</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BoothPerformanceDeck</name>
@@ -1947,6 +1951,25 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>A green square</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MobileRecordButton</name>
+    <message>
+        <source>Stop the recording?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 recorded. It is in REC of the library.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>STOP</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

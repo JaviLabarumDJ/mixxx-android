@@ -221,12 +221,6 @@ Rectangle {
             key: `hotcue_${padItem.number}_activate`
         }
         Mixxx.ControlProxy {
-            id: hotcueClear
-
-            group: root.group
-            key: `hotcue_${padItem.number}_clear`
-        }
-        Mixxx.ControlProxy {
             id: beatloopToggle
 
             group: root.group
@@ -296,9 +290,15 @@ Rectangle {
 
             gesturePolicy: TapHandler.WithinBounds
 
+            // Color and delete, like Classic. Deleting at once lost hot cues
+            // by touching a pad a bit too long.
             onLongPressed: {
                 if (root.padMode === "hotcue" && padItem.hotcueSet) {
-                    hotcueClear.trigger();
+                    const position = padItem.mapToItem(root, padTap.point.position.x, padTap.point.position.y);
+                    popupHotcue.hotcueNumber = padItem.number;
+                    hotcuePopup.x = Math.min(position.x, root.width - hotcuePopup.width);
+                    hotcuePopup.y = Math.min(position.y, root.height - hotcuePopup.height);
+                    hotcuePopup.open();
                 }
             }
             onPressedChanged: {
@@ -319,6 +319,28 @@ Rectangle {
                     }
                 }
             }
+        }
+    }
+    // The hot cue of the pad pressed long, and its color and delete popup
+    Skin.Hotcue {
+        id: popupHotcue
+
+        group: root.group
+        hotcueNumber: 1
+    }
+    Skin.HotcuePopup {
+        id: hotcuePopup
+
+        hotcue: popupHotcue
+
+        Connections {
+            function onIsSetChanged() {
+                if (!popupHotcue.isSet) {
+                    hotcuePopup.close();
+                }
+            }
+
+            target: popupHotcue
         }
     }
     Mixxx.ControlProxy {

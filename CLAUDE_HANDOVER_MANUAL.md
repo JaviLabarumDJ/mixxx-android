@@ -14,9 +14,10 @@ Este documento recopila de manera exhaustiva el estado actual del port de **Mixx
   - **Frontend**: Qt 6.8 / QML con interfaz táctil adaptada (`res/qml/`).
   - **Subsistema de Audio**: PortAudio con el backend Android Oboe (AAudio) y, para tarjetas de sonido USB que Android no puede usar, un driver USB propio de Mixxx (libusb, ver §6.6).
   - **Subsistema de Controladoras**: MIDI nativo de Android (AMidi), USB-MIDI propio para las tarjetas que maneja el driver USB, y USB Bulk/HID. PortMidi está desactivado en Android.
-- **Versión publicada**: `v1.5.4-android` (`versionCode 13`), ver §6.9. La rama `stems` (separación de stems, §6.19 en esa rama) se publicará como v1.6.0.
+- **Versión publicada**: `v1.5.5-android` (`versionCode 14`), ver §6.9. La rama `stems` (separación de stems, §6.19 en esa rama) se publicará como v1.6.0.
+- **Mejoras pendientes**: lista priorizada y su estado en [`docs/ROADMAP_ANDROID.md`](docs/ROADMAP_ANDROID.md); al terminar una tarea, marcarla allí con su versión.
 - **Dispositivo objetivo de prueba**:
-  - Tablet Lenovo Tab M11 (`TB331FC`), Android 13/14.
+  - Tablet Lenovo Tab M11 (`TB331FC`), Android 14 (desde la v1.5.3 es el mínimo).
   - Conexión: ADB por Wi-Fi (depuración inalámbrica); la IP y el puerto cambian, se encuentran con `nmap -sn 192.168.0.0/24` y `nmap -p 30000-49999 <ip>`.
   - Controladora de prueba: **Pioneer DDJ-400**.
 
@@ -273,7 +274,7 @@ Nota: `make mixxx` por sí solo **no** actualiza el `.so` del proyecto Gradle; h
 - Errores del HAL de Qualcomm: `adb logcat | grep -E "PAL|AGM|AHAL"`.
 
 ### 6.9. Publicar una release
-1. Subir `android:versionCode` y `android:versionName` en `packaging/android/AndroidManifest.xml` (la v1.1.0 es `versionCode 2`, la v1.2.0 `versionCode 3`, la v1.3.0 `versionCode 4`, la v1.4.0 `versionCode 5`, la v1.4.1 `versionCode 6`, la v1.4.2 `versionCode 7`, la v1.5.0 `versionCode 9`, la v1.5.1 `versionCode 10`, la v1.5.2 `versionCode 11`, la v1.5.3 `versionCode 12`, la v1.5.4 `versionCode 13`; el 8 lo usó una build de prueba de la rama `stems`).
+1. Subir `android:versionCode` y `android:versionName` en `packaging/android/AndroidManifest.xml` (la v1.1.0 es `versionCode 2`, la v1.2.0 `versionCode 3`, la v1.3.0 `versionCode 4`, la v1.4.0 `versionCode 5`, la v1.4.1 `versionCode 6`, la v1.4.2 `versionCode 7`, la v1.5.0 `versionCode 9`, la v1.5.1 `versionCode 10`, la v1.5.2 `versionCode 11`, la v1.5.3 `versionCode 12`, la v1.5.4 `versionCode 13`, la v1.5.5 `versionCode 14`; el 8 lo usó una build de prueba de la rama `stems`).
 2. Actualizar las insignias y los enlaces de descarga del `README.md`.
 3. `make -C build-android -j12 apk`, firmar como `mixxx-android-vX.Y.Z.apk` y verificar con `apksigner verify` y `aapt2 dump badging`.
 4. Según `AGENTS.md`, el commit, la etiqueta (`vX.Y.Z-android`), el push y la publicación en GitHub los hace la persona, después de probar en un equipo de DJ real. El nombre del APK adjunto debe coincidir con el enlace del README.
@@ -400,6 +401,13 @@ La v1.4.0 fusiona `morpheasgr/android-stable` (ya incluía la v1.3.0, así que l
   - Descarga con `DownloadManager` a `Android/data/org.mixxx/files/updates/`, comprobación del SHA-256 con el `digest` del asset de GitHub, instalador con `ACTION_VIEW` y el FileProvider `org.mixxx.qtprovider` (permiso `REQUEST_INSTALL_PACKAGES`; la primera vez se abre «Instalar apps desconocidas»). Al arrancar se borran los APK de versiones ya instaladas.
   - UI: `res/qml/AppUpdateBanner.qml` (barra no modal bajo la barra superior, en `+android/main.qml`), `AppUpdateInstallPopup.qml`, `AppUpdateStatusText.qml` y la tarjeta ACTUALIZACIONES de `Settings/About.qml`.
   - Probar sin publicar: compilar con un `versionName` menor (p. ej. 1.5.2) y `versionCode` mayor que el instalado. Encuentra la última release y la descarga y verifica; el instalador la rechaza al final (no se puede bajar el versionCode), pero el resto del flujo queda probado.
+- **v1.5.5 (Booth y DDJ-400):**
+  - Booth: knob FILTRO (`[QuickEffectRack1_[ChannelN]]`, `super1`) en `BoothMixer.qml`; pestañas SPLIT (`[Master],headSplit`) y REC; la pulsación larga en un pad abre `HotcuePopup` con un `Skin.Hotcue` por deck cuyo número cambia.
+  - REC de las dos skins: `res/qml/MobileRecordButton.qml`. El tiempo sale de `Mixxx.Recording.durationText` (el `RecordingManager`), no de un contador QML que se reiniciaba; parar pide confirmación.
+  - DDJ-400: las opciones de la FLX4 que no dependen de modos de pad, con la misma lógica (`option()`, memory cues 9–36, `loopButtonPressed`, `loadPressed`…). `shiftSyncMode` tiene por defecto `tempoRange` para no cambiar el comportamiento. Los mensajes MIDI de esos controles son iguales en las dos controladoras.
+  - Ajustes → Interfaz: las filas que no hacen nada en Android tienen `visible: false` con el motivo; siguen cargándose y guardándose como antes.
+  - Arranque: el splash ya no espera 1,4 s mínimos.
+  - REC de la biblioteca: `RecordingFeature` solo tenía la vista de widgets (`DlgRecording`) y en QML la lista no cambiaba. Si no se ha llamado a `bindLibraryWidget()` (interfaz QML), `activate()` muestra la carpeta de grabaciones con su propio `BrowseTableModel` y `ProxyTrackModel` (`showTrackModel`).
 - **Pendiente:** portar a Booth la cola, el aviso y la pestaña STEM de los stems (rama `stems`); `applySkinTheme` reasigna todas las propiedades de `Theme` y rompe sus bindings internos (una skin debe dar los colores derivados explícitamente).
 
 > _Fin de la sección escrita por IA._

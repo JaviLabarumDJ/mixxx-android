@@ -5,8 +5,8 @@
 ![Android Version](https://img.shields.io/badge/Android-10.0%2B%20(API%2029--35)-brightgreen?logo=android&logoColor=white)
 ![Architecture](https://img.shields.io/badge/Arch-ARM64%20(arm64--v8a)-blue?logo=arm)
 ![Framework](https://img.shields.io/badge/Qt-6.8%20%7C%20QML-41cd52?logo=qt)
-[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.5.4-android)
-[![Download APK](https://img.shields.io/badge/Download-APK%20(236%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.5.4-android/mixxx-android-v1.5.4.apk)
+[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.5.5-android)
+[![Download APK](https://img.shields.io/badge/Download-APK%20(236%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.5.5-android/mixxx-android-v1.5.5.apk)
 ![License](https://img.shields.io/badge/License-GPL%20v2-orange.svg)
 
 **The world's premier open-source DJ software, fully ported, modernized, and touch-optimized for Android smartphones, tablets, and standalone hardware setups.**
@@ -28,7 +28,29 @@ Whether you're performing live sets using a USB DJ controller, mixing on the go 
 <!-- START_AI_GENERATED_DISCLAIMER -->
 <!-- This section was written with the assistance of an AI Agent (Claude). -->
 
-## 🆕 What's New in v1.5.4
+## 🆕 What's New in v1.5.5
+
+* **Booth skin:**
+  * **FILTER** knob for each deck in the touch mixer. It is dimmed while the filter is off.
+  * **SPLIT** and **REC** tabs in the top bar; they can be hidden in *Settings → Interface*.
+  * A long press on a hot cue pad opens its color and delete menu, like in Classic, instead of deleting the hot cue at once.
+* **REC (both skins):**
+  * Stopping a recording asks first.
+  * The time comes from the recorder, so it stays right after switching the skin.
+  * **REC in the library** shows the recordings (it showed the track list).
+* **DDJ-400 options** (mapping settings, like the DDJ-FLX4):
+  * LEVEL/DEPTH;
+  * rekordbox modes for IN/OUT and 4 BEAT/EXIT, BEAT SYNC and CUE/LOOP CALL (memory cues);
+  * SHIFT + BEAT SYNC: tempo range (as before) or key lock;
+  * SHIFT + headphones CUE: quantize or tap tempo;
+  * Fader Start;
+  * Instant Doubles.
+
+  The defaults keep the behaviour of earlier versions.
+* **Faster start:** the loading screen goes away as soon as Mixxx is ready (it used to wait about 2 extra seconds).
+* **Settings → Interface:** options that did nothing on Android are hidden (theme color, layout, tooltips, fullscreen, auto-hide top bar, search history shortcuts, beatjump color).
+
+## 🗂️ What was new in v1.5.4
 
 * **Updates from the app:** when Mixxx starts (once a day at most) it looks for a newer version in the GitHub releases. A small bar at the top tells about it, without blocking the decks: **DOWNLOAD** downloads it with Android's download manager (its progress is in the notifications), the download is checked against the release, and **INSTALL** opens the Android installer once you confirm. **Skip** hides that version. *Settings → About → Updates* has **CHECK NOW** and turns the automatic check off. The first time, Android asks to allow installing apps from Mixxx.
 
@@ -183,7 +205,7 @@ This release merges the work of **[morpheasgr (Angelos Exarchos)](https://github
 ## 🚀 Installation & Quick Start
 
 ### Option A: Install Pre-Built Signed APK
-1. Download [**mixxx-android-v1.5.4.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.5.4-android/mixxx-android-v1.5.4.apk) from the [Official GitHub Release v1.5.4](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.5.4-android).
+1. Download [**mixxx-android-v1.5.5.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.5.5-android/mixxx-android-v1.5.5.apk) from the [Official GitHub Release v1.5.5](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.5.5-android).
 2. Enable *"Install unknown apps"* in your Android device settings.
 3. Install and launch **MIXXX**.
 4. Grant storage and audio permissions when prompted.
