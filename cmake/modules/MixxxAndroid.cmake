@@ -25,6 +25,7 @@ if(QML)
     mixxx-qml-lib
     PRIVATE
       src/qml/androidpresetnames.cpp
+      src/qml/qmlappupdateproxy.cpp
       src/qml/librarycoverloader.cpp
       src/qml/qmllanguageproxy.cpp
       src/qml/qmllibraryfeaturesource.cpp

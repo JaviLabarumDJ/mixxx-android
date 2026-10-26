@@ -14,7 +14,7 @@ Este documento recopila de manera exhaustiva el estado actual del port de **Mixx
   - **Frontend**: Qt 6.8 / QML con interfaz táctil adaptada (`res/qml/`).
   - **Subsistema de Audio**: PortAudio con el backend Android Oboe (AAudio) y, para tarjetas de sonido USB que Android no puede usar, un driver USB propio de Mixxx (libusb, ver §6.6).
   - **Subsistema de Controladoras**: MIDI nativo de Android (AMidi), USB-MIDI propio para las tarjetas que maneja el driver USB, y USB Bulk/HID. PortMidi está desactivado en Android.
-- **Versión publicada**: `v1.5.3-android` (`versionCode 12`), ver §6.9. La rama `stems` (separación de stems, §6.19 en esa rama) se publicará como v1.6.0.
+- **Versión publicada**: `v1.5.4-android` (`versionCode 13`), ver §6.9. La rama `stems` (separación de stems, §6.19 en esa rama) se publicará como v1.6.0.
 - **Dispositivo objetivo de prueba**:
   - Tablet Lenovo Tab M11 (`TB331FC`), Android 13/14.
   - Conexión: ADB por Wi-Fi (depuración inalámbrica); la IP y el puerto cambian, se encuentran con `nmap -sn 192.168.0.0/24` y `nmap -p 30000-49999 <ip>`.
@@ -273,7 +273,7 @@ Nota: `make mixxx` por sí solo **no** actualiza el `.so` del proyecto Gradle; h
 - Errores del HAL de Qualcomm: `adb logcat | grep -E "PAL|AGM|AHAL"`.
 
 ### 6.9. Publicar una release
-1. Subir `android:versionCode` y `android:versionName` en `packaging/android/AndroidManifest.xml` (la v1.1.0 es `versionCode 2`, la v1.2.0 `versionCode 3`, la v1.3.0 `versionCode 4`, la v1.4.0 `versionCode 5`, la v1.4.1 `versionCode 6`, la v1.4.2 `versionCode 7`, la v1.5.0 `versionCode 9`, la v1.5.1 `versionCode 10`, la v1.5.2 `versionCode 11`, la v1.5.3 `versionCode 12`; el 8 lo usó una build de prueba de la rama `stems`).
+1. Subir `android:versionCode` y `android:versionName` en `packaging/android/AndroidManifest.xml` (la v1.1.0 es `versionCode 2`, la v1.2.0 `versionCode 3`, la v1.3.0 `versionCode 4`, la v1.4.0 `versionCode 5`, la v1.4.1 `versionCode 6`, la v1.4.2 `versionCode 7`, la v1.5.0 `versionCode 9`, la v1.5.1 `versionCode 10`, la v1.5.2 `versionCode 11`, la v1.5.3 `versionCode 12`, la v1.5.4 `versionCode 13`; el 8 lo usó una build de prueba de la rama `stems`).
 2. Actualizar las insignias y los enlaces de descarga del `README.md`.
 3. `make -C build-android -j12 apk`, firmar como `mixxx-android-vX.Y.Z.apk` y verificar con `apksigner verify` y `aapt2 dump badging`.
 4. Según `AGENTS.md`, el commit, la etiqueta (`vX.Y.Z-android`), el push y la publicación en GitHub los hace la persona, después de probar en un equipo de DJ real. El nombre del APK adjunto debe coincidir con el enlace del README.
@@ -393,6 +393,13 @@ La v1.4.0 fusiona `morpheasgr/android-stable` (ya incluía la v1.3.0, así que l
   - USB-MIDI directo: `AndroidUsbMidiController` usa `rigtorp::SPSCQueue` (4096 paquetes con su hora de llegada) en vez de mutex + vector en el hilo USB/motor.
   - Manifiesto: `allowBackup="false"` (la copia en la nube llevaba `mixxx.cfg` con la contraseña de Subsonic), `installLocation="internalOnly"`, sin `READ_MEDIA_AUDIO` duplicado ni `requestLegacyExternalStorage`; el receptor de USB es `RECEIVER_NOT_EXPORTED` (los broadcasts USB son protegidos del sistema y llegan igual).
   - APK: el objetivo `copy-resource-android` borra de los assets los `.ts` y las skins de escritorio Deere, Shade y Tango (LateNight se queda: es la skin por defecto del `SkinLoader`). Las `.so` ya salen sin símbolos (Gradle las strippea); lo grande es Qt (`Qt6Core` y `Core5Compat` llevan datos ICU), el plugin FFmpeg de QtMultimedia y los estilos de Qt Quick Controls, que están en `libs.xml` (se cargan al arrancar) y no se pueden quitar sin más.
+- **v1.5.4 (actualizaciones desde la app):** `src/qml/qmlappupdateproxy.{h,cpp}` (`Mixxx.AppUpdate`) y `packaging/android/src/org/mixxx/AppUpdater.java`.
+  - Red en Java (`HttpsURLConnection`), porque el backend TLS de Qt no tiene OpenSSL en el APK (`libplugins_tls_qopensslbackend` sin `libssl`): las peticiones HTTPS de Qt fallan en Android.
+  - Consulta `api.github.com/repos/JaviLabarumDJ/mixxx-android/releases`; solo cuentan las releases con tag `vX.Y.Z-android`, no borrador ni prerelease, con un `.apk`. Se compara con `versionName` (`QmlMobileAppProxy::installedVersion()`), así que **el versionName de cada release tiene que subir** además del versionCode.
+  - Automática a los 20 s del arranque si `[Updates],AutoCheck` (por defecto sí) y han pasado 20 h desde `[Updates],LastCheck`; `[Updates],SkippedVersion` oculta el aviso de esa versión.
+  - Descarga con `DownloadManager` a `Android/data/org.mixxx/files/updates/`, comprobación del SHA-256 con el `digest` del asset de GitHub, instalador con `ACTION_VIEW` y el FileProvider `org.mixxx.qtprovider` (permiso `REQUEST_INSTALL_PACKAGES`; la primera vez se abre «Instalar apps desconocidas»). Al arrancar se borran los APK de versiones ya instaladas.
+  - UI: `res/qml/AppUpdateBanner.qml` (barra no modal bajo la barra superior, en `+android/main.qml`), `AppUpdateInstallPopup.qml`, `AppUpdateStatusText.qml` y la tarjeta ACTUALIZACIONES de `Settings/About.qml`.
+  - Probar sin publicar: compilar con un `versionName` menor (p. ej. 1.5.2) y `versionCode` mayor que el instalado. Encuentra la última release y la descarga y verifica; el instalador la rechaza al final (no se puede bajar el versionCode), pero el resto del flujo queda probado.
 - **Pendiente:** portar a Booth la cola, el aviso y la pestaña STEM de los stems (rama `stems`); `applySkinTheme` reasigna todas las propiedades de `Theme` y rompe sus bindings internos (una skin debe dar los colores derivados explícitamente).
 
 > _Fin de la sección escrita por IA._

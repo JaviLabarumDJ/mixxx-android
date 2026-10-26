@@ -33,7 +33,8 @@ QmlMobileAppProxy* QmlMobileAppProxy::create(QQmlEngine* pQmlEngine, QJSEngine*)
     return new QmlMobileAppProxy(pQmlEngine);
 }
 
-QString QmlMobileAppProxy::packageVersion() const {
+// static
+QString QmlMobileAppProxy::installedVersion() {
 #ifdef Q_OS_ANDROID
     QJniObject context = QNativeInterface::QAndroidApplication::context();
     QJniObject packageManager = context.callObjectMethod(

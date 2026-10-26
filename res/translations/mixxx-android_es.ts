@@ -54,6 +54,30 @@ Esta edición de Mixxx para Android nace de una necesidad personal como DJ: tene
         <translation>Colaborador de esta app: skins intercambiables y la skin Booth, edición y corrección de rejillas, playlists, fechas y rejillas de Rekordbox, copias de seguridad de la biblioteca y del USB, navegación con la controladora, las opciones y el SMART CFX de la DDJ-FLX4, y arreglos de efectos y Rekordbox.</translation>
     </message>
     <message>
+        <source>UPDATES</source>
+        <translation>ACTUALIZACIONES</translation>
+    </message>
+    <message>
+        <source>CHECK NOW</source>
+        <translation>BUSCAR AHORA</translation>
+    </message>
+    <message>
+        <source>DOWNLOAD</source>
+        <translation>DESCARGAR</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
+    </message>
+    <message>
+        <source>INSTALL</source>
+        <translation>INSTALAR</translation>
+    </message>
+    <message>
+        <source>Look for updates when Mixxx starts (once a day at most). The versions are read from the GitHub releases of Mixxx Android, and nothing is downloaded without asking.</source>
+        <translation>Buscar actualizaciones al abrir Mixxx (una vez al día como mucho). Las versiones se consultan en las releases de Mixxx Android en GitHub, y no se descarga nada sin preguntar.</translation>
+    </message>
+    <message>
         <source>Based on the open source Mixxx project. Mobile adaptation by JaviLabarum.</source>
         <translation>Basado en el proyecto Open Source Mixxx. Adaptación móvil por JaviLabarum.</translation>
     </message>
@@ -107,6 +131,99 @@ Esta edición de Mixxx para Android nace de una necesidad personal como DJ: tene
     <message>
         <source>Cannot copy backup %1</source>
         <translation>No se puede copiar la copia %1</translation>
+    </message>
+</context>
+<context>
+    <name>AppUpdateBanner</name>
+    <message>
+        <source>Skip</source>
+        <translation>Omitir</translation>
+    </message>
+    <message>
+        <source>INSTALL</source>
+        <translation>INSTALAR</translation>
+    </message>
+    <message>
+        <source>DOWNLOAD</source>
+        <translation>DESCARGAR</translation>
+    </message>
+</context>
+<context>
+    <name>AppUpdateInstallPopup</name>
+    <message>
+        <source>Install Mixxx %1?</source>
+        <translation>¿Instalar Mixxx %1?</translation>
+    </message>
+    <message>
+        <source>Mixxx closes while Android installs the update, so the music stops. Your library and settings are kept.</source>
+        <translation>Mixxx se cierra mientras Android instala la actualización, así que la música se detiene. Se conservan la biblioteca y los ajustes.</translation>
+    </message>
+    <message>
+        <source>Android has opened its setting to install apps from Mixxx: allow it, come back and press INSTALL again.</source>
+        <translation>Android ha abierto su ajuste para instalar apps desde Mixxx: actívalo, vuelve y pulsa INSTALAR otra vez.</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
+    </message>
+    <message>
+        <source>INSTALL</source>
+        <translation>INSTALAR</translation>
+    </message>
+</context>
+<context>
+    <name>AppUpdateStatusText</name>
+    <message>
+        <source>%1 MB</source>
+        <translation>%1 MB</translation>
+    </message>
+    <message>
+        <source>Unable to look for updates. Is there an Internet connection?</source>
+        <translation>No se han podido buscar actualizaciones. ¿Hay conexión a Internet?</translation>
+    </message>
+    <message>
+        <source>Not enough free storage for the update (%1).</source>
+        <translation>No hay espacio libre suficiente para la actualización (%1).</translation>
+    </message>
+    <message>
+        <source>The download failed or was cancelled.</source>
+        <translation>La descarga ha fallado o se ha cancelado.</translation>
+    </message>
+    <message>
+        <source>The download is damaged, download it again.</source>
+        <translation>La descarga está dañada, descárgala de nuevo.</translation>
+    </message>
+    <message>
+        <source>Unable to open the Android installer.</source>
+        <translation>No se ha podido abrir el instalador de Android.</translation>
+    </message>
+    <message>
+        <source>Looking for updates…</source>
+        <translation>Buscando actualizaciones…</translation>
+    </message>
+    <message>
+        <source>Mixxx is up to date.</source>
+        <translation>Mixxx está actualizado.</translation>
+    </message>
+    <message>
+        <source>Mixxx %1 is available (%2).</source>
+        <translation>Mixxx %1 está disponible (%2).</translation>
+    </message>
+    <message>
+        <source>Downloading Mixxx %1… %2%</source>
+        <translation>Descargando Mixxx %1… %2%</translation>
+    </message>
+    <message>
+        <source>Checking the download…</source>
+        <translation>Comprobando la descarga…</translation>
+    </message>
+    <message>
+        <source>Mixxx %1 is ready to install.</source>
+        <translation>Mixxx %1 está lista para instalar.</translation>
+    </message>
+    <message>
+        <source>Look for a newer version of Mixxx Android.</source>
+        <translation>Busca si hay una versión más nueva de Mixxx Android.</translation>
     </message>
 </context>
 <context>

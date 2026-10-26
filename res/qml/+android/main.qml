@@ -152,6 +152,24 @@ ApplicationWindow {
             }
         }
     }
+    // Updates found by the check at startup (see Mixxx.AppUpdate). Created
+    // once the core is ready, like the rest of the UI that uses Mixxx.
+    Loader {
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: parent.top
+        // Below the top bar of the skins, so that their buttons stay usable
+        anchors.topMargin: 84
+        z: 1000
+        active: Mixxx.Core.ready
+        sourceComponent: Skin.AppUpdateBanner {
+            onInstallRequested: updateInstallPopup.open()
+        }
+    }
+
+    Skin.AppUpdateInstallPopup {
+        id: updateInstallPopup
+    }
+
     Popup {
         id: quitPopup
 

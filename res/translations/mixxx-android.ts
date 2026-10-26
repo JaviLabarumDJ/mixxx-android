@@ -47,6 +47,30 @@ This edition of Mixxx for Android was born from a personal need as a DJ: to have
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>UPDATES</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CHECK NOW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DOWNLOAD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>INSTALL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Look for updates when Mixxx starts (once a day at most). The versions are read from the GitHub releases of Mixxx Android, and nothing is downloaded without asking.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Based on the open source Mixxx project. Mobile adaptation by JaviLabarum.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -98,6 +122,99 @@ This edition of Mixxx for Android was born from a personal need as a DJ: to have
     </message>
     <message>
         <source>Cannot copy backup %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AppUpdateBanner</name>
+    <message>
+        <source>Skip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>INSTALL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DOWNLOAD</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AppUpdateInstallPopup</name>
+    <message>
+        <source>Install Mixxx %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mixxx closes while Android installs the update, so the music stops. Your library and settings are kept.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Android has opened its setting to install apps from Mixxx: allow it, come back and press INSTALL again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>INSTALL</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AppUpdateStatusText</name>
+    <message>
+        <source>%1 MB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to look for updates. Is there an Internet connection?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not enough free storage for the update (%1).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The download failed or was cancelled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The download is damaged, download it again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to open the Android installer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Looking for updates…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mixxx is up to date.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mixxx %1 is available (%2).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Downloading Mixxx %1… %2%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checking the download…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mixxx %1 is ready to install.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Look for a newer version of Mixxx Android.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
