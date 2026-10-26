@@ -3194,6 +3194,22 @@ Aborting the operation to avoid library inconsistencies</source>
 <context>
     <name>main</name>
     <message>
+        <source>Quit Mixxx?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The music stops. The loaded tracks and the settings are saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QUIT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>By JaviLabarumDJ on Android</source>
         <translation type="unfinished"></translation>
     </message>

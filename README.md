@@ -5,8 +5,8 @@
 ![Android Version](https://img.shields.io/badge/Android-10.0%2B%20(API%2029--35)-brightgreen?logo=android&logoColor=white)
 ![Architecture](https://img.shields.io/badge/Arch-ARM64%20(arm64--v8a)-blue?logo=arm)
 ![Framework](https://img.shields.io/badge/Qt-6.8%20%7C%20QML-41cd52?logo=qt)
-[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.5.2-android)
-[![Download APK](https://img.shields.io/badge/Download-APK%20(249%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.5.2-android/mixxx-android-v1.5.2.apk)
+[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.5.3-android)
+[![Download APK](https://img.shields.io/badge/Download-APK%20(236%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.5.3-android/mixxx-android-v1.5.3.apk)
 ![License](https://img.shields.io/badge/License-GPL%20v2-orange.svg)
 
 **The world's premier open-source DJ software, fully ported, modernized, and touch-optimized for Android smartphones, tablets, and standalone hardware setups.**
@@ -28,7 +28,17 @@ Whether you're performing live sets using a USB DJ controller, mixing on the go 
 <!-- START_AI_GENERATED_DISCLAIMER -->
 <!-- This section was written with the assistance of an AI Agent (Claude). -->
 
-## 🆕 What's New in v1.5.2
+## 🆕 What's New in v1.5.3
+
+Stability:
+
+* **Back no longer quits by accident:** the Back button (or swiping in from the edge of the screen) asks *Quit Mixxx?* first, instead of closing the app in the middle of a set.
+* **USB sound cards driven by Mixxx** (e.g. the DDJ-400) recover by themselves if their audio stream stops: the audio devices are set up again instead of staying silent until a restart.
+* **Controllers on those sound cards:** their MIDI no longer shares a lock with the audio, and each message keeps the time it arrived (smoother jog wheels).
+* **Requires Android 14 or newer.** Mixxx already needed it to start; Android 10–13 devices could install it but it closed at once. They can no longer install it.
+* Smaller APK (without unused desktop skins and translation sources), installed on the internal storage only, and no Android cloud backup of the settings (the Subsonic password stays on the device; use the library backup in *Settings → Music Library*).
+
+## 🗂️ What was new in v1.5.2
 
 By [morpheasgr](https://github.com/morpheasgr):
 
@@ -158,7 +168,7 @@ This release merges the work of **[morpheasgr (Angelos Exarchos)](https://github
 
 | Component | Minimum | Recommended |
 |---|---|---|
-| **OS** | Android 10.0 (API 29) | Android 13 - 15 (HyperOS / OneUI / AOSP) |
+| **OS** | Android 14 (API 34) | Android 14 - 16 (HyperOS / OneUI / AOSP) |
 | **Processor** | 64-bit ARM (ARMv8-A) | Snapdragon 8 Gen 1 / Dimensity 8300-Ultra or higher |
 | **RAM** | 4 GB | 8 GB+ |
 | **Screen** | 5.5" (1080p) | 6.67" AMOLED 120Hz+ or Tablet (10"+) |
@@ -169,7 +179,7 @@ This release merges the work of **[morpheasgr (Angelos Exarchos)](https://github
 ## 🚀 Installation & Quick Start
 
 ### Option A: Install Pre-Built Signed APK
-1. Download [**mixxx-android-v1.5.2.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.5.2-android/mixxx-android-v1.5.2.apk) from the [Official GitHub Release v1.5.2](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.5.2-android).
+1. Download [**mixxx-android-v1.5.3.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.5.3-android/mixxx-android-v1.5.3.apk) from the [Official GitHub Release v1.5.3](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.5.3-android).
 2. Enable *"Install unknown apps"* in your Android device settings.
 3. Install and launch **MIXXX**.
 4. Grant storage and audio permissions when prompted.

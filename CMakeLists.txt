@@ -2452,6 +2452,14 @@ if(QT6)
       PROPERTIES
         QT_ANDROID_APPLICATION_ARGUMENTS "--new-ui"
     )
+    # Mixxx and Qt call functions that the C library only has from Android 14
+    # on (e.g. copy_file_range), so the app can't start on older versions. The target stays at the compile SDK:
+    # from 36 on, Android 16 ignores the landscape lock on tablets and no
+    # longer delivers the Back key to Qt.
+    set_target_properties(
+      mixxx
+      PROPERTIES QT_ANDROID_MIN_SDK_VERSION 34 QT_ANDROID_TARGET_SDK_VERSION 35
+    )
     qt_add_android_permission(mixxx
     NAME android.permission.ACCESS_NETWORK_STATE
     )
@@ -2514,6 +2522,24 @@ if(QT6)
       mixxx
       PROPERTIES QT_ANDROID_EXTRA_LIBS "${ANDROID_LIBOMP}"
     )
+    # Not needed in the APK: the translation sources (only the compiled .qm
+    # files are loaded) and the widget skins of the desktop. LateNight stays,
+    # it is the default skin of the skin loader.
+    set(ANDROID_ASSETS_DIR "${CMAKE_CURRENT_BINARY_DIR}/android-build/assets")
+    file(
+      GLOB ANDROID_UNUSED_ASSETS
+      RELATIVE "${CMAKE_SOURCE_DIR}/res"
+      "${CMAKE_SOURCE_DIR}/res/translations/*.ts"
+    )
+    list(TRANSFORM ANDROID_UNUSED_ASSETS PREPEND "${ANDROID_ASSETS_DIR}/")
+    set(
+      ANDROID_UNUSED_SKINS
+      "${ANDROID_ASSETS_DIR}/skins/Deere"
+      "${ANDROID_ASSETS_DIR}/skins/Deere (64 Samplers)"
+      "${ANDROID_ASSETS_DIR}/skins/Shade"
+      "${ANDROID_ASSETS_DIR}/skins/Tango"
+      "${ANDROID_ASSETS_DIR}/skins/Tango (64 Samplers)"
+    )
     add_custom_target(
       copy-resource-android
       COMMENT "Copy resources folder to Android build asset directory"
@@ -2522,8 +2548,11 @@ if(QT6)
         ${CMAKE_CURRENT_BINARY_DIR}/android
       COMMAND
         ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/res
-        ${CMAKE_CURRENT_BINARY_DIR}/android-build/assets
+        ${ANDROID_ASSETS_DIR}
+      COMMAND ${CMAKE_COMMAND} -E rm -f -- ${ANDROID_UNUSED_ASSETS}
+      COMMAND ${CMAKE_COMMAND} -E rm -rf -- ${ANDROID_UNUSED_SKINS}
       WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+      VERBATIM
     )
     add_dependencies(mixxx copy-resource-android)
     target_link_libraries(mixxx PUBLIC omp)

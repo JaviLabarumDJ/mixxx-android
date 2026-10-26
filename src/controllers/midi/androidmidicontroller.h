@@ -1,11 +1,12 @@
 #pragma once
 
 #include <QJniObject>
+#include <cstdint>
 #include <memory>
-#include <mutex>
-#include <vector>
 
 #include "controllers/midi/midicontroller.h"
+#include "rigtorp/SPSCQueue.h"
+#include "util/duration.h"
 
 struct AMidiDevice;
 struct AMidiInputPort;
@@ -161,8 +162,11 @@ class AndroidUsbMidiController : public AndroidMidiControllerBase {
     }
 
     std::shared_ptr<mixxx::androidusb::AndroidUsbAudioDevice> m_pDevice;
-    // USB-MIDI event packets received on the USB thread
-    std::mutex m_packetMutex;
-    std::vector<uint8_t> m_packets;
-    std::vector<uint8_t> m_pollPackets;
+    // USB-MIDI event packets received on the USB thread, which may also run
+    // the audio engine: no locks or allocations there
+    struct MidiPacket {
+        uint8_t bytes[4];
+        mixxx::Duration timestamp;
+    };
+    rigtorp::SPSCQueue<MidiPacket> m_packets;
 };

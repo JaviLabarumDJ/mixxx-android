@@ -45,11 +45,13 @@ public class MainActivity extends QtActivityBase {
         Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_DISPLAY);
 
         // USB_DEVICE_ATTACHED is only delivered to the activity through
-        // onNewIntent, but USB_DEVICE_DETACHED needs a receiver.
+        // onNewIntent, but USB_DEVICE_DETACHED needs a receiver. Both are
+        // protected system broadcasts, which also reach receivers that other
+        // apps can't send to.
         IntentFilter usbFilter = new IntentFilter();
         usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
-        registerReceiver(mUsbHotplugReceiver, usbFilter, Context.RECEIVER_EXPORTED);
+        registerReceiver(mUsbHotplugReceiver, usbFilter, Context.RECEIVER_NOT_EXPORTED);
 
         MidiHelper.init(this);
     }

@@ -34,6 +34,10 @@ class PortAudioEnumerator : public SoundDeviceEnumerator {
     /// the set changed; the devices that disappeared are added to pRemoved.
     bool refreshAndroidUsbDevices(
             std::vector<SoundDevicePointer>* pRemoved, bool waitForPermission);
+    /// True if the output of a USB sound card driven directly stopped by itself
+    bool androidUsbOutputFailed() const {
+        return m_androidUsbDevices.outputFailed();
+    }
 #endif
 
   private:

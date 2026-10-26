@@ -4,6 +4,8 @@
 #include <jni.h>
 
 #include <QJniEnvironment>
+#include <cstring>
+#include <vector>
 
 #include "controllers/midi/midiutils.h"
 #include "moc_androidmidicontroller.cpp"
@@ -468,6 +470,10 @@ int packetLength(uint8_t codeIndex) {
     }
 }
 
+// Packets received and not yet handled by the controller thread: a few
+// seconds of turning every knob at once
+constexpr size_t kMaxPendingUsbMidiPackets = 4096;
+
 } // namespace
 
 AndroidUsbMidiController::AndroidUsbMidiController(
@@ -475,7 +481,8 @@ AndroidUsbMidiController::AndroidUsbMidiController(
         // Same name as the Android MIDI device, so the configuration and the
         // mapping carry over
         : AndroidMidiControllerBase(pDevice->productName()),
-          m_pDevice(std::move(pDevice)) {
+          m_pDevice(std::move(pDevice)),
+          m_packets(kMaxPendingUsbMidiPackets) {
     setInputDevice(m_pDevice->midiInterface().inEndpoint != 0);
     setOutputDevice(m_pDevice->midiInterface().outEndpoint != 0);
 }
@@ -507,13 +514,16 @@ int AndroidUsbMidiController::open(const QString& resourcePath) {
         qCWarning(m_logBase) << "USB MIDI device" << getName() << "already open";
         return -1;
     }
-    {
-        std::lock_guard lock(m_packetMutex);
-        m_packets.clear();
+    while (m_packets.front()) {
+        m_packets.pop();
     }
     if (isInputDevice() && !m_pDevice->startMidiInput([this](const uint8_t* pPacket) {
-            std::lock_guard lock(m_packetMutex);
-            m_packets.insert(m_packets.end(), pPacket, pPacket + 4);
+            MidiPacket packet;
+            std::memcpy(packet.bytes, pPacket, sizeof(packet.bytes));
+            // Timed on arrival, not when the controller thread polls
+            packet.timestamp = mixxx::Time::elapsed();
+            // Dropped if the controller thread is that far behind
+            m_packets.try_push(packet);
         })) {
         qCWarning(m_logBase) << "Unable to start the USB MIDI input of" << getName();
         return -2;
@@ -541,23 +551,16 @@ int AndroidUsbMidiController::close() {
 }
 
 bool AndroidUsbMidiController::poll() {
-    {
-        std::lock_guard lock(m_packetMutex);
-        if (m_packets.empty()) {
-            return false;
-        }
-        m_pollPackets.swap(m_packets);
-    }
-    const mixxx::Duration timestamp = mixxx::Time::elapsed();
-    for (size_t i = 0; i + 4 <= m_pollPackets.size(); i += 4) {
-        const uint8_t* pPacket = &m_pollPackets[i];
-        const int length = packetLength(pPacket[0] & 0x0F);
+    bool received = false;
+    while (const MidiPacket* pPacket = m_packets.front()) {
+        const int length = packetLength(pPacket->bytes[0] & 0x0F);
         if (length > 0) {
-            parseBytes(pPacket + 1, length, timestamp);
+            parseBytes(pPacket->bytes + 1, length, pPacket->timestamp);
         }
+        m_packets.pop();
+        received = true;
     }
-    m_pollPackets.clear();
-    return true;
+    return received;
 }
 
 void AndroidUsbMidiController::sendShortMsg(
