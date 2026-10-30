@@ -111,6 +111,23 @@ reader there without changing it.
 
 > _End of AI-written section._
 
+## Android 10 to 13
+
+> _The following section was written by an AI agent (Claude Code)._
+
+Qt and the dependencies are built against the C library of API 35. Only
+three of its functions that libQt6Core, libQt6Test and libmixxx use are
+newer than Android 10 (`pthread_cond_clockwait`, `backtrace`,
+`copy_file_range`), so the app runs from Android 10 on without rebuilding
+Qt: `libmixxx_libccompat.so` (`src/util/androidlibccompat.c`) provides
+them, and these libraries are patched with patchelf to load it
+(`cmake/scripts/android_libccompat.cmake`, needs `patchelf`). `build.gradle`
+here is the template of Qt with the patched libraries kept out of Gradle's
+strip, which would break the patched layout. Android 9 is not supported:
+AMidi, used for the MIDI controllers, needs Android 10.
+
+> _End of AI-written section._
+
 ## Skins
 
 > _The following section was written by an AI agent (Claude Code)._
@@ -165,6 +182,19 @@ waveforms when one is plugged in or out. Its knobs and faders
 (`BoothKnob.qml`, `BoothFader.qml`) use pointer handlers, so several can be
 moved at once. XY shows the XY pad of the Classic skin in the colors of the
 skin (`XYPad.qml` has properties for its colors, and `closable`).
+
+The **Lite** skin (`res/qml/Skins/Lite/`) draws and updates as little as
+possible, for slow devices and to save battery. It has no waveforms: each
+deck has a position bar that is read 5 times a second
+(`playposition` changes with every audio buffer and would redraw the
+window that often). It has no images, Canvas knobs (`LiteKnob.qml` is a
+bar), animations, level meters, effects panel or XY pad. DECKS shows two
+decks (`LiteDeck.qml`: track, position and time left, BPM and tempo, hot
+cues A–D or A–H, a loop, SYNC, CUE, PLAY, tempo fader and nudge) and a
+mixer between them (`LiteMixer.qml`: EQ, filter, headphones CUE, channel
+faders and the crossfader). BROWSE loads the browser of the Booth skin only
+while it is shown. It creates two decks when Mixxx starts with it. The
+samplers stay, as controller mappings use them.
 
 Settings → Interface → TOP BAR lists the items of the skin in use: a skin
 can list its own in a `topBarItems` property of its main window (`main.qml`

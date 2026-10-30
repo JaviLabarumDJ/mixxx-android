@@ -85,6 +85,7 @@ case "$1" in
                 ccache \
                 cmake \
                 make \
+                patchelf \
                 build-essential \
                 '^libxcb.*-dev' \
                 autoconf \

@@ -2,7 +2,6 @@
 
 #include <qtmetamacros.h>
 
-#include <QElapsedTimer>
 #include <QPointer>
 #include <QQuickItem>
 #include <QQuickWindow>
@@ -171,7 +170,6 @@ class QmlWaveformDisplay : public QQuickItem, VSyncTimeProvider, public Waveform
     QColor m_backgroundColor{QColor(0, 0, 0, 255)};
 
     PerformanceTimer m_timer;
-    QElapsedTimer m_frameRequestTimer;
     QTimer m_frameRateTimer;
     QmlTrackProxy* m_pTrack;
     QSharedPointer<VisualPlayPosition> m_visualPlayPosition;

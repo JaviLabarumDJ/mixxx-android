@@ -50,6 +50,8 @@ Rectangle {
         id: playPositionControl
         group: root.group
         key: "playposition"
+        // Changes with every audio buffer; this is enough for the screen
+        updateInterval: 100
     }
 
     Mixxx.ControlProxy {

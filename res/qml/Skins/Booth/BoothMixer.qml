@@ -26,12 +26,16 @@ Rectangle {
 
             group: meter.group
             key: "vu_meter"
+            // Drawn on the ticks of the frame clock, with the waveforms
+            updateInterval: 33
         }
         Mixxx.ControlProxy {
             id: peakControl
 
             group: meter.group
             key: "peak_indicator"
+            // Drawn on the ticks of the frame clock, with the waveforms
+            updateInterval: 33
         }
         Rectangle {
             anchors.fill: parent

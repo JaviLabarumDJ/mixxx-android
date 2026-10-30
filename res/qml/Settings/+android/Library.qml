@@ -335,6 +335,33 @@ Category {
                                 root.addQuickFolder("/storage/emulated/0/Mixxx");
                             }
                         }
+
+                        // The SD cards and USB drives Android has mounted,
+                        // read again whenever the settings are shown
+                        Repeater {
+                            model: root.visible ? Mixxx.MobileLibrary.removableVolumes() : []
+
+                            Skin.Button {
+                                required property var modelData
+
+                                height: 32
+                                width: Math.max(170, implicitWidth + 24)
+                                activeColor: "#00e5ff"
+                                backgroundColor: root.isFolderAdded(modelData.path) ? "#004d40" : "#1a2533"
+                                normalColor: root.isFolderAdded(modelData.path) ? "#00e676" : "#ffffff"
+                                font.bold: true
+                                font.pixelSize: 11
+                                text: (root.isFolderAdded(modelData.path) ? "✔ " : "➕ ") + (modelData.kind === "sd" ? "💾 " : "🔌 ") + modelData.name
+                                onClicked: {
+                                    // Without access to all files Android
+                                    // may list the card as empty
+                                    if (!Mixxx.MobileLibrary.hasFullStorageAccess()) {
+                                        Mixxx.MobileLibrary.requestFullStorageAccess();
+                                    }
+                                    root.addQuickFolder(modelData.path);
+                                }
+                            }
+                        }
                     }
 
                     // --- BOTÓN EXPLORAR / AÑADIR OTRA CARPETA ---

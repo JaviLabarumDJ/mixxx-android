@@ -16,6 +16,7 @@
 #include "library/library.h"
 #include "mixer/basetrackplayer.h"
 #include "moc_qmlwaveformdisplay.cpp"
+#include "qml/qmlframeclock.h"
 #include "qml/qmlconfigproxy.h"
 #include "qml/qmlplayerproxy.h"
 #include "qmllibraryproxy.h"
@@ -61,7 +62,6 @@ QmlWaveformDisplay::QmlWaveformDisplay(QQuickItem* parent)
     m_frameRateTimer.setSingleShot(true);
     m_frameRateTimer.setTimerType(Qt::PreciseTimer);
     connect(&m_frameRateTimer, &QTimer::timeout, this, [this]() {
-        m_frameRequestTimer.restart();
         update();
     });
 
@@ -81,6 +81,7 @@ void QmlWaveformDisplay::setFrameRate(int frameRate) {
     m_frameRate = clampedFrameRate;
     m_syncInterval = std::chrono::microseconds(
             std::max(1, 1'000'000 / m_frameRate));
+    frameclock::setFrameInterval(m_syncInterval);
     if (window()) {
         m_frameRateTimer.stop();
         requestUpdateAtFrameRate();
@@ -290,7 +291,6 @@ void QmlWaveformDisplay::slotWindowChanged(QQuickWindow* window) {
     }
     m_timer.restart();
     m_frameRateTimer.stop();
-    m_frameRequestTimer.restart();
 }
 
 void QmlWaveformDisplay::setOptions(mixxx::qml::WaveformRendererSignalBaseOptions options) {
@@ -347,23 +347,13 @@ void QmlWaveformDisplay::requestUpdateAtFrameRate() {
     }
     m_lastFramePlayPos = playPos;
 
-    if (!m_frameRequestTimer.isValid()) {
-        m_frameRequestTimer.start();
+    // The next tick of the common frame clock, so that both waveforms (and
+    // the other periodic updates) are drawn in one frame instead of one
+    // frame each. At least half an interval after this frame, so that a
+    // frame that ended just before a tick doesn't draw again at once.
+    if (!m_frameRateTimer.isActive()) {
+        m_frameRateTimer.start(frameclock::millisToNextTick(m_syncInterval / 2));
     }
-
-    const qint64 elapsedMicros = m_frameRequestTimer.nsecsElapsed() / 1000;
-    const qint64 intervalMicros = m_syncInterval.count();
-    if (elapsedMicros >= intervalMicros) {
-        m_frameRateTimer.stop();
-        m_frameRequestTimer.restart();
-        update();
-        return;
-    }
-
-    const qint64 remainingMicros = intervalMicros - elapsedMicros;
-    const int remainingMillis = static_cast<int>(
-            std::max<qint64>(1, (remainingMicros + 999) / 1000));
-    m_frameRateTimer.start(remainingMillis);
 }
 
 void QmlWaveformDisplay::geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry) {

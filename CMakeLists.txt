@@ -2452,13 +2452,15 @@ if(QT6)
       PROPERTIES
         QT_ANDROID_APPLICATION_ARGUMENTS "--new-ui"
     )
-    # Mixxx and Qt call functions that the C library only has from Android 14
-    # on (e.g. copy_file_range), so the app can't start on older versions. The target stays at the compile SDK:
+    # From Android 10 on: functions of the C library that Mixxx and Qt use
+    # only exist from Android 11/13/14 on, see the libccompat part of
+    # cmake/modules/MixxxAndroid.cmake. Not Android 9: the MIDI API of the
+    # NDK (AMidi) used for the controllers comes with Android 10. The target stays at the compile SDK:
     # from 36 on, Android 16 ignores the landscape lock on tablets and no
     # longer delivers the Back key to Qt.
     set_target_properties(
       mixxx
-      PROPERTIES QT_ANDROID_MIN_SDK_VERSION 34 QT_ANDROID_TARGET_SDK_VERSION 35
+      PROPERTIES QT_ANDROID_MIN_SDK_VERSION 29 QT_ANDROID_TARGET_SDK_VERSION 35
     )
     qt_add_android_permission(mixxx
     NAME android.permission.ACCESS_NETWORK_STATE
@@ -4147,6 +4149,7 @@ if(QML)
       src/qml/qmlconfigproxy.cpp
       src/qml/qmlconfigproxybase.cpp
       src/qml/qmlcontrolproxy.cpp
+      src/qml/qmlframeclock.cpp
       src/qml/qmlcuesmodel.cpp
       src/qml/qmldlgpreferencesproxy.cpp
       src/qml/qmleffectslotparametersmodel.cpp

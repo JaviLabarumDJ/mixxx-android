@@ -78,6 +78,9 @@ class QmlMobileLibraryProxy : public QObject {
     Q_INVOKABLE bool removeSourcePath(const QString& rawPath);
     Q_INVOKABLE QStringList getSubDirectories(const QString& rawPath) const;
     Q_INVOKABLE QString defaultMusicDirectory() const;
+    /// The SD cards and USB drives Android has mounted, to add one as a music
+    /// folder: [{path, name, kind: "sd" | "usb"}]
+    Q_INVOKABLE QVariantList removableVolumes() const;
 
     /// Analyzes all tracks again. With redoBeats, also their beatgrids,
     /// except locked ones and those imported from Rekordbox: that replaces

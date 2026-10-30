@@ -501,6 +501,14 @@ Use the advanced mode to view them</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Permission to read folders</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To browse the folders of the tablet, SD cards and USB drives, Android has to grant Mixxx access to all files. Enable it on the screen that opens, then tap the section again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>To read Rekordbox and Engine DJ playlists from a USB drive, Android has to grant Mixxx access to all files. Enable it on the screen that opens, then tap the section again.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1433,6 +1441,14 @@ Button</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Permission to read folders</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To browse the folders of the tablet, SD cards and USB drives, Android has to grant Mixxx access to all files. Enable it on the screen that opens, then tap the section again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>To read Rekordbox and Engine DJ playlists from a USB drive, Android has to grant Mixxx access to all files. Enable it on the screen that opens, then tap the section again.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1856,6 +1872,36 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
 </context>
 <context>
+    <name>LiteDeck</name>
+    <message>
+        <source>No track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LOOP %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LiteMixer</name>
+    <message>
+        <source>HIGH</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LOW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FILTER</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Loop</name>
     <message>
         <source>exit</source>
@@ -1914,6 +1960,10 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>XY PAD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DECKS</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

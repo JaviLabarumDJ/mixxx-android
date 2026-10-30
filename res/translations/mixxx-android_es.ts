@@ -512,6 +512,14 @@ Usa el modo avanzado para verla</translation>
         <translation>Permiso para leer USB</translation>
     </message>
     <message>
+        <source>Permission to read folders</source>
+        <translation>Permiso para leer carpetas</translation>
+    </message>
+    <message>
+        <source>To browse the folders of the tablet, SD cards and USB drives, Android has to grant Mixxx access to all files. Enable it on the screen that opens, then tap the section again.</source>
+        <translation>Para navegar por las carpetas de la tablet, las tarjetas SD y los USB, Android tiene que dar a Mixxx acceso a todos los archivos. Actívalo en la pantalla que se abre y vuelve a tocar la sección.</translation>
+    </message>
+    <message>
         <source>To read Rekordbox and Engine DJ playlists from a USB drive, Android has to grant Mixxx access to all files. Enable it on the screen that opens, then tap the section again.</source>
         <translation>Para leer las playlists de Rekordbox y Engine DJ de un USB, Android tiene que permitir a Mixxx el acceso a todos los archivos. Actívalo en la pantalla que se abre y vuelve a tocar la sección.</translation>
     </message>
@@ -1448,6 +1456,14 @@ Cue</translation>
         <translation>Permiso para leer USB</translation>
     </message>
     <message>
+        <source>Permission to read folders</source>
+        <translation>Permiso para leer carpetas</translation>
+    </message>
+    <message>
+        <source>To browse the folders of the tablet, SD cards and USB drives, Android has to grant Mixxx access to all files. Enable it on the screen that opens, then tap the section again.</source>
+        <translation>Para navegar por las carpetas de la tablet, las tarjetas SD y los USB, Android tiene que dar a Mixxx acceso a todos los archivos. Actívalo en la pantalla que se abre y vuelve a tocar la sección.</translation>
+    </message>
+    <message>
         <source>To read Rekordbox and Engine DJ playlists from a USB drive, Android has to grant Mixxx access to all files. Enable it on the screen that opens, then tap the section again.</source>
         <translation>Para leer las playlists de Rekordbox y Engine DJ de un USB, Android tiene que permitir a Mixxx el acceso a todos los archivos. Actívalo en la pantalla que se abre y vuelve a tocar la sección.</translation>
     </message>
@@ -1871,6 +1887,36 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
 </context>
 <context>
+    <name>LiteDeck</name>
+    <message>
+        <source>No track</source>
+        <translation>Sin pista</translation>
+    </message>
+    <message>
+        <source>LOOP %1</source>
+        <translation>LOOP %1</translation>
+    </message>
+</context>
+<context>
+    <name>LiteMixer</name>
+    <message>
+        <source>HIGH</source>
+        <translation>HIGH</translation>
+    </message>
+    <message>
+        <source>MID</source>
+        <translation>MID</translation>
+    </message>
+    <message>
+        <source>LOW</source>
+        <translation>LOW</translation>
+    </message>
+    <message>
+        <source>FILTER</source>
+        <translation>FILTRO</translation>
+    </message>
+</context>
+<context>
     <name>Loop</name>
     <message>
         <source>exit</source>
@@ -1930,6 +1976,10 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>XY PAD</source>
         <translation>XY PAD</translation>
+    </message>
+    <message>
+        <source>DECKS</source>
+        <translation>DECKS</translation>
     </message>
 </context>
 <context>

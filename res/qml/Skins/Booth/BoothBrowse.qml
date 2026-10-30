@@ -138,10 +138,11 @@ Item {
     // permission, as in Library/Browser.qml
     function checkStorageAccess(path) {
         const icon = root.sectionIcon(path);
-        if (icon !== "rekordbox" && icon !== "enginedj") {
+        if (icon !== "rekordbox" && icon !== "enginedj" && icon !== "computer") {
             return;
         }
         if (!Mixxx.MobileLibrary.hasFullStorageAccess()) {
+            storageAccessPopup.forFolders = icon === "computer";
             storageAccessPopup.open();
         }
         Mixxx.MobileLibrary.allowUsbPermissionRequests();
@@ -820,9 +821,13 @@ Item {
         visible: root.streaming
     }
 
-    // Reading Rekordbox and Engine DJ drives needs access to all files
+    // Reading Rekordbox and Engine DJ drives, and browsing folders (FOLDER,
+    // e.g. on SD cards), needs access to all files
     Popup {
         id: storageAccessPopup
+
+        // For FOLDER rather than USB drives
+        property bool forFolders: false
 
         anchors.centerIn: parent
         modal: true
@@ -841,13 +846,15 @@ Item {
                 color: "#ffffff"
                 font.bold: true
                 font.pixelSize: 15
-                text: qsTr("Permission to read USB")
+                text: storageAccessPopup.forFolders ? qsTr("Permission to read folders") : qsTr("Permission to read USB")
                 width: parent.width
             }
             Text {
                 color: "#d8dadd"
                 font.pixelSize: 13
-                text: qsTr("To read Rekordbox and Engine DJ playlists from a USB drive, Android has to grant Mixxx access to all files. Enable it on the screen that opens, then tap the section again.")
+                text: storageAccessPopup.forFolders
+                      ? qsTr("To browse the folders of the tablet, SD cards and USB drives, Android has to grant Mixxx access to all files. Enable it on the screen that opens, then tap the section again.")
+                      : qsTr("To read Rekordbox and Engine DJ playlists from a USB drive, Android has to grant Mixxx access to all files. Enable it on the screen that opens, then tap the section again.")
                 width: parent.width
                 wrapMode: Text.WordWrap
             }
