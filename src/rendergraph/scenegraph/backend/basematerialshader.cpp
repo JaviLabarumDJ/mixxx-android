@@ -18,7 +18,9 @@ bool BaseMaterialShader::updateUniformData(RenderState& state,
                                   newMaterial != oldMaterial);
     QByteArray* buf = state.uniformData();
 
-    if (state.isMatrixDirty()) {
+    // The copy above wrote the matrix of the uniforms cache too, which
+    // materials don't keep up to date: write it whenever the buffer changed
+    if (state.isMatrixDirty() || result) {
         const QMatrix4x4 m = state.combinedMatrix();
         memcpy(buf->data(), m.constData(), 64);
         result = true;

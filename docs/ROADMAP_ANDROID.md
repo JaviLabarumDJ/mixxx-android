@@ -12,7 +12,7 @@ Lista de mejoras salida de la revisión del 26-10-2026 (sobre la v1.5.2), con su
 | 🟡 A medias | 4, 7 |
 | ⬜ Pendientes | 2, 12, 14, 16–25, 28–33, 35–37 |
 
-Fuera de la lista: **actualizaciones desde la app** (v1.5.4) y, en la v1.5.6, la **skin Lite**, **Android 10 a 13** (#34), **SD y navegador de carpetas** (#38) y el **reloj de fotogramas común** (actualizaciones de la interfaz alineadas, sin medir aún).
+Fuera de la lista: **ondas fluidas** (v1.6.0: se reconstruían en cada fotograma; ahora por GPU y al ritmo de la pantalla), **actualizaciones desde la app** (v1.5.4) y, en la v1.5.6, la **skin Lite**, **Android 10 a 13** (#34), **SD y navegador de carpetas** (#38) y el **reloj de fotogramas común** (actualizaciones de la interfaz alineadas, sin medir aún).
 
 ## 🔴 Prioridad 1: puede cortar o cerrar la sesión en directo
 
@@ -74,11 +74,10 @@ Fuera de la lista: **actualizaciones desde la app** (v1.5.4) y, en la v1.5.6, la
 
 ## Otros pendientes
 
-- **Stems** (rama `stems`, saldrá como v1.6.0):
-  - fusionar `android-stable` en ella y renumerar;
-  - portar a Booth la cola, el aviso y la pestaña STEM;
-  - dejar en Acerca de una sola tarjeta GRACIAS con Angelos y Dani Roman;
-  - subir los modelos (`.release/stems-models-v1/`) a la release `stems-models-v1`.
+- **Stems** (v1.6.0, rama `stems-1.6`): hecho el paso a la v1.5.6, Booth (modo STEMS de los pads, cola y aviso compartidos en `StemsOverlay.qml`, también en Lite), Acerca de con Angelos y Dani Roman, y la separación ~25 % más rápida (etapas en paralelo, AAC en paralelo en los núcleos lentos). Falta:
+  - **subir los modelos** (`.release/stems-models-v1/`) a la release `stems-models-v1` antes de publicar, o la descarga falla;
+  - recortar ONNX Runtime a los operadores de los modelos (APK ~33 MB más pequeña).
+- **Rediseño de los pads de Classic:** el selector CUE / LOOP / STEM y la zona de pads se ven sobrecargados al lado de Booth (opinión del usuario al probar la v1.6.0). Pensar un diseño más limpio que sirva también en móviles.
 - **SHIFT + LOAD en Booth:** sin probar.
 - **Cuelgue del audio de la tablet** (HAL de audio / audioserver) al soltar la DDJ el driver USB propio: sin investigar.
 - **Candidatos a enviarse a Mixxx:** el arreglo de uniforms de `rendergraph` (parpadeo de los loops) y el `i < numSamples` de `EngineEffectChain`.
@@ -88,7 +87,7 @@ Fuera de la lista: **actualizaciones desde la app** (v1.5.4) y, en la v1.5.6, la
 
 ## Orden propuesto
 
-1. **v1.6.0 (directo):** 2 y lo que falta de 4, junto con los stems.
+1. **v1.6.0:** los stems. Después, 2 y lo que falta de 4 (directo).
 2. ~~**Booth y DDJ-400:** 8, 9, 10, 11, 13 y 15.~~ Hecho en la v1.5.5.
 3. **Funciones:** 16, 17, 18, 19 y 23.
 4. **Resto:** según lo que pidan los usuarios.

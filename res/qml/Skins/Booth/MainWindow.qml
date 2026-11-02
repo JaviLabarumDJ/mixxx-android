@@ -528,6 +528,13 @@ Item {
             height: topBar.height
             spacing: 6
 
+            // The stem separation: its progress, opens its queue
+            Tab {
+                active: Mixxx.Stems.hold !== ""
+                label: Mixxx.Stems.hold !== "" ? `🎚 ⏸ ${Mixxx.Stems.pendingCount}` : `🎚 ${Math.round(Mixxx.Stems.progress * 100)}%`
+                visible: Mixxx.Stems.pendingCount > 0
+                onClicked: stemsOverlay.openQueue()
+            }
             Tab {
                 active: headSplitControl.value > 0
                 label: "SPLIT"
@@ -740,6 +747,14 @@ Item {
                 z: 10
             }
         }
+    }
+
+    // The queue of the stem separation and its notices
+    Skin.StemsOverlay {
+        id: stemsOverlay
+
+        anchors.fill: parent
+        z: 95
     }
 
     Skin.Settings {

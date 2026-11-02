@@ -284,6 +284,26 @@ Category {
                             wrapMode: Text.WordWrap
                         }
                     }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 12
+
+                        SocialButton {
+                            Layout.preferredWidth: 200
+                            title: "Dani Roman"
+                            handle: "@danigiavanni"
+                            accentColor: "#e1306c"
+                            url: "https://www.instagram.com/danigiavanni"
+                        }
+                        Text {
+                            Layout.fillWidth: true
+                            text: qsTr("Live stems in Mixxx: his mixxx-stems project inspired the stem separation of this app.")
+                            font.pixelSize: 10
+                            color: "#90a4ae"
+                            wrapMode: Text.WordWrap
+                        }
+                    }
                 }
             }
 

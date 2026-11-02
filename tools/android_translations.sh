@@ -27,6 +27,7 @@ SOURCES=(
     src/library/rekordbox/rekordboxdrivebackup.cpp
     src/library/rekordbox/rekordboxplaylistcopy.cpp
     src/util/androidbackup.cpp
+    src/stems/stemsmanager.cpp
     src/util/removablestorage.cpp
 )
 

@@ -187,11 +187,43 @@ Item {
                 }
             }
 
+            // Progress of the stem separation, opens its queue
+            Skin.Button {
+                id: stemsIndicator
+
+                readonly property bool active: Mixxx.Stems.pendingCount > 0
+
+                anchors.right: showPreferencesButton.left
+                anchors.rightMargin: active ? 6 : 0
+                anchors.verticalCenter: parent.verticalCenter
+                visible: active
+                height: 30
+                width: active ? stemsIndicatorMetrics.width + 20 : 0
+                activeColor: Theme.accentColor
+                backgroundColor: Mixxx.Stems.hold !== "" ? "#4a3a12" : "#1e3a5f"
+                normalColor: "#ffffff"
+                font.bold: true
+                font.pixelSize: 11
+                text: Mixxx.Stems.hold !== ""
+                        ? `🎚 ⏸ ${Mixxx.Stems.pendingCount}`
+                        : `🎚 ${Math.round(Mixxx.Stems.progress * 100)}% · ${Mixxx.Stems.pendingCount}`
+
+                onClicked: stemsOverlay.openQueue()
+
+                TextMetrics {
+                    id: stemsIndicatorMetrics
+
+                    font.bold: true
+                    font.pixelSize: 11
+                    text: stemsIndicator.text
+                }
+            }
+
             Flickable {
                 id: toolbarFlickable
                 anchors.left: logoText.right
                 anchors.leftMargin: 8
-                anchors.right: showPreferencesButton.left
+                anchors.right: stemsIndicator.left
                 anchors.rightMargin: 8
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
@@ -994,6 +1026,14 @@ Item {
         width: root.applicationWindow.isMobile ? parent.width : Math.min(1400, parent.width)
         x: root.applicationWindow.isMobile ? 0 : Math.round((parent.width - width) / 2)
         y: root.applicationWindow.isMobile ? 0 : Math.round((parent.height - height) / 2)
+    }
+
+    // The queue of the stem separation and its notices
+    Skin.StemsOverlay {
+        id: stemsOverlay
+
+        anchors.fill: parent
+        z: 95
     }
 
     Skin.XYPad {

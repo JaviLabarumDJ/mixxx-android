@@ -5,8 +5,8 @@
 ![Android Version](https://img.shields.io/badge/Android-10.0%2B%20(API%2029--35)-brightgreen?logo=android&logoColor=white)
 ![Architecture](https://img.shields.io/badge/Arch-ARM64%20(arm64--v8a)-blue?logo=arm)
 ![Framework](https://img.shields.io/badge/Qt-6.8%20%7C%20QML-41cd52?logo=qt)
-[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.5.6-android)
-[![Download APK](https://img.shields.io/badge/Download-APK%20(238%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.5.6-android/mixxx-android-v1.5.6.apk)
+[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.6.0-android)
+[![Download APK](https://img.shields.io/badge/Download-APK%20(272%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.6.0-android/mixxx-android-v1.6.0.apk)
 ![License](https://img.shields.io/badge/License-GPL%20v2-orange.svg)
 
 **The world's premier open-source DJ software, fully ported, modernized, and touch-optimized for Android smartphones, tablets, and standalone hardware setups.**
@@ -28,7 +28,21 @@ Whether you're performing live sets using a USB DJ controller, mixing on the go 
 <!-- START_AI_GENERATED_DISCLAIMER -->
 <!-- This section was written with the assistance of an AI Agent (Claude). -->
 
-## 🆕 What's New in v1.5.6
+## 🆕 What's New in v1.6.0
+
+* **AI stem separation** (drums, bass, other, vocals), inspired by [Dani Roman](https://www.instagram.com/danigiavanni)'s mixxx-stems: choose a track or a whole list in the library (**🎚 STEMS**) and Mixxx separates it in the background, on the device, without internet. The stems are saved next to the track (`.stems/<track>.stem.mp4`), so the cues, beatgrid and BPM are kept.
+  * Two models, downloaded from the app: **Spleeter** (fast and light, ~1 min per 5 minute track on a Lenovo Tab M11) and **HTDemucs** (best quality, slow, needs ~2.5 GB of memory).
+  * A queue that goes on with the screen off or in another app (with a notification), can be paused, and waits or slows down while a deck plays (*Settings → Stems*).
+  * **On the deck:** in **Classic**, the **STEM** tab of the pads; in **Booth**, the **STEMS** pad mode of the DJ view. Four buttons, one per stem: tap to mute it, hold to play only that one.
+* **Smooth waveforms:** the scrolling waveforms ran at about 30 jumpy frames per second on a Lenovo Tab M11, now at 70–90 (the refresh rate of the display):
+  * a bug made the waveforms build all their parts again on every frame (a type check that fails on Android);
+  * the RGB and stem waveforms are now drawn by the GPU: their data is uploaded once and only a few numbers change from frame to frame;
+  * frames follow the refresh rate of the display (60, 90 or 120 Hz) instead of a timer of their own;
+  * the EQ now also changes the stem waveforms, like the others.
+* **Faster separation:** the models, the Wiener filter and the AAC encoding of the 5 tracks now run at the same time, the encoding on the slower cores: about 25% faster than the first stems test builds.
+* Requires about 33 MB more of APK for ONNX Runtime; the models (80 MB for Spleeter, 156 MB for HTDemucs) are only downloaded if you use them. User manual: [English](../docs/stems/STEMS_MANUAL_en.md) · [Español](../docs/stems/MANUAL_STEMS_es.md).
+
+## 🗂️ What was new in v1.5.6
 
 * **Lite skin** (*Settings → Interface → Skin → Lite*), for slow phones and tablets and to save battery:
   * two decks without waveforms: a position bar with the time left, BPM and tempo;
@@ -218,7 +232,7 @@ This release merges the work of **[morpheasgr (Angelos Exarchos)](https://github
 ## 🚀 Installation & Quick Start
 
 ### Option A: Install Pre-Built Signed APK
-1. Download [**mixxx-android-v1.5.6.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.5.6-android/mixxx-android-v1.5.6.apk) from the [Official GitHub Release v1.5.6](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.5.6-android).
+1. Download [**mixxx-android-v1.6.0.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.6.0-android/mixxx-android-v1.6.0.apk) from the [Official GitHub Release v1.6.0](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.6.0-android).
 2. Enable *"Install unknown apps"* in your Android device settings.
 3. Install and launch **MIXXX**.
 4. Grant storage and audio permissions when prompted.

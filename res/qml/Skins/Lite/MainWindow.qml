@@ -208,6 +208,13 @@ Item {
             Item {
                 Layout.fillWidth: true
             }
+            // The stem separation: its progress, opens its queue
+            Tab {
+                lit: Mixxx.Stems.hold !== ""
+                text: Mixxx.Stems.hold !== "" ? `🎚 ⏸ ${Mixxx.Stems.pendingCount}` : `🎚 ${Math.round(Mixxx.Stems.progress * 100)}%`
+                visible: Mixxx.Stems.pendingCount > 0
+                onClicked: stemsOverlay.openQueue()
+            }
             // Asks before stopping, keeps its time across skin switches
             Skin.MobileRecordButton {
                 Layout.fillHeight: true
@@ -274,6 +281,14 @@ Item {
                 }
             }
         }
+    }
+
+    // The queue of the stem separation and its notices
+    Skin.StemsOverlay {
+        id: stemsOverlay
+
+        anchors.fill: parent
+        z: 95
     }
 
     Skin.Settings {

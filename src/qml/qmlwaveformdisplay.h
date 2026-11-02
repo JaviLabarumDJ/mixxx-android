@@ -135,6 +135,7 @@ class QmlWaveformDisplay : public QQuickItem, VSyncTimeProvider, public Waveform
     }
     void setOptions(WaveformRendererSignalBaseOptions options);
 
+
     // Recreate the scene-graph renderer stack after a setting changes which
     // renderer is enabled. The renderer factories are declared in QML, while
     // their scene-graph nodes are created lazily by updatePaintNode().
@@ -164,6 +165,9 @@ class QmlWaveformDisplay : public QQuickItem, VSyncTimeProvider, public Waveform
   private:
     void setCurrentTrack(TrackPointer pTrack);
     void requestUpdateAtFrameRate();
+    /// The frame interval from the refresh rate of the display and the
+    /// frame rate, see frameclock::setDisplay()
+    void updateFrameInterval();
 
     // Properties
     QPointer<QmlPlayerProxy> m_pPlayer;
@@ -177,6 +181,7 @@ class QmlWaveformDisplay : public QQuickItem, VSyncTimeProvider, public Waveform
     std::chrono::microseconds m_syncInterval;
     int m_frameRate;
     double m_lastFramePlayPos{-1.0};
+
     enum class DirtyFlag : int {
         None = 0x0,
         Geometry = 0x1,

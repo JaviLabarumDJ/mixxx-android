@@ -6,7 +6,7 @@ import QtQuick.Layouts
 
 // The controls of a deck in the DJ view of the booth skin, for playing
 // without a controller, in the style of the PERFORMANCE layout of
-// rekordbox: the pads (hot cues, beat jump or beat loop), the loop size,
+// rekordbox: the pads (hot cues, beat jump, beat loop or the stems), the loop size,
 // CUE and PLAY, the jog and the tempo. Deck 2 is mirrored, with its pads on
 // the outer side.
 Rectangle {
@@ -17,14 +17,45 @@ Rectangle {
     property bool mirrored: false
     // Landscape phones
     property bool compact: false
-    // hotcue, beatjump or beatloop
+    // hotcue, beatjump, beatloop or stem (if the track has stems)
     property string padMode: "hotcue"
+    // Kept in a property: the player proxy is deleted with its tracks (and
+    // their stems model) once nothing refers to it
+    readonly property var deckPlayer: Mixxx.PlayerManager.getPlayer(group)
+    readonly property var currentTrack: deckPlayer?.currentTrack ?? null
+    readonly property bool hasStems: stemCountControl.value > 0
     readonly property color deckColor: deckNumber === 1 ? "#1f6fd1" : "#e8650f"
     readonly property bool loaded: trackLoadedControl.value > 0
     readonly property real unit: Math.max(9, Math.min(height / 14, width / 34))
 
     function pad(number, digits) {
         return ("000" + number).slice(-digits);
+    }
+    // The names of the stems of the stem files made by the app
+    function stemName(label) {
+        switch (label) {
+        case "Drums":
+            return qsTr("DRUMS");
+        case "Bass":
+            return qsTr("BASS");
+        case "Vocals":
+            return qsTr("VOCALS");
+        case "Other":
+            return qsTr("OTHER");
+        default:
+            return label.toUpperCase();
+        }
+    }
+    // Plays only one stem, or all again if it is the only one playing
+    function soloStem(index) {
+        let soloed = true;
+        for (let i = 0; i < stemPads.count; ++i) {
+            const muted = stemPads.itemAt(i).muted;
+            if (muted !== (i !== index))
+                soloed = false;
+        }
+        for (let i = 0; i < stemPads.count; ++i)
+            stemPads.itemAt(i).setMuted(soloed ? false : i !== index);
     }
     function formatTime(seconds) {
         const total = Math.floor(Math.max(0, seconds));
@@ -124,6 +155,17 @@ Rectangle {
 
         group: root.group
         key: "track_samplerate"
+    }
+    Mixxx.ControlProxy {
+        id: stemCountControl
+
+        group: root.group
+        key: "stem_count"
+
+        onValueChanged: {
+            if (value <= 0 && root.padMode === "stem")
+                root.padMode = "hotcue";
+        }
     }
 
     // A square button with a label, lit when on
@@ -370,6 +412,7 @@ Rectangle {
                 columnSpacing: 3
                 columns: 2
                 rowSpacing: 3
+                visible: root.padMode !== "stem"
 
                 Repeater {
                     model: 8
@@ -380,16 +423,79 @@ Rectangle {
                     }
                 }
             }
+            // The stems: tap to mute or unmute one, hold to play only that one
+            ColumnLayout {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                spacing: 3
+                visible: root.padMode === "stem"
+
+                Repeater {
+                    id: stemPads
+
+                    model: root.currentTrack && root.hasStems ? root.currentTrack.stemsModel : 0
+
+                    Rectangle {
+                        id: stemPad
+
+                        required property int index
+                        // The roles color and label: a Rectangle has a color
+                        // of its own
+                        required property var model
+                        readonly property color stemColor: model.color
+                        readonly property bool muted: stemMute.value > 0
+
+                        function setMuted(mute) {
+                            stemMute.value = mute ? 1 : 0;
+                        }
+
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        border.color: stemTap.pressed ? "#ffffff" : stemPad.stemColor
+                        border.width: stemPad.muted ? 1 : 2
+                        color: stemTap.pressed ? "#2a2c30" : (stemPad.muted ? "#141518" : Qt.darker(stemPad.stemColor, 2.2))
+
+                        Mixxx.ControlProxy {
+                            id: stemMute
+
+                            group: `${root.group.slice(0, -1)}_Stem${stemPad.index + 1}]`
+                            key: "mute"
+                        }
+
+                        Text {
+                            anchors.fill: parent
+                            anchors.margins: 3
+                            color: stemPad.muted ? "#5c6068" : "#ffffff"
+                            font.bold: true
+                            font.pixelSize: Math.round(root.unit * 1.2)
+                            font.strikeout: stemPad.muted
+                            fontSizeMode: Text.Fit
+                            horizontalAlignment: Text.AlignHCenter
+                            minimumPixelSize: 7
+                            text: root.stemName(stemPad.model.label)
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        TapHandler {
+                            id: stemTap
+
+                            gesturePolicy: TapHandler.WithinBounds
+
+                            onLongPressed: root.soloStem(stemPad.index)
+                            onTapped: stemPad.setMuted(!stemPad.muted)
+                        }
+                    }
+                }
+            }
             // Tap: the next mode
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: Math.round(root.unit * 1.8)
-                border.color: "#2a2c30"
+                border.color: root.padMode === "stem" ? "#b388ff" : "#2a2c30"
                 color: modeTap.pressed ? "#2a2c30" : "#141518"
 
                 Text {
                     anchors.centerIn: parent
-                    color: "#d8dadd"
+                    color: root.padMode === "stem" ? "#b388ff" : "#d8dadd"
                     font.pixelSize: Math.round(root.unit * 1.0)
                     text: {
                         switch (root.padMode) {
@@ -397,6 +503,8 @@ Rectangle {
                             return qsTr("BEAT JUMP") + "  ⇅";
                         case "beatloop":
                             return qsTr("BEAT LOOP") + "  ⇅";
+                        case "stem":
+                            return qsTr("STEMS") + "  ⇅";
                         default:
                             return qsTr("HOT CUE") + "  ⇅";
                         }
@@ -406,7 +514,7 @@ Rectangle {
                     id: modeTap
 
                     onTapped: {
-                        const modes = ["hotcue", "beatjump", "beatloop"];
+                        const modes = root.hasStems ? ["hotcue", "beatjump", "beatloop", "stem"] : ["hotcue", "beatjump", "beatloop"];
                         root.padMode = modes[(modes.indexOf(root.padMode) + 1) % modes.length];
                     }
                 }
