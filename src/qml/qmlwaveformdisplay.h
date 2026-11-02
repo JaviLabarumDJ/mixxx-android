@@ -4,6 +4,8 @@
 
 #include <QPointer>
 #include <QQuickItem>
+#include <QElapsedTimer>
+#include <atomic>
 #include <QQuickWindow>
 #include <QSGNode>
 #include <QSGSimpleRectNode>
@@ -181,6 +183,9 @@ class QmlWaveformDisplay : public QQuickItem, VSyncTimeProvider, public Waveform
     std::chrono::microseconds m_syncInterval;
     int m_frameRate;
     double m_lastFramePlayPos{-1.0};
+    QElapsedTimer m_lastMove;
+    /// Drawn in the frame being rendered (render thread)
+    std::atomic<bool> m_drawnInFrame{false};
 
     enum class DirtyFlag : int {
         None = 0x0,

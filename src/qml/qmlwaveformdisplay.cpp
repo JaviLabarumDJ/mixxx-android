@@ -32,6 +32,8 @@ namespace {
 constexpr int kDefaultFrameRate = 60;
 // Refresh interval of a still waveform, see requestUpdateAtFrameRate()
 constexpr int kStillRefreshMillis = 100;
+// A waveform whose position didn't change for this long is still
+constexpr int kStillAfterMillis = 150;
 } // namespace
 
 namespace mixxx {
@@ -287,7 +289,12 @@ void QmlWaveformDisplay::slotWindowChanged(QQuickWindow* window) {
                 window,
                 &QQuickWindow::afterFrameEnd,
                 this,
-                []() { frameclock::frameShown(); },
+                [this]() {
+                    frameclock::frameShown();
+                    if (m_drawnInFrame.exchange(false)) {
+                        frameclock::tickShown();
+                    }
+                },
                 Qt::DirectConnection);
         connect(window,
                 &QQuickWindow::afterFrameEnd,
@@ -358,19 +365,31 @@ void QmlWaveformDisplay::requestUpdateAtFrameRate() {
     const double playPos = WaveformWidgetRenderer::m_visualPlayPosition
             ? WaveformWidgetRenderer::m_visualPlayPosition->getEnginePlayPos()
             : -1.0;
-    if (playPos == m_lastFramePlayPos) {
+    // The engine moves the position once per audio buffer: at 120 Hz two
+    // frames in a row can see the same one while playing. Still only when it
+    // hasn't moved for a while.
+    if (playPos != m_lastFramePlayPos || !m_lastMove.isValid()) {
+        m_lastFramePlayPos = playPos;
+        m_lastMove.start();
+    } else if (m_lastMove.elapsed() > kStillAfterMillis) {
         // Still: a slow refresh for marks, analysis progress and the like
         if (!m_frameRateTimer.isActive()) {
             m_frameRateTimer.start(kStillRefreshMillis);
         }
         return;
     }
-    m_lastFramePlayPos = playPos;
 
-    // The next tick of the common frame clock, just before a refresh of the
-    // display: both waveforms (and the other periodic updates) are drawn in
-    // one frame instead of one frame each, and every frame is shown for the
-    // same time.
+    // On every refresh of the display: drawn again right after each frame,
+    // the waveform moves by the same amount on every refresh
+    if (frameclock::frameInterval() <= frameclock::refreshPeriod()) {
+        m_frameRateTimer.stop();
+        update();
+        return;
+    }
+    // Otherwise the next tick of the common frame clock, just before a
+    // refresh of the display: both waveforms (and the other periodic
+    // updates) are drawn in one frame instead of one frame each, and every
+    // frame is shown for the same time.
     if (!m_frameRateTimer.isActive()) {
         m_frameRateTimer.start(frameclock::millisToNextTick());
     }
@@ -472,6 +491,7 @@ QSGNode* QmlWaveformDisplay::updatePaintNode(QSGNode* node, UpdatePaintNodeData*
     }
 
     onPreRender(this);
+    m_drawnInFrame = true;
 
     for (auto* pRenderer : std::as_const(m_rendererStack)) {
         pRenderer->update();
