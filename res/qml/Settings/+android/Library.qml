@@ -579,7 +579,7 @@ Category {
                     }
 
                     Text {
-                        text: qsTr("Tracks played from streaming platforms (Navidrome, Audius, SoundCloud, Tidal) are stored locally so playback continues without dropouts even if the internet connection is lost.")
+                        text: qsTr("Tracks played from streaming (Deezer) are stored locally so playback continues without dropouts even if the internet connection is lost.")
                         font.pixelSize: 11
                         color: "#90a4ae"
                         wrapMode: Text.WordWrap
@@ -645,6 +645,124 @@ Category {
                             onClicked: {
                                 if (Mixxx.StreamingManager) {
                                     Mixxx.StreamingManager.clearCache();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ================= 3. DEEZER STREAMING SETTINGS (ARL / DEEMIX) =================
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: deezerCol.implicitHeight + 24
+                color: Theme.darkGray3
+                radius: 8
+                border.color: "#303440"
+                border.width: 1
+
+                ColumnLayout {
+                    id: deezerCol
+                    anchors.fill: parent
+                    anchors.margins: 12
+                    spacing: 10
+
+                    Text {
+                        text: qsTr("🎧 Deezer Streaming & ARL")
+                        font.bold: true
+                        font.pixelSize: 14
+                        color: "#b388ff"
+                        Layout.fillWidth: true
+                    }
+
+                    Text {
+                        text: qsTr("Configura tu cookie ARL de Deezer para descargas directas en máxima calidad o conéctate a tu servidor Deemix local. Si no tienes ARL, Mixxx utiliza automáticamente el motor de emparejamiento para descargar canciones completas.")
+                        font.pixelSize: 11
+                        color: "#90a4ae"
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 8
+
+                        Text {
+                            text: qsTr("ARL Cookie:")
+                            font.pixelSize: 12
+                            color: "#b388ff"
+                            font.bold: true
+                        }
+
+                        TextField {
+                            id: settingsArlInput
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 38
+                            placeholderText: qsTr("Pega aquí tu cookie ARL de Deezer...")
+                            color: "#ffffff"
+                            font.pixelSize: 11
+                            text: Mixxx.StreamingManager ? Mixxx.StreamingManager.deezerArl : ""
+                            background: Rectangle {
+                                color: "#1c142c"
+                                border.color: "#3d2466"
+                                border.width: 1
+                                radius: 4
+                            }
+                        }
+
+                        Skin.Button {
+                            Layout.preferredHeight: 38
+                            Layout.preferredWidth: 90
+                            activeColor: "#b388ff"
+                            backgroundColor: "#4a148c"
+                            normalColor: "#ffffff"
+                            font.bold: true
+                            text: qsTr("Guardar")
+                            onClicked: {
+                                if (Mixxx.StreamingManager) {
+                                    Mixxx.StreamingManager.deezerArl = settingsArlInput.text.trim();
+                                }
+                            }
+                        }
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 8
+
+                        Text {
+                            text: qsTr("Servidor Deemix (opcional):")
+                            font.pixelSize: 11
+                            color: "#9575cd"
+                        }
+
+                        TextField {
+                            id: settingsDeemixInput
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 34
+                            placeholderText: qsTr("http://192.168.0.X:6595 (opcional)")
+                            color: "#ffffff"
+                            font.pixelSize: 11
+                            text: Mixxx.StreamingManager ? Mixxx.StreamingManager.deemixServerUrl : ""
+                            background: Rectangle {
+                                color: "#1c142c"
+                                border.color: "#3d2466"
+                                border.width: 1
+                                radius: 4
+                            }
+                        }
+
+                        Skin.Button {
+                            Layout.preferredHeight: 34
+                            Layout.preferredWidth: 90
+                            activeColor: "#b388ff"
+                            backgroundColor: "#311b92"
+                            normalColor: "#ffffff"
+                            font.bold: true
+                            text: qsTr("Guardar")
+                            onClicked: {
+                                if (Mixxx.StreamingManager) {
+                                    Mixxx.StreamingManager.deemixServerUrl = settingsDeemixInput.text.trim();
                                 }
                             }
                         }

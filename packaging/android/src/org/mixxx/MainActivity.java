@@ -54,6 +54,10 @@ public class MainActivity extends QtActivityBase {
         registerReceiver(mUsbHotplugReceiver, usbFilter, Context.RECEIVER_NOT_EXPORTED);
 
         MidiHelper.init(this);
+
+        // Why Mixxx ended last time, off the main thread
+        final Context context = getApplicationContext();
+        new Thread(() -> ExitReport.save(context), "MixxxExitReport").start();
     }
 
     /// Saves the settings and the loaded tracks on the main thread of Mixxx,

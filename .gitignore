@@ -82,3 +82,4 @@ res/qrc_mixxx.cc
 *.jpg
 
 /.release/
+.gradle/

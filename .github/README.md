@@ -5,8 +5,8 @@
 ![Android Version](https://img.shields.io/badge/Android-10.0%2B%20(API%2029--35)-brightgreen?logo=android&logoColor=white)
 ![Architecture](https://img.shields.io/badge/Arch-ARM64%20(arm64--v8a)-blue?logo=arm)
 ![Framework](https://img.shields.io/badge/Qt-6.8%20%7C%20QML-41cd52?logo=qt)
-[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.6.1-android)
-[![Download APK](https://img.shields.io/badge/Download-APK%20(272%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.6.1-android/mixxx-android-v1.6.1.apk)
+[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.7.0-android)
+[![Download APK](https://img.shields.io/badge/Download-APK%20(272%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.7.0-android/mixxx-android-v1.7.0.apk)
 ![License](https://img.shields.io/badge/License-GPL%20v2-orange.svg)
 
 **The world's premier open-source DJ software, fully ported, modernized, and touch-optimized for Android smartphones, tablets, and standalone hardware setups.**
@@ -28,16 +28,20 @@ Whether you're performing live sets using a USB DJ controller, mixing on the go 
 <!-- START_AI_GENERATED_DISCLAIMER -->
 <!-- This section was written with the assistance of an AI Agent (Claude). -->
 
-## 🆕 What's New in v1.6.1
+## 🆕 What's New in v1.7.0
 
-* **Even smoother waveforms**, above all on 90 and 120 Hz screens:
-  * the waveforms move on every refresh of the display while playing (they moved on every second one at 60 fps, which on a 120 Hz screen looked choppy next to the rest of the window, drawn on every refresh);
-  * on devices that can't draw a frame on every refresh, Mixxx notices it and moves them on every second refresh at a steady pace (e.g. 45 fps at 90 Hz), which looks smoother than uneven frames, trying again later.
-  * Measured on a POCO X6 Pro (120 Hz): 120 fps, every frame on time.
+* **The FX Station (Remix Effector):** Pioneer RMX-1000-style remix effector module on the main mix processed on the engine thread with zero overhead when idle (Scene FX build-ups/break-downs, Isolate FX 3-band modulation, X-Pad rhythm rolls, Release FX exits, and dedicated hardware mappings for Akai LPD8 & MPK mini).
+* **Native Deezer Streaming:** Direct track search and full-length downloading with personal ARL support, real-time in-place Blowfish-CBC decryption, TagLib ID3 tagging, and offline caching.
+* **In-App MIDI Learning:** Visually map any controller directly from Android (*Settings → Controller → 🎛 Learn controller*).
+* **Multi-USB Audio Driver & Dual CDJ Preset:** Drive multiple USB sound cards concurrently with adaptive PI clock resampling to run two separate CDJs into an external DJ mixer.
+* **New Controller Mappings:** Pioneer CDJ-400, Pioneer XDJ-700, Numark NDX900, Akai LPD8 FX Station, Akai MPK mini FX Station.
+* **Beat Counter:** 4-cell bar indicator on waveforms (red downbeat, blue 2-4 beats).
+* **Exit Report Diagnostics:** Automatic logging of process terminations in `/sdcard/Mixxx/last-exit.txt`.
 
-## 🗂️ What was new in v1.6.0
+## 🗂️ Previous Releases
 
-* **AI stem separation** (drums, bass, other, vocals), inspired by [Dani Roman](https://www.instagram.com/danigiavanni)'s mixxx-stems: choose a track or a whole list in the library (**🎚 STEMS**) and Mixxx separates it in the background, on the device, without internet. The stems are saved next to the track (`.stems/<track>.stem.mp4`), so the cues, beatgrid and BPM are kept.
+* **v1.6.1:** Even smoother waveforms matching display refresh (up to 120 FPS).
+* **v1.6.0:** Offline AI stem separation (drums, bass, other, vocals) and GPU waveforms.
   * Two models, downloaded from the app: **Spleeter** (fast and light, ~1 min per 5 minute track on a Lenovo Tab M11) and **HTDemucs** (best quality, slow, needs ~2.5 GB of memory).
   * A queue that goes on with the screen off or in another app (with a notification), can be paused, and waits or slows down while a deck plays (*Settings → Stems*).
   * **On the deck:** in **Classic**, the **STEM** tab of the pads; in **Booth**, the **STEMS** pad mode of the DJ view. Four buttons, one per stem: tap to mute it, hold to play only that one.
@@ -239,7 +243,7 @@ This release merges the work of **[morpheasgr (Angelos Exarchos)](https://github
 ## 🚀 Installation & Quick Start
 
 ### Option A: Install Pre-Built Signed APK
-1. Download [**mixxx-android-v1.6.1.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.6.1-android/mixxx-android-v1.6.1.apk) from the [Official GitHub Release v1.6.1](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.6.1-android).
+1. Download [**mixxx-android-v1.7.0.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.7.0-android/mixxx-android-v1.7.0.apk) from the [Official GitHub Release v1.7.0](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.7.0-android).
 2. Enable *"Install unknown apps"* in your Android device settings.
 3. Install and launch **MIXXX**.
 4. Grant storage and audio permissions when prompted.

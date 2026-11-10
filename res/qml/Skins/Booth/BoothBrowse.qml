@@ -494,7 +494,7 @@ Item {
                 color: root.streaming ? "#d4e157" : "#9a9ea6"
                 font.bold: true
                 font.pixelSize: root.compact ? 10 : 12
-                text: qsTr("STREAMING")
+                text: qsTr("DEEZER")
             }
             MouseArea {
                 anchors.fill: parent

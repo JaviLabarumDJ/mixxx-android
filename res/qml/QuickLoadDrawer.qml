@@ -121,13 +121,13 @@ Popup {
 
                 Skin.Button {
                     Layout.preferredHeight: 30
-                    Layout.preferredWidth: 120
+                    Layout.preferredWidth: 100
                     activeColor: "#00ffff"
                     backgroundColor: root.activeTab === 1 ? "#004d40" : "#222733"
                     normalColor: root.activeTab === 1 ? "#00ffff" : "#80deea"
                     font.bold: true
                     font.pixelSize: 10
-                    text: qsTr("STREAMING HUB")
+                    text: qsTr("DEEZER")
                     onClicked: root.activeTab = 1
                 }
 

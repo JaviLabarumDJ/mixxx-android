@@ -125,13 +125,13 @@ Item {
 
             Skin.Button {
                 Layout.fillHeight: true
-                Layout.preferredWidth: 140
+                Layout.preferredWidth: 120
                 activeColor: Theme.libraryStreamingTabColor
                 backgroundColor: root.librarySourceMode === 1 ? Theme.libraryStreamingTabBackground : Theme.librarySourceTabBackground
                 normalColor: root.librarySourceMode === 1 ? Theme.libraryStreamingTabColor : Theme.libraryStreamingTabText
                 font.bold: true
                 font.pixelSize: 11
-                text: qsTr("STREAMING HUB")
+                text: qsTr("DEEZER")
                 onClicked: root.librarySourceMode = 1
             }
 

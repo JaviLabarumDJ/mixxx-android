@@ -223,6 +223,9 @@ QmlApplication::QmlApplication(
         // Files of other versions would still be loaded (e.g. +android file
         // selector folders), so start from an empty folder
         QDir(externalQmlDir).removeRecursively();
+        // Before the files: the images of the skins stay out of the gallery
+        QDir().mkpath(externalQmlDir);
+        QFile(externalQmlDir + QStringLiteral("/.nomedia")).open(QIODevice::WriteOnly);
         copyAssetDir(QStringLiteral("assets:/qml"), externalQmlDir);
         m_mainFilePath = externalQmlDir + QStringLiteral("/main.qml");
     }

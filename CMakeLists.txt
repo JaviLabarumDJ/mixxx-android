@@ -1409,6 +1409,8 @@ add_library(
   src/engine/enginebuffer.cpp
   src/engine/enginedelay.cpp
   src/engine/enginemixer.cpp
+  src/engine/fxstation/fxstation.cpp
+  src/engine/fxstation/fxstationinstruments.cpp
   src/engine/engineobject.cpp
   src/engine/enginepregain.cpp
   src/engine/enginesidechaincompressor.cpp
@@ -4103,6 +4105,10 @@ if(QML)
     SYSTEM
     PUBLIC lib/rigtorp/SPSCQueue/include lib/portaudio
   )
+  if(OPENSSL_INCLUDE_DIR)
+    target_include_directories(mixxx-qml-lib SYSTEM PRIVATE ${OPENSSL_INCLUDE_DIR})
+    target_link_libraries(mixxx-qml-lib PRIVATE ${OPENSSL_CRYPTO_LIBRARY})
+  endif()
 
   target_link_libraries(mixxx-qml-lib PUBLIC mixxx-proto)
   target_link_libraries(mixxx-qml-libplugin PUBLIC mixxx-proto)
