@@ -18,6 +18,7 @@
 #include "engine/enginevumeter.h"
 #include "engine/engineworkerscheduler.h"
 #include "engine/enginexfader.h"
+#include "engine/fxstation/fxstation.h"
 #include "engine/sidechain/enginesidechain.h"
 #include "engine/sync/enginesync.h"
 #include "mixer/playermanager.h"
@@ -182,6 +183,8 @@ EngineMixer::EngineMixer(UserSettingsPointer pConfig,
     // 1.11.0 and earlier. See issue #7413.
     m_pMainGain->addAlias(ConfigKey(group, QStringLiteral("volume")));
 
+    m_pFxStation = std::make_unique<mixxx::FxStation>();
+
     // Legacy: the headphone "headGain" control used to be named "headVolume" in
     // Mixxx 1.11.0 and earlier. See issue #7413.
     m_pHeadGain->addAlias(ConfigKey(group, QStringLiteral("headVolume")));
@@ -190,7 +193,11 @@ EngineMixer::EngineMixer(UserSettingsPointer pConfig,
     m_pHeadMix->set(-1.);
 
     m_pHeadSplitEnabled->setButtonMode(mixxx::control::ButtonMode::Toggle);
+#ifndef Q_OS_ANDROID
+    // On Android the "split cable" audio preset relies on head split, so the
+    // persisted value is kept there.
     m_pHeadSplitEnabled->set(0.0);
+#endif
 
     // zero out otherwise uninitialized buffers
     m_head.clear();
@@ -811,6 +818,11 @@ void EngineMixer::applyMainEffects(std::size_t bufferSize) {
                 mainFeatures,
                 CSAMPLE_GAIN_ONE,
                 CSAMPLE_GAIN_ONE);
+    }
+    if (m_pFxStation) {
+        m_pFxStation->process(m_main.data(),
+                static_cast<int>(bufferSize / 2),
+                static_cast<float>(m_sampleRate.value()));
     }
 }
 

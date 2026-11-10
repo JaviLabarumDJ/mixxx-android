@@ -99,6 +99,8 @@ class allshader::WaveformRenderMark : public ::WaveformRenderMarkBase,
     rendergraph::GeometryNode* m_pPlayPosNode;
     float m_playPosHeight;
     float m_playPosDevicePixelRatio;
+    // The height the play marker geometry was made for
+    float m_playPosGeometryHeight;
 
     DigitsRenderNode* m_pDigitsRenderNode{};
 

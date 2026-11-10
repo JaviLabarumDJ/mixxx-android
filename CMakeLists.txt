@@ -1268,6 +1268,7 @@ add_library(
   src/controllers/controllerinputmappingtablemodel.cpp
   src/controllers/controllerlearningeventfilter.cpp
   src/controllers/controllermanager.cpp
+  src/controllers/mappingmatcher.cpp
   src/controllers/controllermappinginfo.cpp
   src/controllers/legacycontrollersettings.cpp
   src/controllers/legacycontrollersettingslayout.cpp
@@ -1408,6 +1409,8 @@ add_library(
   src/engine/enginebuffer.cpp
   src/engine/enginedelay.cpp
   src/engine/enginemixer.cpp
+  src/engine/fxstation/fxstation.cpp
+  src/engine/fxstation/fxstationinstruments.cpp
   src/engine/engineobject.cpp
   src/engine/enginepregain.cpp
   src/engine/enginesidechaincompressor.cpp
@@ -1740,6 +1743,7 @@ add_library(
   src/util/rotary.cpp
   src/util/runtimeloggingcategory.cpp
   src/util/safelywritablefile.cpp
+  src/util/removablestorage.cpp
   src/util/sample.cpp
   src/util/sandbox.cpp
   src/util/screensaver.cpp
@@ -2433,7 +2437,6 @@ if(QT6)
       mixxx-lib
       PUBLIC ANDROID_PACKAGE_NAME="org.mixxx"
     )
-    target_sources(mixxx-lib PRIVATE src/util/androidpermissions.cpp)
     qt_add_executable(mixxx src/main.cpp MANUAL_FINALIZATION)
     set_property(
       TARGET mixxx
@@ -2450,6 +2453,16 @@ if(QT6)
       mixxx
       PROPERTIES
         QT_ANDROID_APPLICATION_ARGUMENTS "--new-ui"
+    )
+    # From Android 10 on: functions of the C library that Mixxx and Qt use
+    # only exist from Android 11/13/14 on, see the libccompat part of
+    # cmake/modules/MixxxAndroid.cmake. Not Android 9: the MIDI API of the
+    # NDK (AMidi) used for the controllers comes with Android 10. The target stays at the compile SDK:
+    # from 36 on, Android 16 ignores the landscape lock on tablets and no
+    # longer delivers the Back key to Qt.
+    set_target_properties(
+      mixxx
+      PROPERTIES QT_ANDROID_MIN_SDK_VERSION 29 QT_ANDROID_TARGET_SDK_VERSION 35
     )
     qt_add_android_permission(mixxx
     NAME android.permission.ACCESS_NETWORK_STATE
@@ -2513,6 +2526,24 @@ if(QT6)
       mixxx
       PROPERTIES QT_ANDROID_EXTRA_LIBS "${ANDROID_LIBOMP}"
     )
+    # Not needed in the APK: the translation sources (only the compiled .qm
+    # files are loaded) and the widget skins of the desktop. LateNight stays,
+    # it is the default skin of the skin loader.
+    set(ANDROID_ASSETS_DIR "${CMAKE_CURRENT_BINARY_DIR}/android-build/assets")
+    file(
+      GLOB ANDROID_UNUSED_ASSETS
+      RELATIVE "${CMAKE_SOURCE_DIR}/res"
+      "${CMAKE_SOURCE_DIR}/res/translations/*.ts"
+    )
+    list(TRANSFORM ANDROID_UNUSED_ASSETS PREPEND "${ANDROID_ASSETS_DIR}/")
+    set(
+      ANDROID_UNUSED_SKINS
+      "${ANDROID_ASSETS_DIR}/skins/Deere"
+      "${ANDROID_ASSETS_DIR}/skins/Deere (64 Samplers)"
+      "${ANDROID_ASSETS_DIR}/skins/Shade"
+      "${ANDROID_ASSETS_DIR}/skins/Tango"
+      "${ANDROID_ASSETS_DIR}/skins/Tango (64 Samplers)"
+    )
     add_custom_target(
       copy-resource-android
       COMMENT "Copy resources folder to Android build asset directory"
@@ -2521,13 +2552,11 @@ if(QT6)
         ${CMAKE_CURRENT_BINARY_DIR}/android
       COMMAND
         ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/res
-        ${CMAKE_CURRENT_BINARY_DIR}/android-build/assets
-      COMMAND
-        ${CMAKE_COMMAND}
-        -DTEMPLATE_FILE="${CMAKE_SOURCE_DIR}/packaging/android/usb_device_filter.xml.in"
-        -DTARGET_FILE="${CMAKE_CURRENT_BINARY_DIR}/android/res/xml/usb_device_filter.xml"
-        -P ${CMAKE_SOURCE_DIR}/cmake/modules/gen_usb_device_filter.cmake
+        ${ANDROID_ASSETS_DIR}
+      COMMAND ${CMAKE_COMMAND} -E rm -f -- ${ANDROID_UNUSED_ASSETS}
+      COMMAND ${CMAKE_COMMAND} -E rm -rf -- ${ANDROID_UNUSED_SKINS}
       WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+      VERBATIM
     )
     add_dependencies(mixxx copy-resource-android)
     target_link_libraries(mixxx PUBLIC omp)
@@ -3567,6 +3596,7 @@ if(ENGINEPRIME)
   target_sources(
     mixxx-lib
     PRIVATE
+      src/library/enginedj/enginedjfeature.cpp
       src/library/export/dlglibraryexport.cpp
       src/library/export/engineprimeexportjob.cpp
       src/library/export/libraryexporter.cpp
@@ -4075,6 +4105,10 @@ if(QML)
     SYSTEM
     PUBLIC lib/rigtorp/SPSCQueue/include lib/portaudio
   )
+  if(OPENSSL_INCLUDE_DIR)
+    target_include_directories(mixxx-qml-lib SYSTEM PRIVATE ${OPENSSL_INCLUDE_DIR})
+    target_link_libraries(mixxx-qml-lib PRIVATE ${OPENSSL_CRYPTO_LIBRARY})
+  endif()
 
   target_link_libraries(mixxx-qml-lib PUBLIC mixxx-proto)
   target_link_libraries(mixxx-qml-libplugin PUBLIC mixxx-proto)
@@ -4121,6 +4155,7 @@ if(QML)
       src/qml/qmlconfigproxy.cpp
       src/qml/qmlconfigproxybase.cpp
       src/qml/qmlcontrolproxy.cpp
+      src/qml/qmlframeclock.cpp
       src/qml/qmlcuesmodel.cpp
       src/qml/qmldlgpreferencesproxy.cpp
       src/qml/qmleffectslotparametersmodel.cpp
@@ -4151,13 +4186,13 @@ if(QML)
       src/qml/qmltrackproxy.cpp
       src/qml/qmlsoundmanagerproxy.cpp
       src/qml/qmlpreferencesproxy.cpp
-      src/qml/qmlstreamingproxy.cpp
       src/waveform/renderers/allshader/digitsrenderer.cpp
       src/waveform/renderers/allshader/waveformrenderbeat.cpp
       src/waveform/renderers/allshader/waveformrenderer.cpp
       src/waveform/renderers/allshader/waveformrendererendoftrack.cpp
       src/waveform/renderers/allshader/waveformrendererpreroll.cpp
       src/waveform/renderers/allshader/waveformrendererrgb.cpp
+      src/waveform/renderers/allshader/waveformrendererrgbgpu.cpp
       src/waveform/renderers/allshader/waveformrenderersignalbase.cpp
       src/waveform/renderers/allshader/waveformrendermark.cpp
       src/waveform/renderers/allshader/waveformrendermarkrange.cpp
@@ -4178,6 +4213,7 @@ if(QML)
       mixxx-qml-lib
       PRIVATE
         src/waveform/renderers/allshader/waveformrendererstem.cpp
+        src/waveform/renderers/allshader/waveformrendererstemgpu.cpp
         src/qml/qmlstemsmodel.cpp
     )
   endif()
@@ -5840,4 +5876,9 @@ if(APPLE AND MACOS_BUNDLE)
     @ONLY
   )
   install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/BundleInstall.cmake")
+endif()
+
+# Android port, see cmake/modules/MixxxAndroid.cmake
+if(ANDROID)
+  include(MixxxAndroid)
 endif()

@@ -354,9 +354,16 @@ class QmlControllerManagerProxy : public QObject {
         return m_knownMappings.value(type);
     }
 
+    QmlControllerMappingProxy* findMapping(
+            QmlControllerDeviceProxy::Type type, const QString& path) const;
+
     Q_INVOKABLE void rescan();
 
     static QmlControllerManagerProxy* create(QQmlEngine* pQmlEngine, QJSEngine* pJsEngine);
+    /// The controller manager, for other Android proxies (e.g. learning)
+    static std::shared_ptr<ControllerManager> manager() {
+        return s_pControllerManager;
+    }
     static void registerManager(std::shared_ptr<ControllerManager> pManager,
             bool controllerPreviewScreens = false) {
         s_pControllerManager = std::move(pManager);

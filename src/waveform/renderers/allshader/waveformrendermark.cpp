@@ -198,6 +198,7 @@ allshader::WaveformRenderMark::WaveformRenderMark(
           m_isSlipRenderer(type == ::WaveformRendererAbstract::Slip),
           m_playPosHeight(0.f),
           m_playPosDevicePixelRatio(0.f),
+          m_playPosGeometryHeight(-1.f),
           m_untilMarkShowBeats{false},
           m_untilMarkShowTime(false),
           m_untilMarkAlign(Qt::AlignVCenter),
@@ -514,17 +515,21 @@ void allshader::WaveformRenderMark::update() {
 
     const float playMarkerPos = static_cast<float>(m_waveformRenderer->getPlayMarkerPosition() *
             m_waveformRenderer->getLength());
-    if (m_lastPlayMarkerPos != playMarkerPos) {
+    // Also when the height changes: the first update may come before the
+    // layout, with a height of 0, and the marker then stayed invisible
+    const float playMarkerHeight = static_cast<float>(m_waveformRenderer->getBreadth());
+    if (m_lastPlayMarkerPos != playMarkerPos || m_playPosGeometryHeight != playMarkerHeight) {
         const float drawOffset = roundToPixel(playMarkerPos + kPlayPosOffset);
         TexturedVertexUpdater vertexUpdater{
                 m_pPlayPosNode->geometry()
                         .vertexDataAs<Geometry::TexturedPoint2D>()};
         vertexUpdater.addRectangle({drawOffset, 0.f},
-                {drawOffset + kPlayPosWidth, static_cast<float>(m_waveformRenderer->getBreadth())},
+                {drawOffset + kPlayPosWidth, playMarkerHeight},
                 {0.f, 0.f},
                 {1.f, 1.f});
         m_pPlayPosNode->markDirtyGeometry();
         m_lastPlayMarkerPos = playMarkerPos;
+        m_playPosGeometryHeight = playMarkerHeight;
     }
 
     if (hasWaveform && (m_untilMarkShowBeats || m_untilMarkShowTime)) {

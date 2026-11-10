@@ -5,8 +5,8 @@
 ![Android Version](https://img.shields.io/badge/Android-10.0%2B%20(API%2029--35)-brightgreen?logo=android&logoColor=white)
 ![Architecture](https://img.shields.io/badge/Arch-ARM64%20(arm64--v8a)-blue?logo=arm)
 ![Framework](https://img.shields.io/badge/Qt-6.8%20%7C%20QML-41cd52?logo=qt)
-[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.5.5-android)
-[![Download APK](https://img.shields.io/badge/Download-APK%20(236%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.5.5-android/mixxx-android-v1.5.5.apk)
+[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.6.1-android)
+[![Download APK](https://img.shields.io/badge/Download-APK%20(272%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.6.1-android/mixxx-android-v1.6.1.apk)
 ![License](https://img.shields.io/badge/License-GPL%20v2-orange.svg)
 
 **The world's premier open-source DJ software, fully ported, modernized, and touch-optimized for Android smartphones, tablets, and standalone hardware setups.**
@@ -28,7 +28,41 @@ Whether you're performing live sets using a USB DJ controller, mixing on the go 
 <!-- START_AI_GENERATED_DISCLAIMER -->
 <!-- This section was written with the assistance of an AI Agent (Claude). -->
 
-## 🆕 What's New in v1.5.5
+## 🆕 What's New in v1.6.1
+
+* **Even smoother waveforms**, above all on 90 and 120 Hz screens:
+  * the waveforms move on every refresh of the display while playing (they moved on every second one at 60 fps, which on a 120 Hz screen looked choppy next to the rest of the window, drawn on every refresh);
+  * on devices that can't draw a frame on every refresh, Mixxx notices it and moves them on every second refresh at a steady pace (e.g. 45 fps at 90 Hz), which looks smoother than uneven frames, trying again later.
+  * Measured on a POCO X6 Pro (120 Hz): 120 fps, every frame on time.
+
+## 🗂️ What was new in v1.6.0
+
+* **AI stem separation** (drums, bass, other, vocals), inspired by [Dani Roman](https://www.instagram.com/danigiavanni)'s mixxx-stems: choose a track or a whole list in the library (**🎚 STEMS**) and Mixxx separates it in the background, on the device, without internet. The stems are saved next to the track (`.stems/<track>.stem.mp4`), so the cues, beatgrid and BPM are kept.
+  * Two models, downloaded from the app: **Spleeter** (fast and light, ~1 min per 5 minute track on a Lenovo Tab M11) and **HTDemucs** (best quality, slow, needs ~2.5 GB of memory).
+  * A queue that goes on with the screen off or in another app (with a notification), can be paused, and waits or slows down while a deck plays (*Settings → Stems*).
+  * **On the deck:** in **Classic**, the **STEM** tab of the pads; in **Booth**, the **STEMS** pad mode of the DJ view. Four buttons, one per stem: tap to mute it, hold to play only that one.
+* **Smooth waveforms:** the scrolling waveforms ran at about 30 jumpy frames per second on a Lenovo Tab M11, now at 70–90 (the refresh rate of the display):
+  * a bug made the waveforms build all their parts again on every frame (a type check that fails on Android);
+  * the RGB and stem waveforms are now drawn by the GPU: their data is uploaded once and only a few numbers change from frame to frame;
+  * frames follow the refresh rate of the display (60, 90 or 120 Hz) instead of a timer of their own;
+  * the EQ now also changes the stem waveforms, like the others.
+* **Faster separation:** the models, the Wiener filter and the AAC encoding of the 5 tracks now run at the same time, the encoding on the slower cores: about 25% faster than the first stems test builds.
+* Requires about 33 MB more of APK for ONNX Runtime; the models (80 MB for Spleeter, 156 MB for HTDemucs) are only downloaded if you use them. User manual: [English](docs/stems/STEMS_MANUAL_en.md) · [Español](docs/stems/MANUAL_STEMS_es.md).
+
+## 🗂️ What was new in v1.5.6
+
+* **Lite skin** (*Settings → Interface → Skin → Lite*), for slow phones and tablets and to save battery:
+  * two decks without waveforms: a position bar with the time left, BPM and tempo;
+  * hot cues (A–D, or A–H on tablets), a loop, SYNC, CUE and PLAY, the tempo fader and nudge;
+  * a mixer with EQ, filter, headphones CUE, channel faders and crossfader;
+  * the browser, loaded only while it is shown, and REC;
+  * flat buttons, no animations, meters or effects panel.
+  * while playing, the interface uses about 5% of a CPU core on a Lenovo Tab M11 (about 64% with Booth).
+* **Android 10, 11, 12 and 13:** Mixxx installs and starts again on these versions (it needed Android 14). A small library supplies the few system functions of newer Android versions that Qt and Mixxx use. Android 9 and older are not supported: they lack the MIDI API that controllers need.
+* **SD cards and folder browser:** *FOLDER → Devices* lists the internal storage, SD cards and USB drives by their Android name, to browse them folder by folder (breadcrumb, **←** back, **ALL TRACKS**) and load tracks from them. *Settings → Music Library* has buttons to add a whole SD card or USB drive to the library. Android asks once for access to all files. With an SD card inserted, USB drives read by Mixxx itself are found again.
+* **Smoother screen in every skin:** waveforms, track times, level meters and overviews now update together on the same screen frame instead of each on its own timer, so the screen is redrawn fewer times; times update 10 times a second and level meters 30 times.
+
+## 🗂️ What was new in v1.5.5
 
 * **Booth skin:**
   * **FILTER** knob for each deck in the touch mixer. It is dimmed while the filter is off.
@@ -194,7 +228,7 @@ This release merges the work of **[morpheasgr (Angelos Exarchos)](https://github
 
 | Component | Minimum | Recommended |
 |---|---|---|
-| **OS** | Android 14 (API 34) | Android 14 - 16 (HyperOS / OneUI / AOSP) |
+| **OS** | Android 10 (API 29) | Android 14 - 16 (HyperOS / OneUI / AOSP) |
 | **Processor** | 64-bit ARM (ARMv8-A) | Snapdragon 8 Gen 1 / Dimensity 8300-Ultra or higher |
 | **RAM** | 4 GB | 8 GB+ |
 | **Screen** | 5.5" (1080p) | 6.67" AMOLED 120Hz+ or Tablet (10"+) |
@@ -205,7 +239,7 @@ This release merges the work of **[morpheasgr (Angelos Exarchos)](https://github
 ## 🚀 Installation & Quick Start
 
 ### Option A: Install Pre-Built Signed APK
-1. Download [**mixxx-android-v1.5.5.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.5.5-android/mixxx-android-v1.5.5.apk) from the [Official GitHub Release v1.5.5](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.5.5-android).
+1. Download [**mixxx-android-v1.6.1.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.6.1-android/mixxx-android-v1.6.1.apk) from the [Official GitHub Release v1.6.1](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.6.1-android).
 2. Enable *"Install unknown apps"* in your Android device settings.
 3. Install and launch **MIXXX**.
 4. Grant storage and audio permissions when prompted.
