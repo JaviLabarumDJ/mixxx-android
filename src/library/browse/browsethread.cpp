@@ -9,6 +9,9 @@
 #include "sources/soundsourceproxy.h"
 #include "util/datetime.h"
 #include "util/trace.h"
+#ifdef __ANDROID_USB_DRIVE__
+#include "library/usbdrive/androidusbdrive.h"
+#endif
 
 namespace {
 constexpr int kRowBatchSize = 10;
@@ -123,6 +126,52 @@ void BrowseThread::populateModel() {
         qWarning() << "Skipping" << thisPath.info();
         return;
     }
+
+#ifdef __ANDROID_USB_DRIVE__
+    // A folder of a USB drive Mixxx reads itself: its files are not copied
+    // yet, so the rows come from the drive's directory and the file names
+    // (the tags are read when a track is loaded)
+    if (const auto entries = mixxx::usbdrive::listFolder(thisPath.info().location())) {
+        emit clearModel(thisModelObserver);
+        QString folder = thisPath.info().location();
+        if (!folder.endsWith(QChar('/'))) {
+            folder.append(QChar('/'));
+        }
+        QList<QList<QStandardItem*>> driveRows;
+        for (const auto& entry : *entries) {
+            if (entry.isDirectory || entry.name.startsWith(QChar('.')) ||
+                    !SoundSourceProxy::isFileNameSupported(entry.name)) {
+                continue;
+            }
+            QList<QStandardItem*> rowItems;
+            for (int column = 0; column < NUM_COLUMNS; ++column) {
+                auto* pItem = new QStandardItem();
+                pItem->setData(QString(), Qt::UserRole);
+                rowItems.append(pItem);
+            }
+            const auto setText = [&rowItems](int column, const QString& text, const QVariant& sortKey) {
+                rowItems[column]->setText(text);
+                rowItems[column]->setToolTip(text);
+                rowItems[column]->setData(sortKey, Qt::UserRole);
+            };
+            mixxx::TrackInfo trackInfo;
+            trackInfo.parseArtistTitleFromFileName(entry.name, true);
+            const QString location = folder + entry.name;
+            setText(COLUMN_PREVIEW, QStringLiteral("0"), QStringLiteral("0"));
+            setText(COLUMN_FILENAME, entry.name, entry.name);
+            setText(COLUMN_ARTIST, trackInfo.getArtist(), trackInfo.getArtist());
+            setText(COLUMN_TITLE, trackInfo.getTitle(), trackInfo.getTitle());
+            setText(COLUMN_TYPE, QFileInfo(entry.name).suffix(), QFileInfo(entry.name).suffix());
+            setText(COLUMN_NATIVELOCATION, QDir::toNativeSeparators(location), location);
+            setText(COLUMN_FILE_MODIFIED_TIME,
+                    mixxx::displayLocalDateTime(entry.modified),
+                    entry.modified);
+            driveRows.append(rowItems);
+        }
+        emit rowsAppended(driveRows, thisModelObserver);
+        return;
+    }
+#endif
 
     // Refresh the name filters in case we loaded new SoundSource plugins.
     const QStringList nameFilters = SoundSourceProxy::getSupportedFileNamePatterns();

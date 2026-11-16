@@ -77,6 +77,9 @@ uchar QmlSoundDeviceConnection::getChannelGroup() const {
 uchar QmlSoundDeviceConnection::getIndex() const {
     return m_audioPath->getIndex();
 }
+int QmlSoundDeviceConnection::getChannelCount() const {
+    return static_cast<int>(m_audioPath->getChannelGroup().getChannelCount());
+}
 
 QmlSoundManagerProxy::QmlSoundManagerProxy(
         std::shared_ptr<SoundManager> pSoundManager,
@@ -219,29 +222,37 @@ void QmlSoundManagerProxy::setAudioBufferSizeIndex(unsigned int latency) {
 void QmlSoundManagerProxy::addOutput(QmlSoundOutputDeviceProxy* device,
         int type,
         unsigned char channelGroup,
-        unsigned char index) {
+        unsigned char index,
+        int channelCount) {
     VERIFY_OR_DEBUG_ASSERT(device && qml_owned_ptr<QmlSoundOutputDeviceProxy>(device)) {
         return;
     }
-    m_config.addOutput(device->getDeviceId(),
-            AudioOutput(static_cast<AudioPathType>(type),
-                    channelGroup,
-                    mixxx::audio::ChannelCount::stereo(),
-                    index));
+    // Mono where the path allows it (all but vinyl control), like the
+    // preferences of the desktop
+    const auto pathType = static_cast<AudioPathType>(type);
+    const auto channels = channelCount == 1 &&
+                    AudioPath::minChannelsForType(pathType) == mixxx::audio::ChannelCount::mono()
+            ? mixxx::audio::ChannelCount::mono()
+            : mixxx::audio::ChannelCount::stereo();
+    m_config.addOutput(device->getDeviceId(), AudioOutput(pathType, channelGroup, channels, index));
 }
 
 void QmlSoundManagerProxy::addInput(QmlSoundInputDeviceProxy* device,
         int type,
         unsigned char channelGroup,
-        unsigned char index) {
+        unsigned char index,
+        int channelCount) {
     VERIFY_OR_DEBUG_ASSERT(device && qml_owned_ptr<QmlSoundInputDeviceProxy>(device)) {
         return;
     }
-    m_config.addInput(device->getDeviceId(),
-            AudioInput(static_cast<AudioPathType>(type),
-                    channelGroup,
-                    mixxx::audio::ChannelCount::stereo(),
-                    index));
+    // Mono where the path allows it (all but vinyl control), like the
+    // preferences of the desktop
+    const auto pathType = static_cast<AudioPathType>(type);
+    const auto channels = channelCount == 1 &&
+                    AudioPath::minChannelsForType(pathType) == mixxx::audio::ChannelCount::mono()
+            ? mixxx::audio::ChannelCount::mono()
+            : mixxx::audio::ChannelCount::stereo();
+    m_config.addInput(device->getDeviceId(), AudioInput(pathType, channelGroup, channels, index));
 }
 
 void QmlSoundManagerProxy::clearOutputs() {

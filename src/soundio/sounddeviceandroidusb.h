@@ -42,6 +42,8 @@ class SoundDeviceAndroidUsb : public SoundDevice {
 
   private:
     void render(uint8_t* pDestination, int frames);
+    /// Converts captured frames to float and queues them for readProcess()
+    void capture(const uint8_t* pSource, int frames);
     /// For a sound card that isn't the clock reference: reads the frames
     /// from the FIFO at a rate that follows the card's own clock, so that
     /// the two clocks drifting apart causes no clicks
@@ -51,6 +53,12 @@ class SoundDeviceAndroidUsb : public SoundDevice {
 
     std::shared_ptr<mixxx::androidusb::AndroidUsbAudioDevice> m_pDevice;
     std::unique_ptr<FIFO<CSAMPLE>> m_pFifo;
+    // The input (e.g. timecode for vinyl control), from the USB event thread
+    // to readProcess()
+    std::unique_ptr<FIFO<CSAMPLE>> m_pInputFifo;
+    std::vector<CSAMPLE> m_captureBuffer;
+    std::vector<CSAMPLE> m_inputBuffer;
+    bool m_inputPrimed = false;
     std::vector<CSAMPLE> m_engineBuffer;
     std::vector<CSAMPLE> m_renderBuffer;
     SINT m_framesPerBuffer;

@@ -29,6 +29,7 @@ SOURCES=(
     src/util/androidbackup.cpp
     src/stems/stemsmanager.cpp
     src/util/removablestorage.cpp
+    src/qml/qmlapplication.cpp
 )
 
 TS_FILES=(res/translations/mixxx-android.ts)

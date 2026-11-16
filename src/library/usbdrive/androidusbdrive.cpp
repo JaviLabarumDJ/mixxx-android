@@ -132,10 +132,25 @@ bool androidMountedRemovableStorage() {
     const QList<mixxx::AndroidStorageVolume> volumes = mixxx::androidStorageVolumes();
     for (const mixxx::AndroidStorageVolume& volume : volumes) {
         if (volume.kind == mixxx::AndroidStorageVolume::Kind::UsbDrive) {
+            qInfo() << "Android mounted the USB drive" << volume.name << "at" << volume.path
+                    << "for apps: not reading USB drives directly";
             return true;
         }
     }
-    return false;
+    // Also while Android checks a drive before mounting it (fsck can take
+    // minutes on a big drive): reading it then makes the check fail, and the
+    // drive is never mounted
+    const jboolean pending = QJniObject::callStaticMethod<jboolean>(
+            "org/mixxx/StorageHelper",
+            "removableVolumePending",
+            "(Landroid/content/Context;)Z",
+            QNativeInterface::QAndroidApplication::context().object());
+    QJniEnvironment env;
+    env.checkAndClearExceptions();
+    if (pending) {
+        qInfo() << "Android is mounting a removable drive: not reading USB drives directly";
+    }
+    return pending;
 }
 
 QString safeFolderName(QString name) {
@@ -499,6 +514,36 @@ bool copyFileTo(const QString& root, const QString& relativePath, const QString&
     const std::lock_guard lock(pDrive->mutex);
     const std::optional<FatVolume::Entry> entry = pDrive->volume.find(relativePath);
     return entry && pDrive->volume.copyFile(*entry, destination);
+}
+
+QFileInfoList knownDriveRoots() {
+    QFileInfoList roots;
+    std::lock_guard lock(s_drivesMutex);
+    for (const auto& pDrive : s_drives) {
+        if (!pDrive->pStorage->isDisconnected()) {
+            roots.append(QFileInfo(pDrive->root));
+        }
+    }
+    return roots;
+}
+
+std::optional<QList<FolderEntry>> listFolder(const QString& localFolder) {
+    QString folder = localFolder;
+    while (folder.endsWith(QChar('/'))) {
+        folder.chop(1);
+    }
+    const auto pDrive = driveFor(folder + QStringLiteral("/"));
+    if (!pDrive) {
+        return std::nullopt;
+    }
+    const QString relativeFolder = folder.mid(pDrive->root.size() + 1);
+    QList<FolderEntry> result;
+    // Reads only the directory, the file system guards itself (see listFiles)
+    const QList<FatVolume::Entry> entries = pDrive->volume.list(relativeFolder);
+    for (const auto& entry : entries) {
+        result.append({entry.name, entry.isDirectory, static_cast<qint64>(entry.size), entry.modified});
+    }
+    return result;
 }
 
 bool isOnDrive(const QString& localPath) {

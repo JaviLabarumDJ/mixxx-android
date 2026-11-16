@@ -1,5 +1,9 @@
 #include "library/browse/browsefeature.h"
 
+#ifdef __ANDROID_USB_DRIVE__
+#include "library/usbdrive/androidusbdrive.h"
+#endif
+
 #include <QAction>
 #include <QFileInfo>
 #include <QMenu>
@@ -408,6 +412,16 @@ std::vector<std::unique_ptr<TreeItem>> createRemovableDevices() {
                 volume.name,
                 QVariant(volume.path + QStringLiteral("/"))));
     }
+#ifdef __ANDROID_USB_DRIVE__
+    // USB drives Mixxx reads itself, which Android didn't mount for apps
+    // (e.g. mounted only for its Files app, or without a partition table)
+    const QFileInfoList drives = mixxx::usbdrive::knownDriveRoots();
+    for (const QFileInfo& drive : drives) {
+        ret.push_back(std::make_unique<TreeItem>(
+                QStringLiteral("USB: ") + drive.fileName(),
+                QVariant(drive.absoluteFilePath() + QStringLiteral("/"))));
+    }
+#endif
 #elif defined(__LINUX__)
     QFileInfoList devices;
     for (const QString& path : removableDriveRootPaths()) {
@@ -491,6 +505,11 @@ void BrowseFeature::onLazyChildExpandation(const QModelIndex& index) {
         for (const mixxx::AndroidStorageVolume& volume : mixxx::androidStorageVolumes()) {
             volumePaths.append(volume.path);
         }
+#ifdef __ANDROID_USB_DRIVE__
+        for (const QFileInfo& drive : mixxx::usbdrive::knownDriveRoots()) {
+            volumePaths.append(drive.absoluteFilePath());
+        }
+#endif
         m_pSidebarModel->removeChildDirsFromCache(volumePaths);
 #endif
         folders = createRemovableDevices();
@@ -510,6 +529,26 @@ std::vector<std::unique_ptr<TreeItem>> BrowseFeature::getChildDirectoryItems(
     if (path.isEmpty()) {
         return items;
     }
+#ifdef __ANDROID_USB_DRIVE__
+    // A folder of a USB drive Mixxx reads itself, listed from the drive
+    if (const auto entries = mixxx::usbdrive::listFolder(path)) {
+        QString folder = path;
+        if (!folder.endsWith(QChar('/'))) {
+            folder.append(QChar('/'));
+        }
+        for (const auto& entry : *entries) {
+            if (entry.isDirectory && !entry.name.startsWith(QChar('.'))) {
+                // The local folder of the drive gets the folder (empty, the
+                // files are copied when loaded), so that it can be opened
+                // like any folder
+                QDir().mkpath(folder + entry.name);
+                items.push_back(std::make_unique<TreeItem>(
+                        entry.name, QVariant(folder + entry.name + QStringLiteral("/"))));
+            }
+        }
+        return items;
+    }
+#endif
     // we assume that the path refers to a folder in the file system
     // populate children
     const auto dirAccess = mixxx::FileAccess(mixxx::FileInfo(path));

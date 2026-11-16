@@ -9,6 +9,7 @@
 
 #include "engine/fxstation/fxstationdsp.h"
 #include "engine/fxstation/fxstationinstruments.h"
+#include "engine/fxstation/groovestation.h"
 #include "util/types.h"
 
 class ControlObject;
@@ -83,6 +84,7 @@ class FxStation : public QObject {
         std::atomic<ControlObject*> pBeatDistance{nullptr};
         std::atomic<ControlObject*> pVolume{nullptr};
         std::atomic<ControlObject*> pSyncLeader{nullptr};
+        std::atomic<ControlObject*> pBeatInBar{nullptr};
     };
 
     struct Voice {
@@ -159,6 +161,11 @@ class FxStation : public QObject {
     std::array<Deck, kDecks> m_decks;
     QTimer m_findDecksTimer;
     std::unique_ptr<fxstation::Instruments> m_pInstruments;
+    // The step sequencer and pads, on the same clock
+    std::unique_ptr<GrooveStation> m_pGroove;
+    // Beats to add to the clock so that its whole beats count the bars of
+    // the leading deck (0 on its first beat)
+    double m_barShift;
 
     float m_sampleRate;
     std::minstd_rand m_random;

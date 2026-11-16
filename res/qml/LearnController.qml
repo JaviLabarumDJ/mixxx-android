@@ -17,6 +17,13 @@ Rectangle {
     // "group,key" -> description of what was learned
     property var learnedText: ({})
     property string status: ""
+    // How the next function learned is played: press (plain), shift1,
+    // shift2, long, double or combo, and its modes
+    property string trigger: "press"
+    property string buttonMode: "auto"
+    property string knobMode: "normal"
+    property bool led: false
+    readonly property bool plainOptions: trigger === "press" && buttonMode === "auto" && knobMode === "normal" && !led
 
     readonly property string deckGroup: "[Channel" + deck + "]"
     readonly property var sections: [
@@ -92,6 +99,35 @@ Rectangle {
 
     color: "#0f1319"
 
+    // A choice of the options of learning
+    component OptionButton: Rectangle {
+        id: optionButton
+
+        property string text: ""
+        property bool active: false
+        signal clicked
+
+        Layout.preferredHeight: 30
+        Layout.preferredWidth: Math.max(64, optionLabel.implicitWidth + 16)
+        border.color: active ? "#00e5ff" : "#2f3846"
+        color: active ? "#0d3a44" : "#161b24"
+        radius: 5
+
+        Text {
+            id: optionLabel
+
+            anchors.centerIn: parent
+            color: optionButton.active ? "#ffffff" : "#b0bec5"
+            font.bold: true
+            font.pixelSize: 11
+            text: optionButton.text
+        }
+        MouseArea {
+            anchors.fill: parent
+            onClicked: optionButton.clicked()
+        }
+    }
+
     Component.onCompleted: {
         if (Mixxx.ControllerLearning.controllers.length > 0)
             Mixxx.ControllerLearning.start(controllerChoice.currentIndex);
@@ -100,8 +136,16 @@ Rectangle {
 
     Connections {
         function onControlLearned(group, key, description) {
+            if (group === "") {
+                // A SHIFT button
+                root.waitingFor = "";
+                root.status = qsTr("Learned %1: %2").arg(key.toUpperCase()).arg(description);
+                return;
+            }
             const learned = root.learnedText;
-            learned[group + "," + key] = description;
+            const learnKey = group + "," + key;
+            // Several ways of playing one function are listed together
+            learned[learnKey] = learned[learnKey] && description.indexOf(" · ") >= 0 ? learned[learnKey] + " | " + description : description;
             root.learnedText = learned;
             root.waitingFor = "";
             root.status = qsTr("Learned: %1").arg(description);
@@ -139,7 +183,7 @@ Rectangle {
             Layout.fillWidth: true
             color: "#90a4ae"
             font.pixelSize: 12
-            text: qsTr("Tap LEARN next to a function, then press or move that control on your controller. With two players (e.g. two CDJs), learn each one with its own deck.")
+            text: qsTr("Tap LEARN next to a function, then press or move that control on your controller. With two players (e.g. two CDJs), learn each one with its own deck. Choose first how it is played: with SHIFT, on a long or double press, or as a combination (hold a button, then press the other one); those work once saved.")
             wrapMode: Text.WordWrap
         }
         RowLayout {
@@ -180,6 +224,130 @@ Rectangle {
                 }
             }
         }
+        // SHIFT buttons and how the next function is played
+        Flow {
+            Layout.fillWidth: true
+            spacing: 6
+
+            Repeater {
+                model: 2
+
+                RowLayout {
+                    id: shiftRow
+
+                    required property int index
+                    readonly property string shiftKey: "shift" + (index + 1)
+                    readonly property string learnedAs: Mixxx.ControllerLearning.shifts[index] || ""
+
+                    spacing: 4
+
+                    Text {
+                        color: "#ffd740"
+                        font.bold: true
+                        font.pixelSize: 12
+                        text: "SHIFT " + (shiftRow.index + 1) + ":"
+                    }
+                    Text {
+                        color: shiftRow.learnedAs ? "#69f0ae" : "#78909c"
+                        font.pixelSize: 11
+                        text: shiftRow.learnedAs || qsTr("none")
+                    }
+                    OptionButton {
+                        active: root.waitingFor === shiftRow.shiftKey
+                        text: root.waitingFor === shiftRow.shiftKey ? qsTr("WAITING…") : qsTr("LEARN")
+                        onClicked: {
+                            root.waitingFor = shiftRow.shiftKey;
+                            root.status = "";
+                            Mixxx.ControllerLearning.listenShift(shiftRow.index);
+                        }
+                    }
+                    OptionButton {
+                        text: "✕"
+                        visible: shiftRow.learnedAs !== ""
+                        onClicked: Mixxx.ControllerLearning.clearShift(shiftRow.index)
+                    }
+                    Item {
+                        width: 12
+                    }
+                }
+            }
+        }
+        Flow {
+            Layout.fillWidth: true
+            spacing: 6
+
+            Text {
+                color: "#90a4ae"
+                font.bold: true
+                font.pixelSize: 11
+                height: 30
+                text: qsTr("Played:")
+                verticalAlignment: Text.AlignVCenter
+            }
+            Repeater {
+                model: [["press", qsTr("Normal")], ["shift1", "SHIFT 1"], ["shift2", "SHIFT 2"], ["long", qsTr("Long press")], ["double", qsTr("Double press")], ["combo", qsTr("Combination")]]
+
+                OptionButton {
+                    required property var modelData
+
+                    active: root.trigger === modelData[0]
+                    text: modelData[1]
+                    onClicked: root.trigger = modelData[0]
+                }
+            }
+            Item {
+                height: 30
+                width: 10
+            }
+            Text {
+                color: "#90a4ae"
+                font.bold: true
+                font.pixelSize: 11
+                height: 30
+                text: qsTr("Button:")
+                verticalAlignment: Text.AlignVCenter
+            }
+            Repeater {
+                model: [["auto", qsTr("Auto")], ["momentary", qsTr("Momentary")], ["toggle", qsTr("On / off")]]
+
+                OptionButton {
+                    required property var modelData
+
+                    active: root.buttonMode === modelData[0]
+                    text: modelData[1]
+                    onClicked: root.buttonMode = modelData[0]
+                }
+            }
+            OptionButton {
+                active: root.led
+                text: qsTr("💡 Light")
+                onClicked: root.led = !root.led
+            }
+            Item {
+                height: 30
+                width: 10
+            }
+            Text {
+                color: "#90a4ae"
+                font.bold: true
+                font.pixelSize: 11
+                height: 30
+                text: qsTr("Knob:")
+                verticalAlignment: Text.AlignVCenter
+            }
+            Repeater {
+                model: [["normal", qsTr("Normal")], ["invert", qsTr("Inverted")], ["relative", qsTr("Relative")], ["soft", qsTr("Soft takeover")]]
+
+                OptionButton {
+                    required property var modelData
+
+                    active: root.knobMode === modelData[0]
+                    text: modelData[1]
+                    onClicked: root.knobMode = modelData[0]
+                }
+            }
+        }
+
         // What the controller sends right now
         Rectangle {
             Layout.fillWidth: true
@@ -269,7 +437,16 @@ Rectangle {
                                     const control = root.controlOf(row.modelData[0]);
                                     root.waitingFor = row.learnKey;
                                     root.status = "";
-                                    Mixxx.ControllerLearning.listen(control[0], control[1]);
+                                    if (root.plainOptions) {
+                                        Mixxx.ControllerLearning.listen(control[0], control[1]);
+                                    } else {
+                                        Mixxx.ControllerLearning.listenWith(control[0], control[1], {
+                                            "trigger": root.trigger,
+                                            "buttonMode": root.buttonMode,
+                                            "knobMode": root.knobMode,
+                                            "led": root.led
+                                        });
+                                    }
                                 }
                             }
                         }

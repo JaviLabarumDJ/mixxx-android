@@ -12,6 +12,10 @@
 
 #include "library/browse/browsefeature.h"
 #include "library/browse/foldertreemodel.h"
+
+#ifdef __ANDROID_USB_DRIVE__
+#include "library/usbdrive/androidusbdrive.h"
+#endif
 #include "library/treeitem.h"
 #include "moc_foldertreemodel.cpp"
 
@@ -57,6 +61,16 @@ bool FolderTreeModel::directoryHasChildren(const QString& path) const {
         return it.value();
     }
 
+#ifdef __ANDROID_USB_DRIVE__
+    // A folder of a USB drive Mixxx reads itself
+    if (const auto entries = mixxx::usbdrive::listFolder(path)) {
+        const bool hasFolders = std::any_of(entries->begin(), entries->end(), [](const auto& entry) {
+            return entry.isDirectory && !entry.name.startsWith(QChar('.'));
+        });
+        m_directoryCache[path] = hasFolders;
+        return hasFolders;
+    }
+#endif
     // Acquire a security token for the path.
     const auto dirAccess = mixxx::FileAccess(mixxx::FileInfo(path));
 

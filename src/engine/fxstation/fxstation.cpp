@@ -120,7 +120,8 @@ FxStation::FxStation()
           m_releaseType(Release::VinylBrake),
           m_releaseElapsed(0.0),
           m_releaseRead(0.0),
-          m_releaseWaiting(false) {
+          m_releaseWaiting(false),
+          m_barShift(0.0) {
     m_pSceneType = makeButton("scene_type", true, kSceneTypes);
     m_pSceneOn = makeButton("scene_on", true);
     m_pSceneDial = makeKnob("scene_dial", 0.0, 1.0, 0.5);
@@ -181,6 +182,7 @@ FxStation::FxStation()
     }
     m_liveGain.reset(1.f);
 
+    m_pGroove = std::make_unique<GrooveStation>();
     m_pInstruments = std::make_unique<Instruments>();
     connect(m_pInstruments.get(),
             &Instruments::bankLoaded,
@@ -222,6 +224,7 @@ void FxStation::slotFindDecks() {
         find(deck.pBeatDistance, "beat_distance");
         find(deck.pVolume, "volume");
         find(deck.pSyncLeader, "sync_leader");
+        find(deck.pBeatInBar, "beat_in_bar");
     }
     if (allFound) {
         m_findDecksTimer.stop();
@@ -230,6 +233,7 @@ void FxStation::slotFindDecks() {
 
 void FxStation::prepare(float sampleRate) {
     m_sampleRate = sampleRate;
+    m_pGroove->prepare(sampleRate);
     m_reverb.setSampleRate(std::min(sampleRate, kMaxSampleRate));
     m_lowMid.set(kLowMidFrequency, sampleRate);
     m_midHigh.set(kMidHighFrequency, sampleRate);
@@ -286,6 +290,15 @@ void FxStation::updateClock(int frames) {
                 difference += 1.0;
             }
             m_beat += difference;
+        }
+        // The bars of the deck, read in the middle of a beat, away from
+        // where the deck and this clock may count the next beat apart
+        ControlObject* pBeatInBar = deck.pBeatInBar.load(std::memory_order_relaxed);
+        const double beatPhase = fraction(m_beat);
+        if (pBeatInBar && pBeatInBar->get() > 0 && beatPhase > 0.25 && beatPhase < 0.75) {
+            const double beatOfBar = pBeatInBar->get() - 1.0;
+            const double shift = beatOfBar - std::floor(m_beat);
+            m_barShift = shift - 4.0 * std::floor(shift / 4.0);
         }
     }
     m_pSource->set(source + 1);
@@ -828,6 +841,7 @@ void FxStation::process(CSAMPLE* pBuffer, int frames, float sampleRate) {
     }
     updateClock(frames);
     handleButtons();
+    m_pGroove->handleControls(m_beat + m_barShift);
 
     // Scene parameters, smoothed per buffer
     const int sceneType = std::clamp(static_cast<int>(m_pSceneType->get()),
@@ -931,6 +945,7 @@ void FxStation::process(CSAMPLE* pBuffer, int frames, float sampleRate) {
         if (xpadActive) {
             processXPad(&xpadLeft, &xpadRight, m_beat, previousBeat);
         }
+        m_pGroove->process(m_beat + m_barShift, previousBeat + m_barShift, &xpadLeft, &xpadRight);
         float left = (sourceInput ? inputLeft : 0.f) + (sourceXPad ? xpadLeft : 0.f);
         float right = (sourceInput ? inputRight : 0.f) + (sourceXPad ? xpadRight : 0.f);
         const float bypassLeft = (sourceInput ? 0.f : inputLeft) + (sourceXPad ? 0.f : xpadLeft);

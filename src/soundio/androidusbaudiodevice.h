@@ -49,6 +49,9 @@ class AndroidUsbAudioDevice {
     using RenderCallback = std::function<void(uint8_t* pDestination, int frames)>;
     /// Receives one 4 byte USB-MIDI event packet. Called on the USB event thread.
     using MidiCallback = std::function<void(const uint8_t* pPacket)>;
+    /// Receives captured frames in the input format (e.g. the timecode of
+    /// turntables or CDJs for vinyl control). Called on the USB event thread.
+    using CaptureCallback = std::function<void(const uint8_t* pSource, int frames)>;
 
     ~AndroidUsbAudioDevice();
 
@@ -80,6 +83,13 @@ class AndroidUsbAudioDevice {
     const usbaudio::StreamFormat& outputFormat() const {
         return m_outputFormat;
     }
+    /// The capture format, only valid if hasInput()
+    const usbaudio::StreamFormat& inputFormat() const {
+        return m_inputFormat;
+    }
+    bool hasInput() const {
+        return m_hasInput;
+    }
     const usbaudio::MidiInterface& midiInterface() const {
         return m_description.midi;
     }
@@ -96,11 +106,13 @@ class AndroidUsbAudioDevice {
     }
 
     /// Starts the output. Each transfer carries about transferMillis of
-    /// audio and numTransfers are queued at the USB controller.
+    /// audio and numTransfers are queued at the USB controller. With a
+    /// captureCallback the input is captured too, at the same rate.
     bool startOutput(int sampleRate,
             int transferMillis,
             int numTransfers,
-            RenderCallback renderCallback);
+            RenderCallback renderCallback,
+            CaptureCallback captureCallback = CaptureCallback());
     void stopOutput();
     bool isOutputRunning() const {
         return m_outputRunning.load();
@@ -149,6 +161,11 @@ class AndroidUsbAudioDevice {
     static void outputTransferCallback(libusb_transfer* pTransfer);
     static void feedbackTransferCallback(libusb_transfer* pTransfer);
     static void implicitTransferCallback(libusb_transfer* pTransfer);
+    static void captureTransferCallback(libusb_transfer* pTransfer);
+    /// Passes the audio of a completed capture transfer to the callback
+    void deliverCapture(libusb_transfer* pTransfer);
+    /// The input runs on its own interface (not the implicit feedback one)
+    bool hasSeparateInput() const;
     static void midiInTransferCallback(libusb_transfer* pTransfer);
 
     QJniObject m_usbDevice;
@@ -165,7 +182,12 @@ class AndroidUsbAudioDevice {
     usbaudio::StreamFormat m_outputFormat;
     /// Capture stream that clocks an implicit feedback output
     usbaudio::StreamFormat m_implicitFormat;
+    /// The implicit feedback stream as chosen for clocking only; while
+    /// capturing on the same interface, m_implicitFormat is the input format
+    usbaudio::StreamFormat m_implicitClockFormat;
     bool m_hasImplicitFeedback;
+    usbaudio::StreamFormat m_inputFormat;
+    bool m_hasInput;
     std::vector<int> m_claimedInterfaces;
 
     std::mutex m_mutex;
@@ -192,6 +214,10 @@ class AndroidUsbAudioDevice {
     std::vector<libusb_transfer*> m_feedbackTransfers;
     std::atomic<int> m_feedbackTransfersPending;
     std::deque<int> m_implicitPacketFrames;
+    // Audio input, on the event thread while the output is running
+    CaptureCallback m_captureCallback;
+    std::vector<libusb_transfer*> m_captureTransfers;
+    std::atomic<int> m_captureTransfersPending;
     // Clock measurement of the first second, on the event thread
     uint64_t m_measuredFrames16_16;
     int m_measuredPackets;

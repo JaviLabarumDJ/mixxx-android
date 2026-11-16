@@ -5,8 +5,8 @@
 ![Android Version](https://img.shields.io/badge/Android-10.0%2B%20(API%2029--35)-brightgreen?logo=android&logoColor=white)
 ![Architecture](https://img.shields.io/badge/Arch-ARM64%20(arm64--v8a)-blue?logo=arm)
 ![Framework](https://img.shields.io/badge/Qt-6.8%20%7C%20QML-41cd52?logo=qt)
-[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.7.0-android)
-[![Download APK](https://img.shields.io/badge/Download-APK%20(272%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.7.0-android/mixxx-android-v1.7.0.apk)
+[![Latest Release](https://img.shields.io/github/v/release/JaviLabarumDJ/mixxx-android?color=success&label=Release&logo=github)](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.8.0-android)
+[![Download APK](https://img.shields.io/badge/Download-APK%20(272%20MB)-007ec6?logo=android&logoColor=white)](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.8.0-android/mixxx-android-v1.8.0.apk)
 ![License](https://img.shields.io/badge/License-GPL%20v2-orange.svg)
 
 **The world's premier open-source DJ software, fully ported, modernized, and touch-optimized for Android smartphones, tablets, and standalone hardware setups.**
@@ -28,7 +28,25 @@ Whether you're performing live sets using a USB DJ controller, mixing on the go 
 <!-- START_AI_GENERATED_DISCLAIMER -->
 <!-- This section was written with the assistance of an AI Agent (Claude). -->
 
-## 🆕 What's New in v1.7.0
+## 🆕 What's New in v1.8.0
+
+* **Groove Station:** a 16-step sequencer with 8 sounds and 8 patterns plus pads for finger drumming, in time with the playing track (*GROOVE* tab). Kits can be replaced with your own samples (`/sdcard/Mixxx/GrooveStation/Kit N`), and the patterns are kept when Mixxx is closed.
+* **Samples:** a *SAMPLES* tab with the 16 samplers, and *Load to → Sampler* in the track menu.
+* **Full sound routing matrix**, like the desktop: every output and input of Mixxx with its device and channels (stereo or mono), plus multi-soundcard sync, engine clock, microphone monitor mode and latency compensation (*Settings → Audio → Full routing matrix*).
+* **Timecode / DVS (beta):** turntables or CDJs with timecode vinyls or CDs (Serato, Traktor, Rekordbox DVS, MixVibes…) control the decks. Mixxx's own USB driver now also records USB sound cards with more than 2 inputs, e.g. a DJ mixer with a sound card like the DJM-250MK2 (*Settings → Timecode / DVS*, *VINYL* button on each deck).
+* **Advanced MIDI learning:** SHIFT layers, long and double presses, two-button combinations, momentary or toggle buttons, inverted, relative and soft-takeover knobs, and button lights.
+* **USB drives:** drives that Android mounts only for itself are read by Mixxx and listed in *Devices* (folders and tracks), as well as their Rekordbox and Engine DJ playlists.
+* **Akai LPD8 FX Station mapping** for its 4 programs, with the pads switched to momentary automatically.
+* **Keeps playing in the background:** a notification keeps Mixxx running with the screen off, during a call or in another app while it plays.
+* **Lighter and faster:** less CPU while idle with a controller, no full-screen blur behind the settings, faster opening of the audio settings, quieter logs.
+* **Track menu:** *Add to playlist…* and *Reanalyze the beatgrid* work.
+* **Spanish translation** of all the new screens.
+
+## 🗂️ Previous Releases
+
+* **v1.7.0:** FX Station (RMX-1000-style remix effector), Deezer streaming, in-app MIDI learning, multiple USB sound cards with a dual CDJ preset, new mappings (CDJ-400, XDJ-700, NDX900, Akai LPD8 and MPK mini FX Station), beat counter and exit diagnostics.
+
+### v1.7.0 in detail
 
 * **The FX Station (Remix Effector):** Pioneer RMX-1000-style remix effector module on the main mix processed on the engine thread with zero overhead when idle (Scene FX build-ups/break-downs, Isolate FX 3-band modulation, X-Pad rhythm rolls, Release FX exits, and dedicated hardware mappings for Akai LPD8 & MPK mini).
 * **Native Deezer Streaming:** Direct track search and full-length downloading with personal ARL support, real-time in-place Blowfish-CBC decryption, TagLib ID3 tagging, and offline caching.
@@ -243,7 +261,7 @@ This release merges the work of **[morpheasgr (Angelos Exarchos)](https://github
 ## 🚀 Installation & Quick Start
 
 ### Option A: Install Pre-Built Signed APK
-1. Download [**mixxx-android-v1.7.0.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.7.0-android/mixxx-android-v1.7.0.apk) from the [Official GitHub Release v1.7.0](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.7.0-android).
+1. Download [**mixxx-android-v1.8.0.apk**](https://github.com/JaviLabarumDJ/mixxx-android/releases/download/v1.8.0-android/mixxx-android-v1.8.0.apk) from the [Official GitHub Release v1.8.0](https://github.com/JaviLabarumDJ/mixxx-android/releases/tag/v1.8.0-android).
 2. Enable *"Install unknown apps"* in your Android device settings.
 3. Install and launch **MIXXX**.
 4. Grant storage and audio permissions when prompted.

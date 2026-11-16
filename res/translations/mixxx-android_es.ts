@@ -85,6 +85,18 @@ Esta edición de Mixxx para Android nace de una necesidad personal como DJ: tene
         <source>Based on the open source Mixxx project. Mobile adaptation by JaviLabarum.</source>
         <translation>Basado en el proyecto Open Source Mixxx. Adaptación móvil por JaviLabarum.</translation>
     </message>
+    <message>
+        <source>SUPPORT THE PROJECT</source>
+        <translation>APOYAR EL PROYECTO</translation>
+    </message>
+    <message>
+        <source>Mixxx Android is free, independent and ad-free. If you enjoy the app and want to support continuous development and maintenance, any donation is greatly appreciated!</source>
+        <translation>Mixxx Android es gratuito, independiente y sin publicidad. Si disfrutas de la app y quieres apoyar su desarrollo continuo, ¡cualquier donación es enormemente bienvenida!</translation>
+    </message>
+    <message>
+        <source>Donate via PayPal</source>
+        <translation>Donar con PayPal</translation>
+    </message>
 </context>
 <context>
     <name>AboutDialog</name>
@@ -439,6 +451,105 @@ Usa el modo avanzado para verla</translation>
     </message>
 </context>
 <context>
+    <name>BeatportView</name>
+    <message>
+        <source>%1 tracks found on Beatport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>❌ Error: %1</source>
+        <translation type="unfinished">❌ Error: %1</translation>
+    </message>
+    <message>
+        <source>%1 electronic chart tracks loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>✔ Track ready and loaded into %1</source>
+        <translation type="unfinished">✔ Pista lista y cargada en %1</translation>
+    </message>
+    <message>
+        <source>Deck 1</source>
+        <translation type="unfinished">Deck 1</translation>
+    </message>
+    <message>
+        <source>Deck 2</source>
+        <translation type="unfinished">Deck 2</translation>
+    </message>
+    <message>
+        <source>cache</source>
+        <translation type="unfinished">caché</translation>
+    </message>
+    <message>
+        <source>❌ Download error: %1</source>
+        <translation type="unfinished">❌ Error al descargar: %1</translation>
+    </message>
+    <message>
+        <source>⚡ BEATPORT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>● Electronic DJ Top 100</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>🔑 Token</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>🔄 ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>⚡ Top 100</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bearer Token:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste Beatport streaming Bearer token (optional for full downloads)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished">Guardar</translation>
+    </message>
+    <message>
+        <source>Search Beatport releases, tracks, remixers (e.g. Fisher, CamelPhat, Tale of Us)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching Beatport...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished">Búsqueda</translation>
+    </message>
+    <message>
+        <source>💾 Ready</source>
+        <translation type="unfinished">💾 Listo</translation>
+    </message>
+    <message>
+        <source>⚡ Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Beatport tracks loaded yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search for electronic releases or click Top 100</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connecting to Beatport...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BoothBeatFx</name>
     <message>
         <source>LEVEL/DEPTH %1%</source>
@@ -500,6 +611,10 @@ Usa el modo avanzado para verla</translation>
         <translation>BUSCAR</translation>
     </message>
     <message>
+        <source>DEEZER</source>
+        <translation>DEEZER</translation>
+    </message>
+    <message>
         <source>ALL TRACKS</source>
         <translation>TODAS LAS PISTAS</translation>
     </message>
@@ -534,6 +649,10 @@ Usa el modo avanzado para verla</translation>
     <message>
         <source>GRANT PERMISSION</source>
         <translation>DAR PERMISO</translation>
+    </message>
+    <message>
+        <source>LOAD TO SAMPLER %1</source>
+        <translation>CARGAR EN SAMPLER %1</translation>
     </message>
 </context>
 <context>
@@ -727,6 +846,14 @@ Usa el modo avanzado para verla</translation>
     <message>
         <source>Scan for USB devices</source>
         <translation>Buscar Dispositivos USB</translation>
+    </message>
+    <message>
+        <source>🎛 Learn controller</source>
+        <translation>🎛 Aprender controladora</translation>
+    </message>
+    <message>
+        <source>Make your own mapping by pressing each control (players like CDJs, controllers without a mapping)</source>
+        <translation>Crea tu propio mapeo pulsando cada control (reproductores como los CDJ, controladoras sin mapeo)</translation>
     </message>
     <message>
         <source>💡 How do I connect my DJ controller to Android properly?</source>
@@ -1074,6 +1201,137 @@ Cue</translation>
     <message>
         <source>Toolbar</source>
         <translation>Barra de herramientas</translation>
+    </message>
+</context>
+<context>
+    <name>DeezerView</name>
+    <message>
+        <source>%1 tracks found on Deezer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>❌ Error: %1</source>
+        <translation type="unfinished">❌ Error: %1</translation>
+    </message>
+    <message>
+        <source>%1 top chart tracks loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>✔ Track ready and loaded into %1</source>
+        <translation type="unfinished">✔ Pista lista y cargada en %1</translation>
+    </message>
+    <message>
+        <source>Deck 1</source>
+        <translation type="unfinished">Deck 1</translation>
+    </message>
+    <message>
+        <source>Deck 2</source>
+        <translation type="unfinished">Deck 2</translation>
+    </message>
+    <message>
+        <source>cache</source>
+        <translation type="unfinished">caché</translation>
+    </message>
+    <message>
+        <source>❌ Download error: %1</source>
+        <translation type="unfinished">❌ Error al descargar: %1</translation>
+    </message>
+    <message>
+        <source>🎧 DEEZER</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>● Global Catalog &amp; Charts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>🔄 Loading...</source>
+        <translation type="unfinished">🔄 Cargando...</translation>
+    </message>
+    <message>
+        <source>📈 Top Charts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>✕ Cerrar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>⚙️ ARL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cookie ARL de Deezer:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>● Configurada</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>● Sin ARL (usando matching)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pega aquí tu cookie ARL (192 caracteres)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guardar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>✔ Cookie ARL guardada correctamente</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Servidor Deemix (opcional):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>http://192.168.0.X:6595 (opcional si usas Deemix relay local)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>✔ Servidor Deemix guardado</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search millions of tracks &amp; artists...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching Deezer...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished">Búsqueda</translation>
+    </message>
+    <message>
+        <source>Searching %1 on Deezer...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>💾 Ready</source>
+        <translation type="unfinished">💾 Listo</translation>
+    </message>
+    <message>
+        <source>🟢 Full Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Deezer tracks loaded yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search for tracks or browse top charts above</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connecting to Deezer...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1477,14 +1735,413 @@ Cue</translation>
     </message>
 </context>
 <context>
+    <name>LearnController</name>
+    <message>
+        <source>Transport</source>
+        <translation>Transporte</translation>
+    </message>
+    <message>
+        <source>Play / pause</source>
+        <translation>Reproducir / pausa</translation>
+    </message>
+    <message>
+        <source>Cue</source>
+        <translation>Cue</translation>
+    </message>
+    <message>
+        <source>Sync</source>
+        <translation>Sync</translation>
+    </message>
+    <message>
+        <source>Master tempo (key lock)</source>
+        <translation>Master tempo (bloqueo de tono)</translation>
+    </message>
+    <message>
+        <source>Quantize</source>
+        <translation>Quantize</translation>
+    </message>
+    <message>
+        <source>Slip</source>
+        <translation>Slip</translation>
+    </message>
+    <message>
+        <source>Tempo and jog</source>
+        <translation>Tempo y jog</translation>
+    </message>
+    <message>
+        <source>Tempo fader</source>
+        <translation>Fader de tempo</translation>
+    </message>
+    <message>
+        <source>Pitch bend +</source>
+        <translation>Pitch bend +</translation>
+    </message>
+    <message>
+        <source>Pitch bend −</source>
+        <translation>Pitch bend −</translation>
+    </message>
+    <message>
+        <source>Tempo range</source>
+        <translation>Rango de tempo</translation>
+    </message>
+    <message>
+        <source>Jog wheel (nudge)</source>
+        <translation>Jog (nudge)</translation>
+    </message>
+    <message>
+        <source>Beat jump forward</source>
+        <translation>Salto de beats adelante</translation>
+    </message>
+    <message>
+        <source>Beat jump back</source>
+        <translation>Salto de beats atrás</translation>
+    </message>
+    <message>
+        <source>Hot cues</source>
+        <translation>Hot cues</translation>
+    </message>
+    <message>
+        <source>Loops</source>
+        <translation>Loops</translation>
+    </message>
+    <message>
+        <source>Loop in</source>
+        <translation>Loop in</translation>
+    </message>
+    <message>
+        <source>Loop out</source>
+        <translation>Loop out</translation>
+    </message>
+    <message>
+        <source>Reloop / exit</source>
+        <translation>Reloop / salir</translation>
+    </message>
+    <message>
+        <source>Loop of 4 beats</source>
+        <translation>Loop de 4 beats</translation>
+    </message>
+    <message>
+        <source>Loop ½</source>
+        <translation>Loop ½</translation>
+    </message>
+    <message>
+        <source>Loop ×2</source>
+        <translation>Loop ×2</translation>
+    </message>
+    <message>
+        <source>Mixer of the deck</source>
+        <translation>Mezclador del deck</translation>
+    </message>
+    <message>
+        <source>Channel fader</source>
+        <translation>Fader de canal</translation>
+    </message>
+    <message>
+        <source>Trim</source>
+        <translation>Trim</translation>
+    </message>
+    <message>
+        <source>Headphones cue</source>
+        <translation>Cue de auriculares</translation>
+    </message>
+    <message>
+        <source>EQ high</source>
+        <translation>EQ agudos</translation>
+    </message>
+    <message>
+        <source>EQ mid</source>
+        <translation>EQ medios</translation>
+    </message>
+    <message>
+        <source>EQ low</source>
+        <translation>EQ graves</translation>
+    </message>
+    <message>
+        <source>Filter</source>
+        <translation>Filtro</translation>
+    </message>
+    <message>
+        <source>Library</source>
+        <translation>Biblioteca</translation>
+    </message>
+    <message>
+        <source>Load the selected track</source>
+        <translation>Cargar la pista seleccionada</translation>
+    </message>
+    <message>
+        <source>Browse knob</source>
+        <translation>Mando de navegación</translation>
+    </message>
+    <message>
+        <source>Browse press (open / back)</source>
+        <translation>Pulsar navegación (abrir / atrás)</translation>
+    </message>
+    <message>
+        <source>Eject</source>
+        <translation>Expulsar</translation>
+    </message>
+    <message>
+        <source>FX Station</source>
+        <translation>FX Station</translation>
+    </message>
+    <message>
+        <source>Scene FX on / off</source>
+        <translation>Scene FX on / off</translation>
+    </message>
+    <message>
+        <source>Next scene</source>
+        <translation>Siguiente scene</translation>
+    </message>
+    <message>
+        <source>Scene dial</source>
+        <translation>Dial de scene</translation>
+    </message>
+    <message>
+        <source>Scene time</source>
+        <translation>Tiempo de scene</translation>
+    </message>
+    <message>
+        <source>Scene feedback</source>
+        <translation>Feedback de scene</translation>
+    </message>
+    <message>
+        <source>Next isolate mode</source>
+        <translation>Siguiente modo de isolate</translation>
+    </message>
+    <message>
+        <source>Isolate low</source>
+        <translation>Isolate graves</translation>
+    </message>
+    <message>
+        <source>Isolate mid</source>
+        <translation>Isolate medios</translation>
+    </message>
+    <message>
+        <source>Isolate high</source>
+        <translation>Isolate agudos</translation>
+    </message>
+    <message>
+        <source>Next X-Pad instrument</source>
+        <translation>Siguiente instrumento del X-Pad</translation>
+    </message>
+    <message>
+        <source>X-Pad roll 1/2 (hold)</source>
+        <translation>Roll del X-Pad 1/2 (mantener)</translation>
+    </message>
+    <message>
+        <source>X-Pad roll 1/4 (hold)</source>
+        <translation>Roll del X-Pad 1/4 (mantener)</translation>
+    </message>
+    <message>
+        <source>X-Pad roll 1/8 (hold)</source>
+        <translation>Roll del X-Pad 1/8 (mantener)</translation>
+    </message>
+    <message>
+        <source>X-Pad roll 1/16 (hold)</source>
+        <translation>Roll del X-Pad 1/16 (mantener)</translation>
+    </message>
+    <message>
+        <source>X-Pad level</source>
+        <translation>Nivel del X-Pad</translation>
+    </message>
+    <message>
+        <source>X-Pad pitch</source>
+        <translation>Tono del X-Pad</translation>
+    </message>
+    <message>
+        <source>X-Pad overdub</source>
+        <translation>Overdub del X-Pad</translation>
+    </message>
+    <message>
+        <source>X-Pad clear</source>
+        <translation>Borrar el X-Pad</translation>
+    </message>
+    <message>
+        <source>Release FX (hold)</source>
+        <translation>Release FX (mantener)</translation>
+    </message>
+    <message>
+        <source>Next release type</source>
+        <translation>Siguiente tipo de release</translation>
+    </message>
+    <message>
+        <source>FX source: input</source>
+        <translation>Fuente FX: entrada</translation>
+    </message>
+    <message>
+        <source>FX source: X-Pad</source>
+        <translation>Fuente FX: X-Pad</translation>
+    </message>
+    <message>
+        <source>Tap tempo</source>
+        <translation>Tap tempo</translation>
+    </message>
+    <message>
+        <source>Quantize of the FX Station</source>
+        <translation>Quantize de la FX Station</translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation>Master</translation>
+    </message>
+    <message>
+        <source>Crossfader</source>
+        <translation>Crossfader</translation>
+    </message>
+    <message>
+        <source>Headphones mix</source>
+        <translation>Mezcla de auriculares</translation>
+    </message>
+    <message>
+        <source>Headphones level</source>
+        <translation>Volumen de auriculares</translation>
+    </message>
+    <message>
+        <source>Main level</source>
+        <translation>Volumen master</translation>
+    </message>
+    <message>
+        <source>Learned %1: %2</source>
+        <translation>Aprendido %1: %2</translation>
+    </message>
+    <message>
+        <source>Learned: %1</source>
+        <translation>Aprendido: %1</translation>
+    </message>
+    <message>
+        <source>Nothing usable was received, try again</source>
+        <translation>No ha llegado nada que se pueda usar, prueba otra vez</translation>
+    </message>
+    <message>
+        <source>🎛 Learn controller</source>
+        <translation>🎛 Aprender controladora</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Cerrar</translation>
+    </message>
+    <message>
+        <source>Tap LEARN next to a function, then press or move that control on your controller. With two players (e.g. two CDJs), learn each one with its own deck. Choose first how it is played: with SHIFT, on a long or double press, or as a combination (hold a button, then press the other one); those work once saved.</source>
+        <translation>Pulsa APRENDER junto a una función y después pulsa o mueve ese control en tu controladora. Con dos reproductores (p. ej. dos CDJ), aprende cada uno con su deck. Elige antes cómo se toca: con SHIFT, con pulsación larga o doble, o como combinación (mantén un botón y pulsa el otro); estas funcionan una vez guardado.</translation>
+    </message>
+    <message>
+        <source>Controller</source>
+        <translation>Controladora</translation>
+    </message>
+    <message>
+        <source>Deck</source>
+        <translation>Deck</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation>ninguna</translation>
+    </message>
+    <message>
+        <source>WAITING…</source>
+        <translation>ESPERANDO…</translation>
+    </message>
+    <message>
+        <source>LEARN</source>
+        <translation>APRENDER</translation>
+    </message>
+    <message>
+        <source>Played:</source>
+        <translation>Se toca:</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation>Normal</translation>
+    </message>
+    <message>
+        <source>Long press</source>
+        <translation>Pulsación larga</translation>
+    </message>
+    <message>
+        <source>Double press</source>
+        <translation>Doble pulsación</translation>
+    </message>
+    <message>
+        <source>Combination</source>
+        <translation>Combinación</translation>
+    </message>
+    <message>
+        <source>Button:</source>
+        <translation>Botón:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Auto</translation>
+    </message>
+    <message>
+        <source>Momentary</source>
+        <translation>Momentáneo</translation>
+    </message>
+    <message>
+        <source>On / off</source>
+        <translation>On / off</translation>
+    </message>
+    <message>
+        <source>💡 Light</source>
+        <translation>💡 Luz</translation>
+    </message>
+    <message>
+        <source>Knob:</source>
+        <translation>Mando:</translation>
+    </message>
+    <message>
+        <source>Inverted</source>
+        <translation>Invertido</translation>
+    </message>
+    <message>
+        <source>Relative</source>
+        <translation>Relativo</translation>
+    </message>
+    <message>
+        <source>Soft takeover</source>
+        <translation>Soft takeover</translation>
+    </message>
+    <message>
+        <source>No MIDI controller is connected and enabled</source>
+        <translation>No hay ninguna controladora MIDI conectada y activada</translation>
+    </message>
+    <message>
+        <source>Press or move the control now…  %1</source>
+        <translation>Pulsa o mueve el control ahora…  %1</translation>
+    </message>
+    <message>
+        <source>Last message: %1</source>
+        <translation>Último mensaje: %1</translation>
+    </message>
+    <message>
+        <source>Name of the mapping</source>
+        <translation>Nombre del mapeo</translation>
+    </message>
+    <message>
+        <source> (deck %1)</source>
+        <translation> (deck %1)</translation>
+    </message>
+    <message>
+        <source>SAVE (%1)</source>
+        <translation>GUARDAR (%1)</translation>
+    </message>
+    <message>
+        <source>Saved and in use: %1</source>
+        <translation>Guardado y en uso: %1</translation>
+    </message>
+    <message>
+        <source>The mapping couldn&apos;t be saved</source>
+        <translation>No se ha podido guardar el mapeo</translation>
+    </message>
+</context>
+<context>
     <name>Library</name>
     <message>
         <source>LOCAL MUSIC</source>
         <translation>MÚSICA LOCAL</translation>
     </message>
     <message>
-        <source>STREAMING HUB</source>
-        <translation>STREAMING HUB</translation>
+        <source>DEEZER</source>
+        <translation type="unfinished">DEEZER</translation>
     </message>
     <message>
         <source>SIDEBAR</source>
@@ -1611,8 +2268,8 @@ Cue</translation>
         <translation>☁️ Almacenamiento &amp; Caché de Streaming</translation>
     </message>
     <message>
-        <source>Tracks played from streaming platforms (Navidrome, Audius, SoundCloud, Tidal) are stored locally so playback continues without dropouts even if the internet connection is lost.</source>
-        <translation>Las pistas reproducidas desde plataformas de streaming (Navidrome, Audius, SoundCloud, Tidal) se almacenan localmente para garantizar una reproducción sin cortes de audio aunque se pierda la conexión a internet.</translation>
+        <source>Tracks played from streaming (Deezer) are stored locally so playback continues without dropouts even if the internet connection is lost.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>💾 Space used:</source>
@@ -1629,6 +2286,34 @@ Cue</translation>
     <message>
         <source>🗑️ Clear cache</source>
         <translation>🗑️ Vaciar Caché</translation>
+    </message>
+    <message>
+        <source>🎧 Deezer Streaming &amp; ARL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configura tu cookie ARL de Deezer para descargas directas en máxima calidad o conéctate a tu servidor Deemix local. Si no tienes ARL, Mixxx utiliza automáticamente el motor de emparejamiento para descargar canciones completas.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ARL Cookie:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pega aquí tu cookie ARL de Deezer...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guardar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Servidor Deemix (opcional):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>http://192.168.0.X:6595 (opcional)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>💾 Library backup</source>
@@ -1776,85 +2461,87 @@ Cue</translation>
     </message>
     <message>
         <source>This or a parent directory is already in your library.</source>
-        <translation type="unfinished"></translation>
+        <translation>Esta carpeta o una que la contiene ya está en tu biblioteca.</translation>
     </message>
     <message>
         <source>This or a listed directory does not exist or is inaccessible.
 Aborting the operation to avoid library inconsistencies</source>
-        <translation type="unfinished"></translation>
+        <translation>Esta carpeta o una de la lista no existe o no se puede abrir.
+Se cancela la operación para no dejar la biblioteca inconsistente</translation>
     </message>
     <message>
         <source>This directory can not be read.</source>
-        <translation type="unfinished"></translation>
+        <translation>No se puede leer esta carpeta.</translation>
     </message>
     <message>
         <source>An unknown error occurred.
 Aborting the operation to avoid library inconsistencies</source>
-        <translation type="unfinished"></translation>
+        <translation>Ha ocurrido un error desconocido.
+Se cancela la operación para no dejar la biblioteca inconsistente</translation>
     </message>
     <message>
         <source>This directory can not be found.</source>
-        <translation type="unfinished"></translation>
+        <translation>No se encuentra esta carpeta.</translation>
     </message>
     <message>
         <source>Library</source>
-        <translation type="unfinished"></translation>
+        <translation>Biblioteca</translation>
     </message>
     <message>
         <source>Sources</source>
-        <translation type="unfinished"></translation>
+        <translation>Fuentes</translation>
     </message>
     <message>
         <source>Music Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Carpeta de música</translation>
     </message>
     <message>
         <source>Choose a music directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Elige una carpeta de música</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Añadir</translation>
     </message>
     <message>
         <source>Icon</source>
-        <translation type="unfinished"></translation>
+        <translation>Icono</translation>
     </message>
     <message>
         <source>Relink music directory to new location</source>
-        <translation type="unfinished"></translation>
+        <translation>Volver a enlazar la carpeta de música a otra ubicación</translation>
     </message>
     <message>
         <source>Save to proceed</source>
-        <translation type="unfinished"></translation>
+        <translation>Guarda para continuar</translation>
     </message>
     <message>
         <source>Relink</source>
-        <translation type="unfinished"></translation>
+        <translation>Volver a enlazar</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Quitar</translation>
     </message>
     <message>
         <source>keep already imported tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>conservar las pistas ya importadas</translation>
     </message>
     <message>
         <source>hide imported tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>ocultar las pistas importadas</translation>
     </message>
     <message>
         <source>purge imported tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>eliminar las pistas importadas</translation>
     </message>
     <message>
         <source>Save to import new folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Guarda para importar la carpeta nueva</translation>
     </message>
     <message>
         <source>File scanning...</source>
-        <translation type="unfinished"></translation>
+        <translation>Escaneando archivos...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1862,63 +2549,63 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Metadatos</translation>
     </message>
     <message>
         <source>Synchronise metadata with file</source>
-        <translation type="unfinished"></translation>
+        <translation>Sincronizar los metadatos con el archivo</translation>
     </message>
     <message>
         <source>Synchronise metadata with Serato library</source>
-        <translation type="unfinished"></translation>
+        <translation>Sincronizar los metadatos con la biblioteca de Serato</translation>
     </message>
     <message>
         <source>Prefer relative path on playlist export</source>
-        <translation type="unfinished"></translation>
+        <translation>Preferir rutas relativas al exportar playlists</translation>
     </message>
     <message>
         <source>History</source>
-        <translation type="unfinished"></translation>
+        <translation>Historial</translation>
     </message>
     <message>
         <source>Track duplicate distance</source>
-        <translation type="unfinished"></translation>
+        <translation>Distancia entre pistas repetidas</translation>
     </message>
     <message>
         <source> tracks</source>
-        <translation type="unfinished"></translation>
+        <translation> pistas</translation>
     </message>
     <message>
         <source> track</source>
-        <translation type="unfinished"></translation>
+        <translation> pista</translation>
     </message>
     <message>
         <source>Delete history playlist with less than</source>
-        <translation type="unfinished"></translation>
+        <translation>Borrar las listas del historial con menos de</translation>
     </message>
     <message>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Búsqueda</translation>
     </message>
     <message>
         <source>Search completion</source>
-        <translation type="unfinished"></translation>
+        <translation>Autocompletar la búsqueda</translation>
     </message>
     <message>
         <source>Search history keyboard shortcuts</source>
-        <translation type="unfinished"></translation>
+        <translation>Atajos de teclado del historial de búsqueda</translation>
     </message>
     <message>
         <source>Search-as-you-type timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>Espera de la búsqueda al escribir</translation>
     </message>
     <message>
         <source>sec</source>
-        <translation type="unfinished"></translation>
+        <translation>s</translation>
     </message>
     <message>
         <source>Pitch slider for fuzz BPM search</source>
-        <translation type="unfinished"></translation>
+        <translation>Fader de pitch para la búsqueda aproximada de BPM</translation>
     </message>
     <message>
         <source>Reset</source>
@@ -1926,7 +2613,7 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Guardar</translation>
     </message>
 </context>
 <context>
@@ -2165,6 +2852,92 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
 </context>
 <context>
+    <name>PlaylistImportView</name>
+    <message>
+        <source>✔ Imported &apos;%1&apos; (%2 tracks)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>❌ Error: %1</source>
+        <translation type="unfinished">❌ Error: %1</translation>
+    </message>
+    <message>
+        <source>✔ Track ready and loaded into %1</source>
+        <translation type="unfinished">✔ Pista lista y cargada en %1</translation>
+    </message>
+    <message>
+        <source>Deck 1</source>
+        <translation type="unfinished">Deck 1</translation>
+    </message>
+    <message>
+        <source>Deck 2</source>
+        <translation type="unfinished">Deck 2</translation>
+    </message>
+    <message>
+        <source>cache</source>
+        <translation type="unfinished">caché</translation>
+    </message>
+    <message>
+        <source>❌ %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>🟢 SPOTIFY &amp; APPLE MUSIC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>● Public Playlist Importer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste Spotify or Apple Music link (e.g. https://open.spotify.com/playlist/... or https://music.apple.com/...)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Importing playlist...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished">Cargando...</translation>
+    </message>
+    <message>
+        <source>📥 Import</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 tracks</source>
+        <translation type="unfinished">%1 pistas</translation>
+    </message>
+    <message>
+        <source>💾 Ready</source>
+        <translation type="unfinished">💾 Listo</translation>
+    </message>
+    <message>
+        <source>🟢 Full Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No playlist imported yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste any Spotify or Apple Music playlist/album URL above</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parsing playlist from provider...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QmlApplication</name>
+    <message>
+        <source>Playing. Tap to open Mixxx.</source>
+        <translation>Sonando. Toca para abrir Mixxx.</translation>
+    </message>
+</context>
+<context>
     <name>QuickLoadDrawer</name>
     <message>
         <source>Load track into %1</source>
@@ -2183,8 +2956,8 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation>MÚSICA LOCAL</translation>
     </message>
     <message>
-        <source>STREAMING HUB</source>
-        <translation>STREAMING HUB</translation>
+        <source>DEEZER</source>
+        <translation>DEEZER</translation>
     </message>
     <message>
         <source>CLOSE</source>
@@ -2197,6 +2970,10 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>📂 Open full library view</source>
         <translation>📂 Abrir Vista Completa de Librería</translation>
+    </message>
+    <message>
+        <source>SAMPLER %1</source>
+        <translation>SAMPLER %1</translation>
     </message>
 </context>
 <context>
@@ -2232,6 +3009,65 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
 </context>
 <context>
+    <name>SamplerStation</name>
+    <message>
+        <source>AUTO</source>
+        <translation>AUTO</translation>
+    </message>
+    <message>
+        <source>SAVE</source>
+        <translation>GUARDAR</translation>
+    </message>
+    <message>
+        <source>EJECT</source>
+        <translation>EXPULSAR</translation>
+    </message>
+    <message>
+        <source>📂 DEVICE FILE</source>
+        <translation>📂 ARCHIVO DEL DISPOSITIVO</translation>
+    </message>
+    <message>
+        <source>Sample loaded into Pad %1</source>
+        <translation>Sample cargado en el Pad %1</translation>
+    </message>
+    <message>
+        <source>PAD %1</source>
+        <translation>PAD %1</translation>
+    </message>
+    <message>
+        <source>+ SAMPLE</source>
+        <translation>+ SAMPLE</translation>
+    </message>
+    <message>
+        <source>Select audio sample for Pad %1</source>
+        <translation>Selecciona una muestra de audio para el Pad %1</translation>
+    </message>
+    <message>
+        <source>Pad color</source>
+        <translation>Color del pad</translation>
+    </message>
+    <message>
+        <source>Auto (use track filename/title)</source>
+        <translation>Auto (usar título/archivo de la pista)</translation>
+    </message>
+    <message>
+        <source>Tap to load or customize</source>
+        <translation>Toca para cargar o personalizar</translation>
+    </message>
+    <message>
+        <source>Could not load sample.</source>
+        <translation>No se pudo cargar el sample.</translation>
+    </message>
+    <message>
+        <source>Custom pad name</source>
+        <translation>Nombre personalizado del pad</translation>
+    </message>
+    <message>
+        <source>🎵 MIXXX LIBRARY</source>
+        <translation>🎵 BIBLIOTECA MIXXX</translation>
+    </message>
+</context>
+<context>
     <name>Settings</name>
     <message>
         <source>← Back</source>
@@ -2240,6 +3076,10 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>⚙️ Settings</source>
         <translation>⚙️ Preferencias</translation>
+    </message>
+    <message>
+        <source>Loading the settings…</source>
+        <translation>Cargando los ajustes…</translation>
     </message>
     <message>
         <source>🔍 Search settings...</source>
@@ -2290,12 +3130,107 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation>Batería, bajo y voz con IA</translation>
     </message>
     <message>
+        <source>Timecode / DVS</source>
+        <translation>Timecode / DVS</translation>
+    </message>
+    <message>
+        <source>Turntables and CDJs with timecode</source>
+        <translation>Platos y CDJ con timecode</translation>
+    </message>
+    <message>
         <source>About</source>
         <translation>Acerca de</translation>
     </message>
     <message>
         <source>JaviLabarum, Socials &amp; Info</source>
         <translation>JaviLabarum, RRSS &amp; Info</translation>
+    </message>
+</context>
+<context>
+    <name>SoundCloudView</name>
+    <message>
+        <source>%1 tracks found on SoundCloud</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>❌ Error: %1</source>
+        <translation type="unfinished">❌ Error: %1</translation>
+    </message>
+    <message>
+        <source>%1 trending tracks on SoundCloud</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>✔ Track ready and loaded into %1</source>
+        <translation type="unfinished">✔ Pista lista y cargada en %1</translation>
+    </message>
+    <message>
+        <source>Deck 1</source>
+        <translation type="unfinished">Deck 1</translation>
+    </message>
+    <message>
+        <source>Deck 2</source>
+        <translation type="unfinished">Deck 2</translation>
+    </message>
+    <message>
+        <source>cache</source>
+        <translation type="unfinished">caché</translation>
+    </message>
+    <message>
+        <source>❌ Download error: %1</source>
+        <translation type="unfinished">❌ Error al descargar: %1</translation>
+    </message>
+    <message>
+        <source>☁️ SOUNDCLOUD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>● High Quality Streams</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>🔄 Loading...</source>
+        <translation type="unfinished">🔄 Cargando...</translation>
+    </message>
+    <message>
+        <source>🔥 Trending</source>
+        <translation type="unfinished">🔥 Tendencias</translation>
+    </message>
+    <message>
+        <source>Search tracks, DJ sets, remixes...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching SoundCloud...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished">Búsqueda</translation>
+    </message>
+    <message>
+        <source>Searching %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>💾 Ready</source>
+        <translation type="unfinished">💾 Listo</translation>
+    </message>
+    <message>
+        <source>☁️ Stream</source>
+        <translation type="unfinished">☁️ Stream</translation>
+    </message>
+    <message>
+        <source>No SoundCloud tracks loaded yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search for any DJ set, track or mashup above</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connecting to SoundCloud...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2343,6 +3278,14 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>Main output through %1 and CUE through the headphones of %2. Using two sound cards may cause slight clicks on the CUE.</source>
         <translation>Master por %1 y CUE por los auriculares de %2. Al usar dos tarjetas puede oírse algún clic leve en el CUE.</translation>
+    </message>
+    <message>
+        <source>Two USB sound cards are needed and %1 was found. Connect both players, wait a few seconds and open the settings again.</source>
+        <translation>Hacen falta dos tarjetas de sonido USB y se ha encontrado %1. Conecta los dos reproductores, espera unos segundos y vuelve a abrir los ajustes.</translation>
+    </message>
+    <message>
+        <source>Deck 1 → %1 and Deck 2 → %2. Mix and pre-listen with your mixer.</source>
+        <translation>Deck 1 → %1 y Deck 2 → %2. Mezcla y preescucha con tu mesa.</translation>
     </message>
     <message>
         <source>%1 Hz</source>
@@ -2403,6 +3346,18 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>Main output through the tablet speakers and CUE pre-listening through the headphones (channels 3-4) of the controller.</source>
         <translation>Master por altavoces de la tablet y Preescucha CUE por los auriculares (canales 3-4) de la mesa.</translation>
+    </message>
+    <message>
+        <source>Two players, one deck each</source>
+        <translation>Dos reproductores, un deck cada uno</translation>
+    </message>
+    <message>
+        <source>Two USB sound cards (e.g. two CDJs) into an external mixer: deck 1 plays through the first one and deck 2 through the second one. Set the deck of each player in its mapping settings.</source>
+        <translation>Dos tarjetas de sonido USB (p. ej. dos CDJ) a una mesa externa: el deck 1 suena por la primera y el deck 2 por la segunda. Elige el deck de cada reproductor en los ajustes de su mapeo.</translation>
+    </message>
+    <message>
+        <source>⇄ Swap</source>
+        <translation>⇄ Intercambiar</translation>
     </message>
     <message>
         <source> — press Save to apply it.</source>
@@ -2537,8 +3492,8 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation>Monitorización directa</translation>
     </message>
     <message>
-        <source>🔧 Advanced routing matrix (virtual cables)</source>
-        <translation>🔧 Matriz de Ruteo Avanzada (Cables Virtuales)</translation>
+        <source>🔧 Full routing matrix (like the desktop)</source>
+        <translation>🔧 Matriz de enrutado completa (como en PC)</translation>
     </message>
     <message>
         <source>Hide matrix</source>
@@ -2547,6 +3502,42 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>Show full matrix</source>
         <translation>Mostrar Matriz Completa</translation>
+    </message>
+    <message>
+        <source>Multi-soundcard synchronization</source>
+        <translation>Sincronización de varias tarjetas</translation>
+    </message>
+    <message>
+        <source>Experimental (no delay)</source>
+        <translation>Experimental (sin retardo)</translation>
+    </message>
+    <message>
+        <source>Disabled (short delay)</source>
+        <translation>Desactivada (retardo corto)</translation>
+    </message>
+    <message>
+        <source>Default (long delay)</source>
+        <translation>Predeterminada (retardo largo)</translation>
+    </message>
+    <message>
+        <source>Engine clock</source>
+        <translation>Reloj del motor</translation>
+    </message>
+    <message>
+        <source>Sound card clock</source>
+        <translation>Reloj de la tarjeta de sonido</translation>
+    </message>
+    <message>
+        <source>Network clock</source>
+        <translation>Reloj de red</translation>
+    </message>
+    <message>
+        <source>Microphone monitor mode</source>
+        <translation>Modo de escucha del micrófono</translation>
+    </message>
+    <message>
+        <source>Microphone latency compensation</source>
+        <translation>Compensación de latencia del micrófono</translation>
     </message>
     <message>
         <source>Output delays (acoustic latency compensation)</source>
@@ -2595,6 +3586,125 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>Near-hi-fi quality</source>
         <translation>Calidad casi hi-fi</translation>
+    </message>
+</context>
+<context>
+    <name>SoundMatrix</name>
+    <message>
+        <source>Main</source>
+        <translation>Master</translation>
+    </message>
+    <message>
+        <source>Headphones</source>
+        <translation>Auriculares</translation>
+    </message>
+    <message>
+        <source>Booth</source>
+        <translation>Cabina</translation>
+    </message>
+    <message>
+        <source>Left bus</source>
+        <translation>Bus izquierdo</translation>
+    </message>
+    <message>
+        <source>Center bus</source>
+        <translation>Bus central</translation>
+    </message>
+    <message>
+        <source>Right bus</source>
+        <translation>Bus derecho</translation>
+    </message>
+    <message>
+        <source>Deck 1</source>
+        <translation>Deck 1</translation>
+    </message>
+    <message>
+        <source>Deck 2</source>
+        <translation>Deck 2</translation>
+    </message>
+    <message>
+        <source>Deck 3</source>
+        <translation>Deck 3</translation>
+    </message>
+    <message>
+        <source>Deck 4</source>
+        <translation>Deck 4</translation>
+    </message>
+    <message>
+        <source>Vinyl control 1</source>
+        <translation>Control de vinilo 1</translation>
+    </message>
+    <message>
+        <source>Vinyl control 2</source>
+        <translation>Control de vinilo 2</translation>
+    </message>
+    <message>
+        <source>Vinyl control 3</source>
+        <translation>Control de vinilo 3</translation>
+    </message>
+    <message>
+        <source>Vinyl control 4</source>
+        <translation>Control de vinilo 4</translation>
+    </message>
+    <message>
+        <source>Microphone 1</source>
+        <translation>Micrófono 1</translation>
+    </message>
+    <message>
+        <source>Microphone 2</source>
+        <translation>Micrófono 2</translation>
+    </message>
+    <message>
+        <source>Microphone 3</source>
+        <translation>Micrófono 3</translation>
+    </message>
+    <message>
+        <source>Microphone 4</source>
+        <translation>Micrófono 4</translation>
+    </message>
+    <message>
+        <source>Auxiliary 1</source>
+        <translation>Auxiliar 1</translation>
+    </message>
+    <message>
+        <source>Auxiliary 2</source>
+        <translation>Auxiliar 2</translation>
+    </message>
+    <message>
+        <source>Auxiliary 3</source>
+        <translation>Auxiliar 3</translation>
+    </message>
+    <message>
+        <source>Auxiliary 4</source>
+        <translation>Auxiliar 4</translation>
+    </message>
+    <message>
+        <source>Recording / broadcasting</source>
+        <translation>Grabación / emisión</translation>
+    </message>
+    <message>
+        <source>Channels %1 - %2</source>
+        <translation>Canales %1 - %2</translation>
+    </message>
+    <message>
+        <source>Channel %1 (mono)</source>
+        <translation>Canal %1 (mono)</translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation>Salida</translation>
+    </message>
+    <message>
+        <source>Input</source>
+        <translation>Entrada</translation>
+    </message>
+    <message>
+        <source>%1 output devices</source>
+        <translation>%1 dispositivos de salida</translation>
+    </message>
+    <message>
+        <source>%1 input devices</source>
+        <translation>%1 dispositivos de entrada</translation>
     </message>
 </context>
 <context>
@@ -3029,12 +4139,32 @@ Aborting the operation to avoid library inconsistencies</source>
 <context>
     <name>StreamingHub</name>
     <message>
-        <source>🔥 AUDIUS (free)</source>
-        <translation>🔥 AUDIUS (Libre)</translation>
+        <source>☁️ SOUNDCLOUD</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>🔗 DIRECT URL / RADIO</source>
-        <translation>🔗 URL DIRECTA / RADIO</translation>
+        <source>🎧 DEEZER</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>⚡ BEATPORT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>🟢 SPOTIFY / APPLE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>🏠 NAVIDROME / SUBSONIC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>🔥 AUDIUS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>🔗 DIRECT URL</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Target:</source>
@@ -3233,6 +4363,14 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation>Sampler</translation>
     </message>
     <message>
+        <source>Add to playlist…</source>
+        <translation>Añadir a playlist…</translation>
+    </message>
+    <message>
+        <source>Reanalyze the beatgrid</source>
+        <translation>Volver a analizar la rejilla</translation>
+    </message>
+    <message>
         <source>Add to playlists</source>
         <translation>Añadir a listas</translation>
     </message>
@@ -3263,6 +4401,10 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>Reanalyze (variable BPM)</source>
         <translation>Volver a analizar (BPM variable)</translation>
+    </message>
+    <message>
+        <source>Sampler %1</source>
+        <translation>Sampler %1</translation>
     </message>
 </context>
 <context>
@@ -3363,164 +4505,283 @@ Aborting the operation to avoid library inconsistencies</source>
         <source>COPY</source>
         <translation>COPIAR</translation>
     </message>
+    <message>
+        <source>SAMPLER %1</source>
+        <translation>SAMPLER %1</translation>
+    </message>
+</context>
+<context>
+    <name>Vinyl</name>
+    <message>
+        <source>Timecode / DVS</source>
+        <translation>Timecode / DVS</translation>
+    </message>
+    <message>
+        <source>💿 TIMECODE / DVS</source>
+        <translation>💿 TIMECODE / DVS</translation>
+    </message>
+    <message>
+        <source>Play the decks with turntables or CDJs and timecode vinyls or CDs (Serato, Traktor, Rekordbox DVS, MixVibes...). They need a sound card with an input for each one, e.g. a DJ mixer with USB like the DJM-250MK2: one stereo input per turntable or CDJ.</source>
+        <translation>Controla los decks con platos o CDJ y vinilos o CDs de timecode (Serato, Traktor, Rekordbox DVS, MixVibes...). Hace falta una tarjeta de sonido con una entrada para cada uno, p. ej. una mesa DJ con USB como la DJM-250MK2: una entrada estéreo por plato o CDJ.</translation>
+    </message>
+    <message>
+        <source>1. In Audio &amp; Outputs, full routing, Input tab: give &quot;Vinyl control 1&quot; and &quot;Vinyl control 2&quot; the inputs of the sound card (e.g. channels 1 - 2 and 3 - 4). 2. Choose the timecode of each deck below. 3. Turn VINYL on in the deck.</source>
+        <translation>1. En Audio y salidas, matriz completa, pestaña Entrada: asigna a «Control de vinilo 1» y «Control de vinilo 2» las entradas de la tarjeta (p. ej. canales 1 - 2 y 3 - 4). 2. Elige abajo el timecode de cada deck. 3. Activa VINYL en el deck.</translation>
+    </message>
+    <message>
+        <source>⚠ The inputs of the mixer must be set to USB / PC (not to the turntable or CDJ directly), and turntables need the PHONO input. Test it before playing live.</source>
+        <translation>⚠ Los canales de la mesa tienen que estar en USB / PC (no directamente en el plato o el CDJ), y los platos necesitan la entrada PHONO. Pruébalo antes de pinchar en directo.</translation>
+    </message>
+    <message>
+        <source>⚠ Sound cards with more than 2 inputs (e.g. the DJM-250MK2) are recorded by Mixxx&apos; own USB driver. For a card with 2 inputs, set Audio &amp; Outputs → Mixxx USB driver to ALWAYS and restart Mixxx: the inputs of Android&apos;s audio don&apos;t open on many devices.</source>
+        <translation>⚠ Las tarjetas con más de 2 entradas (p. ej. la DJM-250MK2) las graba el driver USB propio de Mixxx. Con una tarjeta de 2 entradas, pon Audio y salidas → Driver USB de Mixxx en SIEMPRE y reinicia Mixxx: las entradas del audio de Android no se abren en muchos dispositivos.</translation>
+    </message>
+    <message>
+        <source>📶 SIGNAL</source>
+        <translation>📶 SEÑAL</translation>
+    </message>
+    <message>
+        <source>Input boost</source>
+        <translation>Ganancia de entrada</translation>
+    </message>
+    <message>
+        <source>Raise it if the signal circle is small or broken (quiet turntables or long cables)</source>
+        <translation>Súbela si el círculo de la señal sale pequeño o roto (platos con poco nivel o cables largos)</translation>
+    </message>
+    <message>
+        <source>DECK %1</source>
+        <translation>DECK %1</translation>
+    </message>
+    <message>
+        <source>● input routed</source>
+        <translation>● entrada asignada</translation>
+    </message>
+    <message>
+        <source>● no input routed: see the steps above</source>
+        <translation>● sin entrada asignada: mira los pasos de arriba</translation>
+    </message>
+    <message>
+        <source>VINYL ON</source>
+        <translation>VINYL ON</translation>
+    </message>
+    <message>
+        <source>VINYL OFF</source>
+        <translation>VINYL OFF</translation>
+    </message>
+    <message>
+        <source>Timecode</source>
+        <translation>Timecode</translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation>Velocidad</translation>
+    </message>
+    <message>
+        <source>Of the record; CDJs play like 33</source>
+        <translation>Del disco; los CDJ van como 33</translation>
+    </message>
+    <message>
+        <source>Mode</source>
+        <translation>Modo</translation>
+    </message>
+    <message>
+        <source>ABS: the needle position is the track position. REL: only the speed, needle drops don&apos;t jump. CONST: plays on at a constant speed</source>
+        <translation>ABS: la posición de la aguja es la de la pista. REL: solo la velocidad, mover la aguja no salta. CONST: sigue sonando a velocidad constante</translation>
+    </message>
+    <message>
+        <source>Cueing</source>
+        <translation>Cueing</translation>
+    </message>
+    <message>
+        <source>In REL mode, dropping the needle can jump to the cue point (ONE) or to the nearest hotcue (HOT)</source>
+        <translation>En modo REL, al soltar la aguja puede saltar al punto cue (ONE) o al hot cue más cercano (HOT)</translation>
+    </message>
+    <message>
+        <source>Lead-in</source>
+        <translation>Lead-in</translation>
+    </message>
+    <message>
+        <source>Seconds at the start of the record that aren&apos;t used</source>
+        <translation>Segundos del principio del disco que no se usan</translation>
+    </message>
+    <message>
+        <source>Turn VINYL on to see the signal</source>
+        <translation>Activa VINYL para ver la señal</translation>
+    </message>
+    <message>
+        <source>Signal lost</source>
+        <translation>Señal perdida</translation>
+    </message>
+    <message>
+        <source>Weak signal</source>
+        <translation>Señal débil</translation>
+    </message>
+    <message>
+        <source>Signal OK</source>
+        <translation>Señal correcta</translation>
+    </message>
+    <message>
+        <source>No signal</source>
+        <translation>Sin señal</translation>
+    </message>
 </context>
 <context>
     <name>WMainMenuBar</name>
     <message>
         <source>Load Track to Deck &amp;%1</source>
-        <translation type="unfinished"></translation>
+        <translation>Cargar pista en el deck &amp;%1</translation>
     </message>
     <message>
         <source>&amp;Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Salir</translation>
     </message>
     <message>
         <source>&amp;Rescan Library</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Volver a escanear la biblioteca</translation>
     </message>
     <message>
         <source>E&amp;xport Library to Engine DJ</source>
-        <translation type="unfinished"></translation>
+        <translation>E&amp;xportar la biblioteca a Engine DJ</translation>
     </message>
     <message>
         <source>Search in Current View...</source>
-        <translation type="unfinished"></translation>
+        <translation>Buscar en la vista actual...</translation>
     </message>
     <message>
         <source>Search in Tracks Library...</source>
-        <translation type="unfinished"></translation>
+        <translation>Buscar en la biblioteca de pistas...</translation>
     </message>
     <message>
         <source>Create &amp;New Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Crear &amp;nueva playlist</translation>
     </message>
     <message>
         <source>Create New &amp;Crate</source>
-        <translation type="unfinished"></translation>
+        <translation>Crear nueva &amp;caja</translation>
     </message>
     <message>
         <source>Show Microphone Section</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar la sección de micrófonos</translation>
     </message>
     <message>
         <source>Show Vinyl Control Section</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar la sección de control de vinilo</translation>
     </message>
     <message>
         <source>Show Preview Deck</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar el deck de preescucha</translation>
     </message>
     <message>
         <source>Show Cover Art</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar las carátulas</translation>
     </message>
     <message>
         <source>Show Keywheel</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar la rueda de tonalidades</translation>
     </message>
     <message>
         <source>Maximize Library</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximizar la biblioteca</translation>
     </message>
     <message>
         <source>Show Auto DJ</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar Auto DJ</translation>
     </message>
     <message>
         <source>&amp;Full Screen</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Pantalla completa</translation>
     </message>
     <message>
         <source>Enable Vinyl Control &amp;%1</source>
-        <translation type="unfinished"></translation>
+        <translation>Activar el control de vinilo &amp;%1</translation>
     </message>
     <message>
         <source>&amp;Record Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Grabar la mezcla</translation>
     </message>
     <message>
         <source>Enable Live &amp;Broadcasting</source>
-        <translation type="unfinished"></translation>
+        <translation>Activar la &amp;emisión en directo</translation>
     </message>
     <message>
         <source>Enable &amp;Keyboard Shortcuts</source>
-        <translation type="unfinished"></translation>
+        <translation>Activar los &amp;atajos de teclado</translation>
     </message>
     <message>
         <source>&amp;Preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Preferencias</translation>
     </message>
     <message>
         <source>&amp;Reload Skin</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Recargar la skin</translation>
     </message>
     <message>
         <source>Developer &amp;Tools</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Herramientas de desarrollo</translation>
     </message>
     <message>
         <source>Stats: &amp;Experiment Bucket</source>
-        <translation type="unfinished"></translation>
+        <translation>Estadísticas: grupo &amp;experimental</translation>
     </message>
     <message>
         <source>Stats: &amp;Base Bucket</source>
-        <translation type="unfinished"></translation>
+        <translation>Estadísticas: grupo &amp;base</translation>
     </message>
     <message>
         <source>Deb&amp;ugger Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Dep&amp;urador activado</translation>
     </message>
     <message>
         <source>&amp;Community Support</source>
-        <translation type="unfinished"></translation>
+        <translation>Soporte de la &amp;comunidad</translation>
     </message>
     <message>
         <source>&amp;User Manual</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Manual de usuario</translation>
     </message>
     <message>
         <source>&amp;Keyboard Shortcuts</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Atajos de teclado</translation>
     </message>
     <message>
         <source>&amp;Settings directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Carpeta de &amp;ajustes</translation>
     </message>
     <message>
         <source>&amp;Translate This Application</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Traducir esta aplicación</translation>
     </message>
     <message>
         <source>&amp;About</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Acerca de</translation>
     </message>
     <message>
         <source>&amp;File</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Archivo</translation>
     </message>
     <message>
         <source>&amp;Library</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Biblioteca</translation>
     </message>
     <message>
         <source>&amp;View</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ver</translation>
     </message>
     <message>
         <source>&amp;Options</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Opciones</translation>
     </message>
     <message>
         <source>&amp;Vinyl Control</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Control de vinilo</translation>
     </message>
     <message>
         <source>&amp;Developer</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Desarrollo</translation>
     </message>
     <message>
         <source>&amp;Help</source>
-        <translation type="unfinished"></translation>
+        <translation>Ay&amp;uda</translation>
     </message>
 </context>
 <context>
@@ -3984,6 +5245,49 @@ Aborting the operation to avoid library inconsistencies</source>
     </message>
 </context>
 <context>
+    <name>mixxx::qml::QmlApplication</name>
+    <message>
+        <source>Existing user profile detected</source>
+        <translation>Se ha detectado un perfil de usuario existente</translation>
+    </message>
+    <message>
+        <source>Trying to run Mixxx 3.0 with an existing %0 user profile! &lt;br&gt;&lt;br&gt;There is &lt;b&gt;serious risks&lt;/b&gt; of data loss and corruption.&lt;br&gt;We recommend using a test profile folder with the &apos;--settings-path&apos; argument. &lt;br&gt;&lt;br&gt;If you want to continue at your own risk, run Mixxx with the argument &apos;--allow-dangerous-data-corruption-risk&apos;.</source>
+        <translation>¡Se está intentando abrir Mixxx 3.0 con un perfil de usuario %0 existente! &lt;br&gt;&lt;br&gt;Hay un &lt;b&gt;riesgo serio&lt;/b&gt; de perder o corromper datos.&lt;br&gt;Recomendamos usar una carpeta de perfil de prueba con el argumento &apos;--settings-path&apos;. &lt;br&gt;&lt;br&gt;Si quieres continuar bajo tu responsabilidad, abre Mixxx con el argumento &apos;--allow-dangerous-data-corruption-risk&apos;.</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation>Aceptar</translation>
+    </message>
+    <message>
+        <source>There is no input device selected for this passthrough control.
+Please select an input device in the sound hardware preferences first.</source>
+        <translation>No hay ningún dispositivo de entrada asignado a este passthrough.
+Asigna primero una entrada en los ajustes de audio.</translation>
+    </message>
+    <message>
+        <source>There is no input device selected for this vinyl control.
+Please select an input device in the sound hardware preferences first.</source>
+        <translation>No hay ningún dispositivo de entrada asignado a este control de vinilo.
+Asigna primero una entrada en Audio y salidas, matriz completa, pestaña Entrada.</translation>
+    </message>
+    <message>
+        <source>There is no input device selected for this microphone.
+Do you want to select an input device?</source>
+        <translation>No hay ningún dispositivo de entrada asignado a este micrófono.
+¿Quieres asignar uno?</translation>
+    </message>
+    <message>
+        <source>There is no input device selected for this auxiliary.
+Do you want to select an input device?</source>
+        <translation>No hay ningún dispositivo de entrada asignado a este auxiliar.
+¿Quieres asignar uno?</translation>
+    </message>
+    <message>
+        <source>skin</source>
+        <translation>skin</translation>
+    </message>
+</context>
+<context>
     <name>mixxx::qml::QmlMobileLibraryProxy</name>
     <message>
         <source>Backups need &quot;All files access&quot;. Allow it, then try again.</source>
@@ -4012,6 +5316,46 @@ Aborting the operation to avoid library inconsistencies</source>
     <message>
         <source>The library is not available</source>
         <translation>La biblioteca no está disponible</translation>
+    </message>
+    <message>
+        <source>Invalid sampler pad %1.</source>
+        <translation>Pad de sampler no válido (%1).</translation>
+    </message>
+    <message>
+        <source>Error while copying audio sample.</source>
+        <translation>Error al copiar la muestra de audio.</translation>
+    </message>
+    <message>
+        <source>Empty audio file path.</source>
+        <translation>La ruta del archivo de audio está vacía.</translation>
+    </message>
+    <message>
+        <source>File does not exist: %1</source>
+        <translation>El archivo no existe: %1</translation>
+    </message>
+    <message>
+        <source>Unsupported file URL: %1</source>
+        <translation>URL de archivo no compatible: %1</translation>
+    </message>
+    <message>
+        <source>Unsupported audio format: %1</source>
+        <translation>Formato de audio no compatible: %1</translation>
+    </message>
+    <message>
+        <source>Could not save sample copy on device.</source>
+        <translation>No se pudo guardar la copia del sample en el dispositivo.</translation>
+    </message>
+    <message>
+        <source>Could not open selected audio file.</source>
+        <translation>No se pudo abrir el archivo de audio seleccionado.</translation>
+    </message>
+    <message>
+        <source>Could not create samplers folder.</source>
+        <translation>No se pudo crear la carpeta de samplers.</translation>
+    </message>
+    <message>
+        <source>Player manager is not ready.</source>
+        <translation>El gestor de reproducción no está listo.</translation>
     </message>
 </context>
 <context>
@@ -4049,8 +5393,80 @@ Aborting the operation to avoid library inconsistencies</source>
         <translation>Artista Audius</translation>
     </message>
     <message>
-        <source>Invalid URL or track ID</source>
-        <translation>URL o ID de pista no válidos</translation>
+        <source>SoundCloud track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SoundCloud artist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deezer track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deezer artist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Beatport track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Beatport artist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL is empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Spotify playlist/album link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not read Spotify playlist metadata</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Spotify Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apple Music Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported link format. Use Spotify or Apple Music links.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No matching full track found for &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error downloading Deezer audio: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Empty audio received from Deezer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not write audio to cache file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid track ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not resolve SoundCloud audio stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No stream URL available</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Cannot create the temporary cache file</source>

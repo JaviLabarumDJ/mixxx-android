@@ -47,6 +47,23 @@ struct DriveFile {
     QDateTime modified;
 };
 
+/// The local folders of the drives found so far, without looking for new
+/// ones (doesn't block)
+QFileInfoList knownDriveRoots();
+
+struct FolderEntry {
+    /// As stored on the drive
+    QString name;
+    bool isDirectory;
+    qint64 size;
+    QDateTime modified;
+};
+
+/// The folders and files in a folder of a drive Mixxx reads itself, given as
+/// its local path (e.g. the drive's local folder for its root), or nothing if
+/// it is not on such a drive. Blocks while reading the folder.
+std::optional<QList<FolderEntry>> listFolder(const QString& localFolder);
+
 /// All files of the drive whose local folder is `root`, recursively.
 /// Returns nothing if `root` is not a drive that Mixxx reads itself. Blocks
 /// while reading the drive. Sets *pComplete to false if a part of the drive

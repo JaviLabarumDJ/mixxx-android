@@ -8,6 +8,7 @@ Item {
     id: root
 
     required property string key
+    property string group: "[FxStation]"
     property string label: ""
     // The text under the value, e.g. the meaning of each side
     property string hint: ""
@@ -26,7 +27,7 @@ Item {
     Mixxx.ControlProxy {
         id: control
 
-        group: "[FxStation]"
+        group: root.group
         key: root.key
     }
 

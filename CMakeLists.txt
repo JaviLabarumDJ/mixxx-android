@@ -1411,6 +1411,7 @@ add_library(
   src/engine/enginemixer.cpp
   src/engine/fxstation/fxstation.cpp
   src/engine/fxstation/fxstationinstruments.cpp
+  src/engine/fxstation/groovestation.cpp
   src/engine/engineobject.cpp
   src/engine/enginepregain.cpp
   src/engine/enginesidechaincompressor.cpp

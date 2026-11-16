@@ -109,6 +109,10 @@ DeviceDescription parse(const uint8_t* pData, size_t length);
 /// Returns nullptr if there is no usable output.
 const StreamFormat* chooseOutput(const DeviceDescription& description);
 
+/// Picks the best input (capture) format: most channels, then highest
+/// resolution. Returns nullptr if there is no usable input.
+const StreamFormat* chooseInput(const DeviceDescription& description);
+
 /// The capture stream that clocks an asynchronous output without a feedback
 /// endpoint ("implicit feedback"), or nullptr.
 const StreamFormat* implicitFeedbackSource(

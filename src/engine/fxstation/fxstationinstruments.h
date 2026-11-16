@@ -14,6 +14,8 @@ namespace fxstation {
 
 /// Kick, snare, clap and hi-hat
 constexpr int kInstruments = 4;
+/// Those of the Groove Station: also open hi-hat, low and high tom, crash
+constexpr int kGrooveSounds = 8;
 /// Bank 1 has the sounds of the app, banks 2 to 4 the user's
 constexpr int kBanks = 4;
 
@@ -27,20 +29,30 @@ struct Instrument {
 };
 
 struct Bank {
-    std::array<Instrument, kInstruments> instruments;
+    std::vector<Instrument> instruments;
 };
 
-/// The sounds of the X-Pad. Bank 1 is synthesized (no sample files, no
-/// rights to care about); banks 2 to 4 are loaded in the background from
-/// Mixxx/FxStation/Bank N on the storage (files whose names start with
-/// kick, snare, clap and hat, or else the first four audio files). The
-/// engine reads a bank without locking; a bank replaced by a reload is
-/// kept until the app quits, since the engine may still be playing it.
+/// The sounds of the X-Pad (4) or of the Groove Station (8). Bank 1 is
+/// synthesized (no sample files, no rights to care about); banks 2 to 4 are
+/// loaded in the background from Mixxx/FxStation/Bank N or
+/// Mixxx/GrooveStation/Kit N on the storage (files whose names start with
+/// the names of the sounds, or else the first audio files). The engine reads
+/// a bank without locking; a bank replaced by a reload is kept until the app
+/// quits, since the engine may still be playing it.
 class Instruments : public QObject {
     Q_OBJECT
   public:
-    explicit Instruments(QObject* pParent = nullptr);
+    enum class Kind {
+        XPad,
+        Groove,
+    };
+
+    explicit Instruments(Kind kind = Kind::XPad, QObject* pParent = nullptr);
     ~Instruments() override;
+
+    int sounds() const {
+        return m_sounds;
+    }
 
     /// For the engine thread: the bank, or nullptr while not loaded
     const Bank* bank(int index) const {
@@ -51,7 +63,7 @@ class Instruments : public QObject {
     void reloadUserBanks();
 
     /// The folder of a user bank (1 to 3: Bank 2 to Bank 4)
-    static QString bankDirectory(int index);
+    QString bankDirectory(int index) const;
 
   signals:
     /// A user bank was loaded, with that many sounds
@@ -59,7 +71,10 @@ class Instruments : public QObject {
 
   private:
     void publish(int index, std::unique_ptr<Bank> pBank);
-    static std::unique_ptr<Bank> loadBank(int index);
+    std::unique_ptr<Bank> loadBank(int index) const;
+
+    const Kind m_kind;
+    const int m_sounds;
 
     std::array<std::atomic<const Bank*>, kBanks> m_banks;
     std::mutex m_ownedMutex;

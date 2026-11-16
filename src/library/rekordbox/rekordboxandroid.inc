@@ -326,6 +326,10 @@ namespace {
 
 /// Android mounts a drive a few seconds after it was plugged in
 constexpr int kUsbChangeDelayMs = 4000;
+/// Looks again this often, this many times, while Android may still be
+/// checking a drive
+constexpr int kUsbRetryDelayMs = 30000;
+constexpr int kUsbRetries = 8;
 
 /// Listens to USB changes as long as its feature exists
 class UsbDeviceWatcher : public QObject {
@@ -336,9 +340,24 @@ class UsbDeviceWatcher : public QObject {
         m_timer.setInterval(kUsbChangeDelayMs);
         QObject::connect(&m_timer, &QTimer::timeout, pFeature, &RekordboxFeature::refreshDevices);
         // Called on a Java thread
+        // Again later, for a drive Android checked for a while and then
+        // couldn't mount, which Mixxx reads itself
+        m_retryTimer.setSingleShot(true);
+        QObject::connect(&m_retryTimer, &QTimer::timeout, pFeature, [this, pFeature]() {
+            pFeature->refreshDevices();
+            if (++m_retries < kUsbRetries) {
+                m_retryTimer.start(kUsbRetryDelayMs);
+            }
+        });
         m_listenerId = mixxx::android::addDevicesChangedListener([this]() {
             QMetaObject::invokeMethod(
-                    this, [this]() { m_timer.start(); }, Qt::QueuedConnection);
+                    this,
+                    [this]() {
+                        m_timer.start();
+                        m_retries = 0;
+                        m_retryTimer.start(kUsbRetryDelayMs);
+                    },
+                    Qt::QueuedConnection);
         });
     }
     ~UsbDeviceWatcher() override {
@@ -348,6 +367,8 @@ class UsbDeviceWatcher : public QObject {
 
   private:
     QTimer m_timer;
+    QTimer m_retryTimer;
+    int m_retries = 0;
     int m_listenerId;
 };
 

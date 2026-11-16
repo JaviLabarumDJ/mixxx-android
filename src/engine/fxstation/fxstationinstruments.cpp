@@ -21,7 +21,9 @@ constexpr float kPi = 3.14159265358979f;
 // User sounds are cut after this long
 constexpr double kMaxUserSeconds = 4.0;
 
-const char* const kNamePrefixes[kInstruments] = {"kick", "snare", "clap", "hat"};
+// The beginnings of the file names of the sounds, in their order
+const char* const kNamePrefixes[kGrooveSounds] =
+        {"kick", "snare", "clap", "hat", "openhat", "lowtom", "hightom", "crash"};
 
 /// A mono sound into stereo, peaking at peak
 Instrument stereo(const std::vector<float>& mono, float peak) {
@@ -128,6 +130,53 @@ Instrument synthesizeHat() {
     return stereo(sound, 0.5f);
 }
 
+Instrument synthesizeOpenHat() {
+    std::vector<float> sound = silence(0.45f);
+    std::mt19937 random(5);
+    std::uniform_real_distribution<float> noise(-1.f, 1.f);
+    HighPass highPass1(7000.f);
+    HighPass highPass2(7000.f);
+    for (size_t i = 0; i < sound.size(); ++i) {
+        const float t = static_cast<float>(i) / kSynthesisRate;
+        sound[i] = highPass2.process(highPass1.process(noise(random))) * std::exp(-t * 9.f);
+    }
+    return stereo(sound, 0.45f);
+}
+
+/// A tom: a sine falling to its pitch, with a little noise at the start
+Instrument synthesizeTom(float frequency, unsigned seed) {
+    std::vector<float> sound = silence(0.5f);
+    std::mt19937 random(seed);
+    std::uniform_real_distribution<float> noise(-1.f, 1.f);
+    float phase = 0.f;
+    for (size_t i = 0; i < sound.size(); ++i) {
+        const float t = static_cast<float>(i) / kSynthesisRate;
+        phase += 2.f * kPi * frequency * (1.f + 0.6f * std::exp(-t * 30.f)) / kSynthesisRate;
+        const float body = std::sin(phase) * std::exp(-t * 8.f);
+        const float attack = t < 0.004f ? noise(random) * (1.f - t / 0.004f) * 0.3f : 0.f;
+        sound[i] = std::tanh(1.3f * body) + attack;
+    }
+    return stereo(sound, 0.8f);
+}
+
+/// A crash: bright noise with a long tail and a metallic ring
+Instrument synthesizeCrash() {
+    std::vector<float> sound = silence(1.6f);
+    std::mt19937 random(8);
+    std::uniform_real_distribution<float> noise(-1.f, 1.f);
+    HighPass highPass(3500.f);
+    float phase1 = 0.f;
+    float phase2 = 0.f;
+    for (size_t i = 0; i < sound.size(); ++i) {
+        const float t = static_cast<float>(i) / kSynthesisRate;
+        phase1 += 2.f * kPi * 4870.f / kSynthesisRate;
+        phase2 += 2.f * kPi * 6130.f / kSynthesisRate;
+        const float ring = 0.15f * (std::sin(phase1) + std::sin(phase2));
+        sound[i] = (highPass.process(noise(random)) + ring) * std::exp(-t * 2.6f);
+    }
+    return stereo(sound, 0.5f);
+}
+
 /// Decodes a sound file into stereo, at most kMaxUserSeconds long
 Instrument decode(const QString& path) {
     Instrument instrument;
@@ -155,16 +204,25 @@ Instrument decode(const QString& path) {
 
 } // namespace
 
-Instruments::Instruments(QObject* pParent)
-        : QObject(pParent) {
+Instruments::Instruments(Kind kind, QObject* pParent)
+        : QObject(pParent),
+          m_kind(kind),
+          m_sounds(kind == Kind::Groove ? kGrooveSounds : kInstruments) {
     for (auto& bank : m_banks) {
         bank.store(nullptr);
     }
     auto pFactory = std::make_unique<Bank>();
+    pFactory->instruments.resize(m_sounds);
     pFactory->instruments[0] = synthesizeKick();
     pFactory->instruments[1] = synthesizeSnare();
     pFactory->instruments[2] = synthesizeClap();
     pFactory->instruments[3] = synthesizeHat();
+    if (m_kind == Kind::Groove) {
+        pFactory->instruments[4] = synthesizeOpenHat();
+        pFactory->instruments[5] = synthesizeTom(95.f, 6);
+        pFactory->instruments[6] = synthesizeTom(165.f, 7);
+        pFactory->instruments[7] = synthesizeCrash();
+    }
     publish(0, std::move(pFactory));
     m_threadPool.setMaxThreadCount(1);
     reloadUserBanks();
@@ -174,9 +232,10 @@ Instruments::~Instruments() {
     m_threadPool.waitForDone();
 }
 
-// static
-QString Instruments::bankDirectory(int index) {
-    return QStringLiteral("/storage/emulated/0/Mixxx/FxStation/Bank %1").arg(index + 1);
+QString Instruments::bankDirectory(int index) const {
+    return m_kind == Kind::Groove
+            ? QStringLiteral("/storage/emulated/0/Mixxx/GrooveStation/Kit %1").arg(index + 1)
+            : QStringLiteral("/storage/emulated/0/Mixxx/FxStation/Bank %1").arg(index + 1);
 }
 
 void Instruments::publish(int index, std::unique_ptr<Bank> pBank) {
@@ -188,8 +247,7 @@ void Instruments::publish(int index, std::unique_ptr<Bank> pBank) {
     m_banks[index].store(pPublished, std::memory_order_release);
 }
 
-// static
-std::unique_ptr<Bank> Instruments::loadBank(int index) {
+std::unique_ptr<Bank> Instruments::loadBank(int index) const {
     const QDir dir(bankDirectory(index));
     // The sounds stay out of the music apps
     const QString noMedia = QFileInfo(dir.absolutePath()).path() + QStringLiteral("/.nomedia");
@@ -214,8 +272,8 @@ std::unique_ptr<Bank> Instruments::loadBank(int index) {
         return nullptr;
     }
     // By name, or else in order
-    std::array<QString, kInstruments> chosen;
-    for (int instrument = 0; instrument < kInstruments; ++instrument) {
+    std::vector<QString> chosen(m_sounds);
+    for (int instrument = 0; instrument < m_sounds; ++instrument) {
         for (const QString& file : std::as_const(files)) {
             if (QFileInfo(file).fileName().startsWith(
                         QLatin1String(kNamePrefixes[instrument]), Qt::CaseInsensitive)) {
@@ -234,7 +292,8 @@ std::unique_ptr<Bank> Instruments::loadBank(int index) {
         }
     }
     auto pBank = std::make_unique<Bank>();
-    for (int instrument = 0; instrument < kInstruments; ++instrument) {
+    pBank->instruments.resize(m_sounds);
+    for (int instrument = 0; instrument < m_sounds; ++instrument) {
         if (!chosen[instrument].isEmpty()) {
             pBank->instruments[instrument] = decode(chosen[instrument]);
         }
